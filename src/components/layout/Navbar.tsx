@@ -1,16 +1,19 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { FiLogOut } from 'react-icons/fi';
 import CreateUserForm from '@/components/user/CreateUserForm';
 import LoginForm from '@/components/auth/LoginForm';
 import UserProfileModal from '@/components/user/UserProfileModal';
 import Modal from '@/components/ui/Modal';
-import { NavbarContainer, NavbarContent, Logo, NavButton, ButtonGroup } from '@/components/ui/NavbarElements';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import { NavbarContainer, NavbarContent, Logo, NavLink, NavbarSection } from '@/components/ui/NavbarElements';
 
 const Navbar = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [authState, setAuthState] = useState<'loading' | 'authenticated' | 'unauthenticated'>('loading');
 
   useEffect(() => {
@@ -24,9 +27,14 @@ const Navbar = () => {
     setShowLoginForm(false);
   };
 
-  const handleLogout = () => {
+  const handleLogoutClick = () => {
+    setShowLogoutConfirmation(true);
+  };
+
+  const handleLogoutConfirm = () => {
     localStorage.removeItem('access_token');
     setAuthState('unauthenticated');
+    setShowLogoutConfirmation(false);
   };
 
   const handleRegisterClick = () => {
@@ -40,34 +48,60 @@ const Navbar = () => {
         return null;
       case 'authenticated':
         return (
-          <ButtonGroup>
-            <NavButton variant="dark" onClick={() => setShowProfileModal(true)}>Mi Perfil</NavButton>
-            <NavButton variant="danger" onClick={handleLogout}>Cerrar Sesión</NavButton>
-          </ButtonGroup>
+          <>
+            <NavLink onClick={() => setShowProfileModal(true)}>Mi Perfil</NavLink>
+            <NavLink onClick={handleLogoutClick} title="Cerrar Sesión">
+              <FiLogOut size={15} />
+            </NavLink>
+          </>
         );
       case 'unauthenticated':
-        return <NavButton variant="primary" onClick={() => setShowLoginForm(true)}>Iniciar Sesión</NavButton>;
+        return <NavLink onClick={() => setShowLoginForm(true)}>Iniciar Sesión</NavLink>;
     }
   };
 
   return (
     <NavbarContainer>
       <NavbarContent>
-        <Logo>Mi App</Logo>
-        {renderAuthButtons()}
-        <Modal isOpen={showLoginForm} onClose={() => setShowLoginForm(false)}>
+        <NavbarSection $position="left">
+          <Logo>Mi App</Logo>
+        </NavbarSection>
+        <NavbarSection $position="right">
+          <NavLink>Inicio</NavLink>
+          {renderAuthButtons()}
+        </NavbarSection>
+        <Modal 
+          isOpen={showLoginForm} 
+          onClose={() => setShowLoginForm(false)}
+          title="Iniciar Sesión"
+        >
           <LoginForm 
             onClose={() => setShowLoginForm(false)} 
             onLoginSuccess={handleLoginSuccess}
             onRegisterClick={handleRegisterClick}
           />
         </Modal>
-        <Modal isOpen={showRegisterForm} onClose={() => setShowRegisterForm(false)}>
+        <Modal 
+          isOpen={showRegisterForm} 
+          onClose={() => setShowRegisterForm(false)}
+          title="Crear Usuario"
+        >
           <CreateUserForm onClose={() => setShowRegisterForm(false)} />
         </Modal>
-        <Modal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)}>
-          <UserProfileModal onClose={() => setShowProfileModal(false)} />
+        <Modal 
+          isOpen={showProfileModal} 
+          onClose={() => setShowProfileModal(false)}
+          title="Mi Perfil"
+        >
+          <UserProfileModal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} />
         </Modal>
+        <ConfirmationModal
+          isOpen={showLogoutConfirmation}
+          onClose={() => setShowLogoutConfirmation(false)}
+          onConfirm={handleLogoutConfirm}
+          title="Cierre de sesión"
+          message="¿Estás seguro de que deseas cerrar la sesión?"
+        />
       </NavbarContent>
     </NavbarContainer>
   );

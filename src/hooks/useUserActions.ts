@@ -59,17 +59,24 @@ export const useUserActions = () => {
     }
   };
 
-  const updateUser = async (id: string, userData: Partial<User>) => {
-    setIsLoading(true);
-    setError(null);
-
+  const updateUser = async (userData: { name: string }) => {
     try {
-      await api.put(ENDPOINTS.UPDATE_USER, id, userData);
-      setIsLoading(false);
+      const response = await fetch('http://localhost:3000/users/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update user');
+      }
+
       return true;
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Error desconocido');
-      setIsLoading(false);
+      console.error('Error updating user:', error);
       return false;
     }
   };

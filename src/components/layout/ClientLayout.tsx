@@ -4,7 +4,6 @@ import React from 'react';
 import styled from 'styled-components';
 
 const MainContent = styled.main`
-  padding-top: var(--navbar-height);
   min-height: calc(100vh - var(--navbar-height));
   width: 100%;
   box-sizing: border-box;

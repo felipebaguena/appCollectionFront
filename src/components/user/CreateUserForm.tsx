@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import { useUserActions } from '@/hooks/useUserActions';
 import { 
@@ -8,7 +8,8 @@ import {
   InputGroup, 
   Label, 
   Input, 
-  Message 
+  Message,
+  ErrorMessage
 } from '@/components/ui/FormElements';
 
 interface CreateUserFormProps {
@@ -19,13 +20,26 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [message, setMessage] = useState('');
 
   const { createUser, isLoading, error } = useUserActions();
 
+  useEffect(() => {
+    if (passwordError && password === confirmPassword) {
+      setPasswordError('');
+    }
+  }, [password, confirmPassword, passwordError]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage('');
+
+    if (password !== confirmPassword) {
+      setPasswordError('Las contraseñas no coinciden');
+      return;
+    }
 
     const success = await createUser({ name, email, password });
 
@@ -34,6 +48,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose }) => {
       setName('');
       setEmail('');
       setPassword('');
+      setConfirmPassword('');
       setTimeout(onClose, 2000);
     } else {
       setMessage(error || 'No se pudo crear el usuario');
@@ -42,7 +57,6 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose }) => {
 
   return (
     <div>
-      <h2>Crear Usuario</h2>
       <StyledForm onSubmit={handleSubmit}>
         <InputGroup>
           <Label htmlFor="name">Nombre:</Label>
@@ -74,10 +88,21 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose }) => {
             required
           />
         </InputGroup>
-        <Button type="submit" primary disabled={isLoading}>
+        <InputGroup>
+          <Label htmlFor="confirmPassword">Confirmar Contraseña:</Label>
+          <Input
+            type="password"
+            id="confirmPassword"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+          {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
+        </InputGroup>
+        <Button type="submit" $primary disabled={isLoading}>
           {isLoading ? 'Creando...' : 'Crear Usuario'}
         </Button>
-        <Button onClick={onClose} disabled={isLoading}>Cancelar</Button>
+        <Button type="button" onClick={onClose} disabled={isLoading}>Cancelar</Button>
       </StyledForm>
       {message && <Message error={!!error}>{message}</Message>}
     </div>

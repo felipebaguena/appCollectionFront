@@ -36,23 +36,27 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose, onLoginSuccess, onRegist
 
   const { login, isLoading, error } = useUserActions();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage('');
 
-    const result = await login({ email, password });
-    if (result.success) {
-      setMessage('Login exitoso');
-      onLoginSuccess(result.access_token);
-      setTimeout(onClose, 2000);
-    } else {
-      setMessage(error || 'No se pudo iniciar sesión');
+    try {
+      const result = await login({ email, password });
+      if (result.success) {
+        setMessage('Login exitoso');
+        onLoginSuccess(result.access_token);
+        setTimeout(onClose, 2000);
+      } else {
+        setMessage(error || 'No se pudo iniciar sesión');
+      }
+    } catch (err) {
+      console.error('Error al iniciar sesión:', err);
+      setMessage('Ocurrió un error al intentar iniciar sesión');
     }
   };
 
   return (
     <div>
-      <h2>Iniciar Sesión</h2>
       <StyledForm onSubmit={handleSubmit}>
         <InputGroup>
           <Label htmlFor="email">Email:</Label>
@@ -74,10 +78,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose, onLoginSuccess, onRegist
             required
           />
         </InputGroup>
-        <Button type="submit" primary disabled={isLoading}>
+        <Button type="submit" $primary disabled={isLoading}>
           {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
         </Button>
-        <Button onClick={onClose} disabled={isLoading}>Cancelar</Button>
+        <Button type="button" onClick={onClose} disabled={isLoading}>Cancelar</Button>
       </StyledForm>
       {message && <Message error={!!error}>{message}</Message>}
       <RegisterOption>

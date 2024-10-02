@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 
 const ModalOverlay = styled.div`
@@ -18,28 +18,46 @@ const ModalOverlay = styled.div`
 
 const ModalContent = styled.div`
   background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
+  border-radius: 1px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   max-width: 90%;
   max-height: 90%;
-  overflow-y: auto;
   width: 25rem;
+  display: flex;
+  flex-direction: column;
+`;
+
+const ModalHeader = styled.div`
+  padding: 0.9rem 1.5rem;
+  border-bottom: 2px solid #e0e0e0;
+  font-size: 1.5rem;
+  font-weight: bold;
+`;
+
+const ModalBody = styled.div`
+  padding: 1.5rem 1.5rem;
+  overflow-y: auto;
 `;
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
+  title: string;
   children: React.ReactNode;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
+
+  const handleContentClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
 
   return (
     <ModalOverlay onClick={onClose}>
-      <ModalContent onClick={(e) => e.stopPropagation()}>
-        {children}
+      <ModalContent onClick={handleContentClick}>
+        <ModalHeader>{title}</ModalHeader>
+        <ModalBody>{children}</ModalBody>
       </ModalContent>
     </ModalOverlay>
   );

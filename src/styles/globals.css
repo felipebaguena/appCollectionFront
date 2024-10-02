@@ -2,6 +2,7 @@
   --background: #ffffff;
   --foreground: #171717;
   --navbar-height: 3rem;
+  --font-principal: Arial, Helvetica, sans-serif;
 }
 
 * {
@@ -17,6 +18,6 @@ html, body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-principal);
   line-height: 1.6;
 }

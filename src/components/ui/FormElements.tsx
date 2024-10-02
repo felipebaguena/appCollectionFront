@@ -1,11 +1,11 @@
+'use client'
+
 import styled from 'styled-components';
 
 export const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-width: 300px;
-  margin: 0 auto;
 `;
 
 export const InputGroup = styled.div`
@@ -30,4 +30,17 @@ interface MessageProps {
 export const Message = styled.p<MessageProps>`
   margin-top: 1rem;
   color: ${props => props.error ? 'red' : 'green'};
+`;
+
+export const ErrorMessage = styled.span`
+  color: red;
+  font-size: 0.8em;
+  margin-top: 0.2em;
+`;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
 `;

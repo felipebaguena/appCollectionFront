@@ -1,19 +1,22 @@
+'use client'
+
 import styled, { css } from 'styled-components';
 
 export interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'danger' | 'dark';
-  customColor?: string;
-  primary?: boolean;
+  $variant?: 'primary' | 'secondary' | 'danger' | 'dark';
+  $customColor?: string;
+  $primary?: boolean;
+  disabled?: boolean;
 }
 
 const getButtonStyles = (props: ButtonProps) => {
-  if (props.primary || props.variant === 'primary') {
+  if (props.$primary || props.$variant === 'primary') {
     return css`
       background-color: var(--primary-color, #007bff);
       color: white;
     `;
   }
-  switch (props.variant) {
+  switch (props.$variant) {
     case 'secondary':
       return css`
         background-color: var(--secondary-color, #6c757d);
@@ -31,7 +34,7 @@ const getButtonStyles = (props: ButtonProps) => {
       `;
     default:
       return css`
-        background-color: ${props.customColor || 'var(--background, #ffffff)'};
+        background-color: ${props.$customColor || 'var(--background, #ffffff)'};
         color: var(--foreground, #000000);
       `;
   }
@@ -47,6 +50,11 @@ const Button = styled.button<ButtonProps>`
 
   &:hover {
     opacity: 0.8;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
