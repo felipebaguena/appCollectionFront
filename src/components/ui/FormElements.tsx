@@ -21,6 +21,13 @@ export const Input = styled.input`
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
+
+  &:disabled {
+    background-color: #f0f0f0;
+    color: var(--dark-grey);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
 `;
 
 interface MessageProps {

@@ -22,7 +22,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} title={title}>
       <p>{message}</p>
       <ButtonContainer>
-        <Button onClick={onClose}>Cancelar</Button>
+        <Button $variant={'cancel'} onClick={onClose}>Cancelar</Button>
         <Button $primary onClick={onConfirm}>Confirmar</Button>
       </ButtonContainer>
     </Modal>

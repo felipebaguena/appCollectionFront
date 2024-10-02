@@ -102,7 +102,7 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose }) => {
         <Button type="submit" $primary disabled={isLoading}>
           {isLoading ? 'Creando...' : 'Crear Usuario'}
         </Button>
-        <Button type="button" onClick={onClose} disabled={isLoading}>Cancelar</Button>
+        <Button type="button" $variant={'cancel'} onClick={onClose} disabled={isLoading}>Cancelar</Button>
       </StyledForm>
       {message && <Message error={!!error}>{message}</Message>}
     </div>

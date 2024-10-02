@@ -3,7 +3,7 @@
 import styled, { css } from 'styled-components';
 
 export interface ButtonProps {
-  $variant?: 'primary' | 'secondary' | 'danger' | 'dark';
+  $variant?: 'primary' | 'secondary' | 'danger' | 'dark' | 'cancel';
   $customColor?: string;
   $primary?: boolean;
   disabled?: boolean;
@@ -12,14 +12,19 @@ export interface ButtonProps {
 const getButtonStyles = (props: ButtonProps) => {
   if (props.$primary || props.$variant === 'primary') {
     return css`
-      background-color: var(--primary-color, #007bff);
+      background-color: var(--app-pink);
       color: white;
     `;
   }
   switch (props.$variant) {
     case 'secondary':
       return css`
-        background-color: var(--secondary-color, #6c757d);
+        background-color: var(--app-blue);
+        color: white;
+      `;
+    case 'cancel':
+      return css`
+        background-color: var(--cancel-grey);
         color: white;
       `;
     case 'danger':

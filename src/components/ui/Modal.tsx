@@ -16,8 +16,16 @@ const ModalOverlay = styled.div`
   z-index: 1000;
 `;
 
+const ModalHeader = styled.div`
+  background-color: var(--dark-grey);
+  padding: 0.9rem 1.5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  border-bottom: 2px solid var(--app-blue);
+`;
+
 const ModalContent = styled.div`
-  background-color: white;
+  background-color: var(--mid-grey);
   border-radius: 1px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   max-width: 90%;
@@ -25,13 +33,6 @@ const ModalContent = styled.div`
   width: 25rem;
   display: flex;
   flex-direction: column;
-`;
-
-const ModalHeader = styled.div`
-  padding: 0.9rem 1.5rem;
-  border-bottom: 2px solid #e0e0e0;
-  font-size: 1.5rem;
-  font-weight: bold;
 `;
 
 const ModalBody = styled.div`

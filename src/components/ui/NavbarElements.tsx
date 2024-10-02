@@ -5,10 +5,26 @@ import Button, { ButtonProps } from '@/components/ui/Button';
 
 export const NavbarContainer = styled.nav`
   width: 100%;
-  background-color: var(--background);
+  background-color: var(--dark-grey);
   padding: 0.5rem 0;
-  border-bottom: 2px solid #e0e0e0;
-  margin-bottom: 0.5rem
+  margin-bottom: 0.5rem;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(
+      to right,
+      var(--app-pink) 0%,
+      var(--app-pink) 30%,
+      var(--app-blue) 30%,
+      var(--app-blue) 100%
+    );
+  }
 `;
 
 export const NavbarContent = styled.div`
@@ -56,7 +72,7 @@ export const ButtonGroup = styled.div`
 export const NavLink = styled.a`
   display: flex;
   align-items: center;
-  color: #333;
+  color: var(--grey);
   text-decoration: none;
   padding: 0.5rem 1rem;
   transition: opacity 0.3s ease;
