@@ -63,8 +63,8 @@ const Navbar = () => {
   return (
     <NavbarContainer>
       <NavbarContent>
-        <NavbarSection $position="left">
-          <Logo>Mi App</Logo>
+        <NavbarSection $position='left'>
+          <Logo>LOGO</Logo>
         </NavbarSection>
         <NavbarSection $position="right">
           <NavLink>Inicio</NavLink>

@@ -49,7 +49,7 @@ const Button = styled.button<ButtonProps>`
   ${props => getButtonStyles(props)}
   padding: 10px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 1px;
   cursor: pointer;
   transition: opacity 0.2s ease;
 
