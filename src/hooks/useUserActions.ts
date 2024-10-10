@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from '@/services/api';
 import { ENDPOINTS } from '@/constants/endpoints';
+import { API_BASE_URL } from '@/services/api';
 
 interface User {
   name: string;

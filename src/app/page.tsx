@@ -6,11 +6,11 @@ import {
   BannerBackground,
   LogoContainer,
   BannerLogo,
-  BannerTextLogo,
   HomeContent,
-  HomeTitle,
   HomeSection
 } from '@/components/home/HomeElements';
+import GameGrid from '@/components/home/GameGrid';
+
 
 export default function HomePage() {
   return (
@@ -22,9 +22,8 @@ export default function HomePage() {
         </LogoContainer>
       </BannerContainer>
       <HomeContent>
-        <HomeTitle>Página de inicio</HomeTitle>
         <HomeSection>
-          {/* Contenido de la sección */}
+          <GameGrid />
         </HomeSection>
       </HomeContent>
     </>
