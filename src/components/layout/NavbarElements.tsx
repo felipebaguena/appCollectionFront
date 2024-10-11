@@ -3,11 +3,18 @@
 import styled from 'styled-components';
 import Button, { ButtonProps } from '@/components/ui/Button';
 
+export const NAVBAR_HEIGHT = '3rem';
+
 export const NavbarContainer = styled.nav`
   width: 100%;
+  height: ${NAVBAR_HEIGHT};
   background-color: var(--dark-grey);
   padding: 0.3rem 0;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 `;
 
 export const NavbarContent = styled.div`
@@ -24,7 +31,7 @@ export const NavbarSection = styled.div<{ $position: 'left' | 'center' | 'right'
   align-items: center;
   flex: 1;
   justify-content: ${props => {
-    switch(props.$position) {
+    switch (props.$position) {
       case 'left': return 'flex-start';
       case 'center': return 'center';
       case 'right': return 'flex-end';
@@ -37,7 +44,7 @@ export const Logo = styled.div`
   font-weight: bold;
 `;
 
-export const NavButton = styled(Button)<ButtonProps>`
+export const NavButton = styled(Button) <ButtonProps>`
   padding: 8px 16px;
   transition: opacity 0.3s ease;
 

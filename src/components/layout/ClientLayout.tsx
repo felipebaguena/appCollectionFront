@@ -1,13 +1,7 @@
 'use client';
 
 import React from 'react';
-import styled from 'styled-components';
-
-const MainContent = styled.main`
-  min-height: calc(100vh - var(--navbar-height));
-  width: 100%;
-  box-sizing: border-box;
-`;
+import { MainContent } from './LayoutElements';
 
 interface ClientLayoutProps {
   children: React.ReactNode;

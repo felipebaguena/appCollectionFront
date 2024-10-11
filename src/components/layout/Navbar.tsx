@@ -7,7 +7,7 @@ import LoginForm from '@/components/auth/LoginForm';
 import UserProfileModal from '@/components/user/UserProfileModal';
 import Modal from '@/components/ui/Modal';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
-import { NavbarContainer, NavbarContent, Logo, NavLink, NavbarSection } from '@/components/ui/NavbarElements';
+import { NavbarContainer, NavbarContent, Logo, NavLink, NavbarSection } from '@/components/layout/NavbarElements';
 
 const Navbar = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -70,26 +70,26 @@ const Navbar = () => {
           <NavLink>Inicio</NavLink>
           {renderAuthButtons()}
         </NavbarSection>
-        <Modal 
-          isOpen={showLoginForm} 
+        <Modal
+          isOpen={showLoginForm}
           onClose={() => setShowLoginForm(false)}
           title="Iniciar Sesión"
         >
-          <LoginForm 
-            onClose={() => setShowLoginForm(false)} 
+          <LoginForm
+            onClose={() => setShowLoginForm(false)}
             onLoginSuccess={handleLoginSuccess}
             onRegisterClick={handleRegisterClick}
           />
         </Modal>
-        <Modal 
-          isOpen={showRegisterForm} 
+        <Modal
+          isOpen={showRegisterForm}
           onClose={() => setShowRegisterForm(false)}
           title="Crear Usuario"
         >
           <CreateUserForm onClose={() => setShowRegisterForm(false)} />
         </Modal>
-        <Modal 
-          isOpen={showProfileModal} 
+        <Modal
+          isOpen={showProfileModal}
           onClose={() => setShowProfileModal(false)}
           title="Mi Perfil"
         >
