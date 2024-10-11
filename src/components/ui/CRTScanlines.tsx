@@ -11,6 +11,7 @@ interface CRTScanlinesProps {
   saturation?: number;
   contrast?: number;
   sweepIntensity?: number;
+  glassEffect?: boolean;
 }
 
 const scanAnimation = keyframes`
@@ -108,6 +109,41 @@ const CurvatureEffect = styled.div<{ curvature: number }>`
   }
 `;
 
+const GlassEffect = styled.div<{ curvature: number }>`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 15;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: ${props => props.curvature * 2}%;
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    width: 150%;
+    height: 150%;
+    top: -25%;
+    left: -25%;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.03) 50%,
+      rgba(255, 255, 255, 0) 80%
+    );
+  }
+
+  &::before {
+    transform: rotate(-20deg);
+  }
+
+  &::after {
+    transform: rotate(20deg);
+  }
+`;
+
 const ScanlinesEffect = styled.div<CRTScanlinesProps>`
   position: absolute;
   top: 0;
@@ -182,6 +218,9 @@ export const CRTScanlines: React.FC<CRTScanlinesProps> = (props) => {
     <CRTScanlinesWrapper>
       {(props.curvature ?? 0.2) > 0 && (
         <CurvatureEffect curvature={props.curvature ?? 0.2} />
+      )}
+      {props.glassEffect && (
+        <GlassEffect curvature={props.curvature ?? 0.2} />
       )}
       <ScanlinesEffect>
         <ScanlinesSweep {...props} />
