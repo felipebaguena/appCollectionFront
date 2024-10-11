@@ -3,11 +3,12 @@
 import styled from 'styled-components';
 import Button, { ButtonProps } from '@/components/ui/Button';
 
-export const NAVBAR_HEIGHT = '3rem';
+export const NAVBAR_HEIGHT = '3.5rem';
 
 export const NavbarContainer = styled.nav`
   width: 100%;
   height: ${NAVBAR_HEIGHT};
+  display: flex;
   background-color: var(--dark-grey);
   padding: 0.3rem 0;
   position: fixed;
@@ -19,6 +20,7 @@ export const NavbarContainer = styled.nav`
 
 export const NavbarContent = styled.div`
   display: flex;
+  width: 100%;
   justify-content: space-between;
   align-items: center;
   max-width: 1200px;

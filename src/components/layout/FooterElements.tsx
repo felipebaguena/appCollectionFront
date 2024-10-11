@@ -2,7 +2,7 @@
 
 import styled from 'styled-components';
 
-export const FOOTER_HEIGHT = '3rem';
+export const FOOTER_HEIGHT = '3.5rem';
 
 export const FooterContainer = styled.footer`
   height: ${FOOTER_HEIGHT};
