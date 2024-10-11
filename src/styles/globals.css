@@ -1,0 +1,30 @@
+:root {
+  --background: #f0f0f0;
+  --dark-grey: #222222;
+  --mid-grey: #363636;
+  --cancel-grey: #737373;
+  --grey: #8d8d8d;
+  --clear-grey: #c1c1c1;
+  --app-pink: #ff00cc;
+  --app-blue: #00f2ff;
+  --foreground: #e8e8e8;
+  --font-principal: Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-principal);
+  line-height: 1.6;
+}
