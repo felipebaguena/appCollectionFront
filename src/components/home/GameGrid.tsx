@@ -4,6 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useGames } from '@/hooks/useGames';
 import { API_BASE_URL } from '@/services/api';
+import Link from 'next/link';
 
 interface Game {
   id: number;
@@ -37,6 +38,7 @@ const GameCard = styled.div`
   flex-direction: column;
   height: 300px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 `;
 
 const GameImage = styled.img`
@@ -84,18 +86,21 @@ const GameGrid: React.FC = () => {
     return `${API_BASE_URL}/uploads/resources/no-image.jpg`;
   };
 
+
   return (
     <GridContainer>
       {games.map((game) => (
-        <GameCard key={game.id}>
-          <GameImage
-            src={getGameImageUrl(game)}
-            alt={game.title}
-          />
-          <GameTitle>{game.title}</GameTitle>
-          <GameYear>{game.releaseYear}</GameYear>
-          <GameDescription>{game.description}</GameDescription>
-        </GameCard>
+        <Link href={`/games/${game.id}`} key={game.id}>
+          <GameCard>
+            <GameImage
+              src={getGameImageUrl(game)}
+              alt={game.title}
+            />
+            <GameTitle>{game.title}</GameTitle>
+            <GameYear>{game.releaseYear}</GameYear>
+            <GameDescription>{game.description}</GameDescription>
+          </GameCard>
+        </Link>
       ))}
     </GridContainer>
   );

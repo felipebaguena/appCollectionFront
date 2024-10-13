@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '../ui/Button';
+import Link from 'next/link';
 
 const CardContainer = styled.div`
   display: flex;
@@ -59,7 +60,14 @@ const InfoCardComponent: React.FC<InfoCardProps> = ({ imageUrl, title, descripti
                     <Title>{title}</Title>
                     <Description>{description}</Description>
                 </div>
-                <Button type="button" $variant={'dark'} >Más información</Button>
+                <Link href="/collection" passHref>
+                    <Button
+                        type="button"
+                        $variant={'dark'}
+                    >
+                        Más información
+                    </Button>
+                </Link>
             </ContentSection>
         </CardContainer>
     );

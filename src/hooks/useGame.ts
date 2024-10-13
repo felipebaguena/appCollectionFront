@@ -11,25 +11,25 @@ interface Game {
   images: { id: number; path: string; isCover: boolean }[];
 }
 
-export const useGames = () => {
-  const [games, setGames] = useState<Game[]>([]);
+export const useGame = (id: string) => {
+  const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchGames = async () => {
+    const fetchGame = async () => {
       try {
-        const data = await api.get<Game[]>(ENDPOINTS.GET_GAMES_HOME);
-        setGames(data);
+        const data = await api.get<Game>(ENDPOINTS.GET_GAME(id));
+        setGame(data);
         setLoading(false);
       } catch (error) {
-        setError("Error al cargar los juegos");
+        setError("Error al cargar los detalles del juego");
         setLoading(false);
       }
     };
 
-    fetchGames();
-  }, []);
+    fetchGame();
+  }, [id]);
 
-  return { games, loading, error };
+  return { game, loading, error };
 };
