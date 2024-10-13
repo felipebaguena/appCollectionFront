@@ -9,7 +9,8 @@ const ModalOverlay = styled.div`
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px) saturate(180%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,7 +22,6 @@ const ModalHeader = styled.div`
   padding: 0.9rem 1.5rem;
   font-size: 1.5rem;
   font-weight: bold;
-  border-bottom: 2px solid var(--app-blue);
 `;
 
 const ModalContent = styled.div`

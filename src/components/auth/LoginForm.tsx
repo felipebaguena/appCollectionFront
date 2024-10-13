@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 import { useUserActions } from '@/hooks/useUserActions';
 import Button from '@/components/ui/Button';
-import { 
-  StyledForm, 
-  InputGroup, 
-  Label, 
-  Input, 
-  Message 
+import {
+  StyledForm,
+  InputGroup,
+  Label,
+  Input,
+  Message
 } from '@/components/ui/FormElements';
 import styled from 'styled-components';
 
@@ -18,7 +18,7 @@ const RegisterOption = styled.p`
 `;
 
 const RegisterLink = styled.span`
-  color: blue;
+  color: var(--app-yellow);
   cursor: pointer;
   text-decoration: underline;
 `;
@@ -78,10 +78,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose, onLoginSuccess, onRegist
             required
           />
         </InputGroup>
-        <Button type="submit" $primary disabled={isLoading}>
+        <Button type="submit" $primary $fullWidth disabled={isLoading}>
           {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
         </Button>
-        <Button type="button" $variant={'cancel'} onClick={onClose} disabled={isLoading}>Cancelar</Button>
+        <Button type="button" $variant={'cancel'} $fullWidth onClick={onClose} disabled={isLoading}>Cancelar</Button>
       </StyledForm>
       {message && <Message error={!!error}>{message}</Message>}
       <RegisterOption>

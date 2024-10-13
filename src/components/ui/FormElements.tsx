@@ -14,13 +14,12 @@ export const InputGroup = styled.div`
 `;
 
 export const Label = styled.label`
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
 `;
 
 export const Input = styled.input`
   padding: 0.5rem;
   border: 1px solid #ccc;
-  border-radius: 4px;
 
   &:disabled {
     background-color: #f0f0f0;
