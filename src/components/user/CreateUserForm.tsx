@@ -1,13 +1,11 @@
-'use client';
-
 import React, { useState, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import { useUserActions } from '@/hooks/useUserActions';
-import { 
-  StyledForm, 
-  InputGroup, 
-  Label, 
-  Input, 
+import {
+  StyledForm,
+  InputGroup,
+  Label,
+  Input,
   Message,
   ErrorMessage
 } from '@/components/ui/FormElements';
@@ -99,10 +97,10 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose }) => {
           />
           {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
         </InputGroup>
-        <Button type="submit" $primary disabled={isLoading}>
+        <Button type="submit" $primary $fullWidth disabled={isLoading}>
           {isLoading ? 'Creando...' : 'Crear Usuario'}
         </Button>
-        <Button type="button" $variant={'cancel'} onClick={onClose} disabled={isLoading}>Cancelar</Button>
+        <Button type="button" $variant={'cancel'} $fullWidth onClick={onClose} disabled={isLoading}>Cancelar</Button>
       </StyledForm>
       {message && <Message error={!!error}>{message}</Message>}
     </div>

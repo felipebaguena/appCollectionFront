@@ -6,6 +6,7 @@ import Footer from '@/components/layout/Footer';
 import ClientLayout from "@/components/layout/ClientLayout";
 import { PageWrapper } from '@/components/layout/LayoutElements';
 import StyledComponentsRegistry from "@/components/StyledComponentsRegistry";
+import StyledComponentsProvider from '@/components/StyledComponentsProvider';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,11 +28,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={geistSans.variable}>
         <StyledComponentsRegistry>
-          <PageWrapper>
-            <Navbar />
-            <ClientLayout>{children}</ClientLayout>
-            <Footer />
-          </PageWrapper>
+          <StyledComponentsProvider>
+            <PageWrapper>
+              <Navbar />
+              <ClientLayout>{children}</ClientLayout>
+              <Footer />
+            </PageWrapper>
+          </StyledComponentsProvider>
         </StyledComponentsRegistry>
       </body>
     </html>
