@@ -2,7 +2,6 @@
 
 import styled, { keyframes, css } from 'styled-components';
 import { NAVBAR_HEIGHT } from './NavbarElements';
-import { FOOTER_HEIGHT } from './FooterElements';
 
 const filmGrainAnimation = keyframes`
   0% {
@@ -89,5 +88,4 @@ export const MainContent = styled.main`
   width: 100%;
   box-sizing: border-box;
   padding-top: ${NAVBAR_HEIGHT};
-  padding-bottom: ${FOOTER_HEIGHT};
 `;

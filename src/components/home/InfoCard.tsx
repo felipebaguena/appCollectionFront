@@ -4,11 +4,12 @@ import Button from '../ui/Button';
 
 const CardContainer = styled.div`
   display: flex;
+  padding: 1rem;
+  margin: 0 1rem;
   background-color: #f0f0f0;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin: 20px 0;
 
   @media (max-width: 768px) {
     flex-direction: column;
