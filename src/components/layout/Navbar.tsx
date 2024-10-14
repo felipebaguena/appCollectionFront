@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { FiLogOut } from 'react-icons/fi';
+import { jwtDecode } from "jwt-decode";
 import CreateUserForm from '@/components/user/CreateUserForm';
 import LoginForm from '@/components/auth/LoginForm';
 import UserProfileModal from '@/components/user/UserProfileModal';
@@ -9,21 +10,45 @@ import Modal from '@/components/ui/Modal';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import { NavbarContainer, NavbarContent, Logo, NavLink, NavbarSection } from '@/components/layout/NavbarElements';
 
+interface DecodedToken {
+  role: string;
+}
+
 const Navbar = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [authState, setAuthState] = useState<'loading' | 'authenticated' | 'unauthenticated'>('loading');
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
-    setAuthState(token ? 'authenticated' : 'unauthenticated');
+    if (token) {
+      setAuthState('authenticated');
+      try {
+        const decodedToken = jwtDecode<DecodedToken>(token);
+        setUserRole(decodedToken.role);
+      } catch (error) {
+        console.error('Error al decodificar el token:', error);
+        setUserRole(null);
+      }
+    } else {
+      setAuthState('unauthenticated');
+      setUserRole(null);
+    }
   }, []);
 
   const handleLoginSuccess = (access_token: string) => {
     localStorage.setItem('access_token', access_token);
     setAuthState('authenticated');
+    try {
+      const decodedToken = jwtDecode<DecodedToken>(access_token);
+      setUserRole(decodedToken.role);
+    } catch (error) {
+      console.error('Error al decodificar el token:', error);
+      setUserRole(null);
+    }
     setShowLoginForm(false);
   };
 
@@ -34,6 +59,7 @@ const Navbar = () => {
   const handleLogoutConfirm = () => {
     localStorage.removeItem('access_token');
     setAuthState('unauthenticated');
+    setUserRole(null);
     setShowLogoutConfirmation(false);
   };
 
@@ -49,6 +75,7 @@ const Navbar = () => {
       case 'authenticated':
         return (
           <>
+            {userRole === 'SUPERUSER' && <NavLink href="/management">Gestión</NavLink>}
             <NavLink onClick={() => setShowProfileModal(true)}>Mi Perfil</NavLink>
             <NavLink onClick={handleLogoutClick} title="Cerrar Sesión">
               <FiLogOut size={15} />
