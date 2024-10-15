@@ -4,6 +4,11 @@ import { Game } from "@/types/game";
 
 export const gameColumns: Column<Game>[] = [
   {
+    key: "id",
+    label: "ID",
+    sortable: true,
+  },
+  {
     key: "title",
     label: "Título",
     sortable: true,
