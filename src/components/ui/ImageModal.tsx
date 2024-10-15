@@ -1,11 +1,12 @@
+import { Game } from '@/types/game';
 import React from 'react';
 import styled from 'styled-components';
 
 interface ImageModalProps {
     isOpen: boolean;
     onClose: () => void;
-    imageSrc: string | null;
-    altText: string;
+    game: Game | null;
+    getImageUrl: (path: string) => string;
 }
 
 const ModalOverlay = styled.div`
@@ -70,15 +71,18 @@ const CloseButtonBottom = styled.button`
   }
 `;
 
-const ImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, imageSrc, altText }) => {
-    if (!isOpen) return null;
+const ImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, game, getImageUrl }) => {
+    if (!isOpen || !game) return null;
+
+    const coverImage = game.images.find(img => img.id === game.coverId);
+    const imageSrc = coverImage ? getImageUrl(coverImage.path) : null;
 
     return (
         <ModalOverlay onClick={onClose}>
             <ModalContent onClick={(e) => e.stopPropagation()}>
                 <CloseButton onClick={onClose}>&times;</CloseButton>
                 {imageSrc ? (
-                    <StyledImage src={imageSrc} alt={altText} />
+                    <StyledImage src={imageSrc} alt={`Portada de ${game.title}`} />
                 ) : (
                     <NoImageText>Sin portada</NoImageText>
                 )}

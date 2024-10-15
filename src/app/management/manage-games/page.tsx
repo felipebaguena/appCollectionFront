@@ -45,8 +45,8 @@ export default function ManageGames() {
       <ImageModal
         isOpen={!!selectedGame}
         onClose={() => setSelectedGame(null)}
-        imageSrc={coverImage ? getImageUrl(coverImage.path) : null}
-        altText={`Portada de ${selectedGame?.title}`}
+        game={selectedGame}
+        getImageUrl={getImageUrl}
       />
     </div>
   );
