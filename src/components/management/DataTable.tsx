@@ -1,117 +1,57 @@
-'use client';
-
-import React, { useState } from 'react';
-import styled from 'styled-components';
-
-interface Column<T> {
-    key: keyof T;
-    label: string;
-    render?: (value: T[keyof T], item: T) => React.ReactNode;
-    sortable?: boolean;
-}
+import React from 'react';
+import { useDataTable } from '@/hooks/useDataTable';
+import { Column, DataTableParams, DataTableResponse } from '@/types/dataTable';
+import {
+    Table,
+    Th,
+    Td,
+    PaginationContainer,
+    Button,
+    TableContainer,
+    TableTitle
+} from './DataTableElements';
 
 interface DataTableProps<T> {
     columns: Column<T>[];
-    data: T[];
-    itemsPerPage: number;
-    onPageChange: (page: number) => void;
-    onSortChange: (field: keyof T, order: 'asc' | 'desc') => void;
-    totalItems: number;
-    totalPages: number;
-    currentPage: number;
-    sortField: keyof T | '';
-    sortOrder: 'asc' | 'desc';
+    endpoint: string;
+    initialParams?: Partial<DataTableParams<T>>;
+    title?: string;
 }
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid #ddd;
-`;
-
-const Th = styled.th`
-  padding: 12px;
-  border-bottom: 2px solid #007bff;
-  background-color: #f8f9fa;
-  text-align: left;
-  cursor: pointer;
-  font-weight: bold;
-  color: #333;
-
-  &:hover {
-    background-color: #e9ecef;
-  }
-`;
-
-const Td = styled.td`
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
-  color: #333;
-`;
-
-const PaginationContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-  font-size: 14px;
-  color: #333;
-`;
-
-const Button = styled.button`
-  padding: 8px 12px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-
-  &:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-`;
-
-const TableContainer = styled.div`
-  margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
-  overflow: hidden;
-`;
-
-const TableTitle = styled.h2`
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 1rem;
-`;
 
 function DataTable<T extends Record<string, any>>({
     columns,
-    data,
-    itemsPerPage,
-    onPageChange,
-    onSortChange,
-    totalItems,
-    totalPages,
-    currentPage,
-    sortField,
-    sortOrder
+    endpoint,
+    initialParams = {},
+    title
 }: DataTableProps<T>) {
-    const handleSort = (field: keyof T, sortable: boolean | undefined) => {
-        if (sortable) {
-            const newOrder = field === sortField && sortOrder === 'asc' ? 'desc' : 'asc';
-            onSortChange(field, newOrder);
-        }
+    const defaultParams: DataTableParams<T> = {
+        page: 1,
+        limit: 10,
+        sortField: '' as keyof T | '',
+        sortOrder: 'asc',
+        filters: {},
+        search: ''
     };
+
+    const mergedParams = { ...defaultParams, ...initialParams };
+
+    const {
+        data,
+        loading,
+        error,
+        totalItems,
+        totalPages,
+        handlePageChange,
+        handleSortChange,
+        params
+    } = useDataTable<T>(endpoint, mergedParams);
+
+    if (loading) return <div>Cargando...</div>;
+    if (error) return <div>{error}</div>;
 
     return (
         <>
-            <TableTitle>Listado de datos</TableTitle>
+            {title && <TableTitle>{title}</TableTitle>}
             <TableContainer>
                 <Table>
                     <thead>
@@ -119,12 +59,12 @@ function DataTable<T extends Record<string, any>>({
                             {columns.map((column) => (
                                 <Th
                                     key={String(column.key)}
-                                    onClick={() => handleSort(column.key, column.sortable)}
-                                    style={{ cursor: column.sortable ? 'pointer' : 'default' }}
+                                    onClick={() => column.sortable && handleSortChange(column.key, params.sortOrder === 'asc' ? 'desc' : 'asc')}
+                                    sortable={column.sortable}
                                 >
                                     {column.label}
-                                    {column.sortable && sortField === column.key && (
-                                        sortOrder === 'asc' ? ' ▲' : ' ▼'
+                                    {column.sortable && params.sortField === column.key && (
+                                        params.sortOrder === 'asc' ? ' ▲' : ' ▼'
                                     )}
                                 </Th>
                             ))}
@@ -146,11 +86,14 @@ function DataTable<T extends Record<string, any>>({
                 </Table>
             </TableContainer>
             <PaginationContainer>
-                <Button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage === 1}>
+                <Button onClick={() => handlePageChange(params.page - 1)} disabled={params.page === 1}>
                     Anterior
                 </Button>
-                <span>Página {currentPage} de {totalPages}</span>
-                <Button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                <span>
+                    Página {params.page} de {totalPages} |
+                    Mostrando {Math.min(params.limit, data.length)} de {totalItems} registros
+                </span>
+                <Button onClick={() => handlePageChange(params.page + 1)} disabled={params.page === totalPages}>
                     Siguiente
                 </Button>
             </PaginationContainer>

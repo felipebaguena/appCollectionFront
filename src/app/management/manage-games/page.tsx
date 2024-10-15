@@ -2,33 +2,12 @@
 
 import React from 'react';
 import DataTable from '@/components/management/DataTable';
-import Title from '@/components/ui/Title';
-import { useDataTable } from '@/hooks/useDataTable';
 import { ENDPOINTS } from '@/constants/endpoints';
 import { gameColumns } from '@/constants/tableColumns';
 import { Game, Platform, Genre } from '@/types/game';
 import { Column } from '@/types/dataTable';
 
 export default function ManageGames() {
-  const {
-    data: games,
-    loading,
-    error,
-    totalItems,
-    totalPages,
-    handlePageChange,
-    handleSortChange,
-    params
-  } = useDataTable<Game>(ENDPOINTS.GET_GAMES_DATATABLE, {
-    page: 1,
-    limit: 10,
-    sortField: '',
-    sortOrder: 'asc'
-  });
-
-  if (loading) return <div>Cargando...</div>;
-  if (error) return <div>{error}</div>;
-
   const columnsWithCustomRendering: Column<Game>[] = gameColumns.map(column => {
     if (column.key === 'platforms') {
       return {
@@ -77,18 +56,10 @@ export default function ManageGames() {
 
   return (
     <div>
-      <Title>Gestionar juegos</Title>
-      <DataTable
+      <DataTable<Game>
+        title="Listado de juegos"
         columns={columnsWithActions}
-        data={games}
-        itemsPerPage={params.limit}
-        onPageChange={handlePageChange}
-        onSortChange={handleSortChange}
-        totalItems={totalItems}
-        totalPages={totalPages}
-        currentPage={params.page}
-        sortField={params.sortField}
-        sortOrder={params.sortOrder}
+        endpoint={ENDPOINTS.GET_GAMES_DATATABLE}
       />
     </div>
   );
