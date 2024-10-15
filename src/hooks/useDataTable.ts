@@ -62,6 +62,10 @@ export function useDataTable<T>(
     });
   };
 
+  const refreshData = () => {
+    setParams((prev) => ({ ...prev }));
+  };
+
   return {
     data,
     loading,
@@ -71,5 +75,6 @@ export function useDataTable<T>(
     handlePageChange,
     handleSortChange,
     params,
+    refreshData,
   };
 }

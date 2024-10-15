@@ -8,7 +8,9 @@ import {
     PaginationContainer,
     Button,
     TableContainer,
-    TableTitle
+    TableTitle,
+    TitleContainer,
+    RefreshButton
 } from './DataTableElements';
 
 interface DataTableProps<T> {
@@ -47,7 +49,8 @@ function DataTable<T extends { id: number }>({
         totalPages,
         handlePageChange,
         handleSortChange,
-        params
+        params,
+        refreshData
     } = useDataTable<T>(endpoint, mergedParams);
 
     if (loading) return <div>Cargando...</div>;
@@ -69,7 +72,12 @@ function DataTable<T extends { id: number }>({
 
     return (
         <>
-            {title && <TableTitle>{title}</TableTitle>}
+            {title && (
+                <TitleContainer>
+                    <TableTitle>{title}</TableTitle>
+                    <RefreshButton onClick={refreshData}>Actualizar</RefreshButton>
+                </TitleContainer>
+            )}
             <TableContainer>
                 <Table>
                     <thead>

@@ -84,3 +84,15 @@ export const TableTitle = styled.h2`
   color: #333;
   margin-bottom: 1rem;
 `;
+
+export const TitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
+
+export const RefreshButton = styled(Button)`
+  padding: 6px 10px;
+  font-size: 14px;
+`;
