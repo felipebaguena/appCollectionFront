@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDataTable } from '@/hooks/useDataTable';
-import { Column, DataTableParams, DataTableResponse } from '@/types/dataTable';
+import { Column, DataTableParams } from '@/types/dataTable';
 import {
     Table,
     Th,
@@ -16,13 +16,17 @@ interface DataTableProps<T> {
     endpoint: string;
     initialParams?: Partial<DataTableParams<T>>;
     title?: string;
+    onEdit?: (item: T) => void;
+    onDelete?: (item: T) => void;
 }
 
-function DataTable<T extends Record<string, any>>({
+function DataTable<T extends { id: number }>({
     columns,
     endpoint,
     initialParams = {},
-    title
+    title,
+    onEdit,
+    onDelete
 }: DataTableProps<T>) {
     const defaultParams: DataTableParams<T> = {
         page: 1,
@@ -49,6 +53,20 @@ function DataTable<T extends Record<string, any>>({
     if (loading) return <div>Cargando...</div>;
     if (error) return <div>{error}</div>;
 
+    const columnsWithActions: Column<T>[] = [
+        ...columns,
+        {
+            key: 'actions' as keyof T,
+            label: 'Acciones',
+            render: (_, item: T) => (
+                <div>
+                    {onEdit && <button onClick={() => onEdit(item)}>Editar</button>}
+                    {onDelete && <button onClick={() => onDelete(item)}>Eliminar</button>}
+                </div>
+            ),
+        },
+    ];
+
     return (
         <>
             {title && <TableTitle>{title}</TableTitle>}
@@ -56,7 +74,7 @@ function DataTable<T extends Record<string, any>>({
                 <Table>
                     <thead>
                         <tr>
-                            {columns.map((column) => (
+                            {columnsWithActions.map((column) => (
                                 <Th
                                     key={String(column.key)}
                                     onClick={() => column.sortable && handleSortChange(column.key, params.sortOrder === 'asc' ? 'desc' : 'asc')}
@@ -73,7 +91,7 @@ function DataTable<T extends Record<string, any>>({
                     <tbody>
                         {data.map((item, index) => (
                             <tr key={index}>
-                                {columns.map((column) => (
+                                {columnsWithActions.map((column) => (
                                     <Td key={String(column.key)}>
                                         {column.render
                                             ? column.render(item[column.key], item)

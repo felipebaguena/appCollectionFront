@@ -1,23 +1,36 @@
 import styled from 'styled-components';
 
+export const DataTableContainer = styled.div`
+  margin: 2rem;
+  padding: 1rem;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
 export const Table = styled.table`
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   border: 1px solid #ddd;
 `;
 
 export const Th = styled.th<{ sortable?: boolean }>`
   padding: 12px;
-  border-bottom: 2px solid #007bff;
-  background-color: #f8f9fa;
+  background-color: ${props => props.sortable ? '#e6f2ff' : '#f8f9fa'};
   text-align: left;
   cursor: ${props => props.sortable ? 'pointer' : 'default'};
   font-weight: bold;
   color: #333;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+
+  &:last-child {
+    border-right: none;
+  }
 
   ${props => props.sortable && `
     &:hover {
-      background-color: #e9ecef;
+      background-color: #d4e9ff;
     }
   `}
 `;
@@ -25,7 +38,12 @@ export const Th = styled.th<{ sortable?: boolean }>`
 export const Td = styled.td`
   padding: 12px;
   border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
   color: #333;
+
+  &:last-child {
+    border-right: none;
+  }
 `;
 
 export const PaginationContainer = styled.div`
@@ -58,8 +76,6 @@ export const Button = styled.button`
 
 export const TableContainer = styled.div`
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 4px;
   overflow: hidden;
 `;
 
