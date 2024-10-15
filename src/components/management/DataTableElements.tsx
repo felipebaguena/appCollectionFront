@@ -120,3 +120,113 @@ export const RefreshButton = styled(Button)`
   padding: 6px 10px;
   font-size: 14px;
 `;
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+export const ModalContent = styled.div`
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+export const ModalTitle = styled.h2`
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+`;
+
+export const ModalField = styled.p`
+  margin-bottom: 0.5rem;
+  color: #333;
+`;
+
+export const ModalLabel = styled.label`
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-weight: bold;
+`;
+
+export const ModalCloseButton = styled.button`
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  color: #333;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 1rem;
+  transition: background-color 0.2s, color 0.2s;
+
+  &:hover {
+    background-color: #e9ecef;
+    color: #000;
+  }
+`;
+
+export const FormField = styled.div`
+  margin-bottom: 1rem;
+`;
+
+export const Input = styled.input`
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+`;
+
+export const TextArea = styled.textarea`
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  min-height: 100px;
+`;
+
+export const SubmitButton = styled(ModalCloseButton)`
+  background-color: #007bff;
+  color: white;
+  margin-right: 10px;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
+export const ConfirmationText = styled(ModalField)`
+    margin-bottom: 1.5rem;
+`;
+
+export const ButtonContainer = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+`;
+
+export const DeleteButton = styled(SubmitButton)`
+    background-color: #dc3545;
+
+    &:hover {
+        background-color: #c82333;
+    }
+`;

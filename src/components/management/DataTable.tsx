@@ -12,7 +12,9 @@ import {
     TableContainer,
     TableTitle,
     TitleContainer,
-    RefreshButton
+    RefreshButton,
+    ModalOverlay,
+    ModalContent
 } from './DataTableElements';
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
@@ -26,8 +28,9 @@ interface DataTableProps<T> {
     endpoint: string;
     initialParams?: Partial<DataTableParams<T>>;
     title?: string;
-    onEdit?: (item: T) => void;
-    onDelete?: (item: T) => void;
+    viewComponent?: React.ComponentType<{ item: T; onClose: () => void }>;
+    editComponent?: React.ComponentType<{ item: T; onClose: () => void }>;
+    deleteComponent?: React.ComponentType<{ item: T; onClose: () => void }>;
 }
 
 function DataTable<T extends { id: number }>({
@@ -35,10 +38,13 @@ function DataTable<T extends { id: number }>({
     endpoint,
     initialParams = {},
     title,
-    onEdit,
-    onDelete
+    viewComponent: ViewComponent,
+    editComponent: EditComponent,
+    deleteComponent: DeleteComponent
 }: DataTableProps<T>) {
+    const [selectedItem, setSelectedItem] = useState<T | null>(null);
     const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+    const [actionType, setActionType] = useState<'view' | 'edit' | 'delete' | null>(null);
     const [shouldRefresh, setShouldRefresh] = useState(false);
 
     const defaultParams: DataTableParams<T> = {
@@ -79,6 +85,17 @@ function DataTable<T extends { id: number }>({
         setShouldRefresh(true);
     };
 
+    const handleAction = (item: T, type: 'view' | 'edit' | 'delete') => {
+        setSelectedItem(item);
+        setActionType(type);
+    };
+
+    const handleCloseAction = () => {
+        setSelectedItem(null);
+        setActionType(null);
+        setShouldRefresh(true);
+    };
+
     const columnsWithActions: Column<T>[] = [
         ...columns.map(column => {
             if (column.key === 'coverId') {
@@ -105,15 +122,16 @@ function DataTable<T extends { id: number }>({
             label: 'Acciones',
             render: (_, item: T) => (
                 <div>
-                    {onEdit && <button onClick={() => onEdit(item)}>Editar</button>}
-                    {onDelete && <button onClick={() => onDelete(item)}>Eliminar</button>}
+                    {ViewComponent && <button onClick={() => handleAction(item, 'view')}>Ver</button>}
+                    {EditComponent && <button onClick={() => handleAction(item, 'edit')}>Editar</button>}
+                    {DeleteComponent && <button onClick={() => handleAction(item, 'delete')}>Eliminar</button>}
                 </div>
             ),
         },
     ];
 
     return (
-        <>
+        <div style={{ position: 'relative' }}>
             {title && (
                 <TitleContainer>
                     <TableTitle>{title}</TableTitle>
@@ -167,6 +185,8 @@ function DataTable<T extends { id: number }>({
                     Siguiente
                 </Button>
             </PaginationContainer>
+
+            {/* Modal para la imagen de portada */}
             <CoverImageModal
                 isOpen={!!selectedGame}
                 onClose={() => setSelectedGame(null)}
@@ -174,7 +194,23 @@ function DataTable<T extends { id: number }>({
                 getImageUrl={getImageUrl}
                 onCoverUpdated={handleCoverUpdated}
             />
-        </>
+
+            {selectedItem && (
+                <ModalOverlay>
+                    <ModalContent>
+                        {actionType === 'view' && ViewComponent && (
+                            <ViewComponent item={selectedItem} onClose={handleCloseAction} />
+                        )}
+                        {actionType === 'edit' && EditComponent && (
+                            <EditComponent item={selectedItem} onClose={handleCloseAction} />
+                        )}
+                        {actionType === 'delete' && DeleteComponent && (
+                            <DeleteComponent item={selectedItem} onClose={handleCloseAction} />
+                        )}
+                    </ModalContent>
+                </ModalOverlay>
+            )}
+        </div>
     );
 }
 
