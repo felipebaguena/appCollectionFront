@@ -7,4 +7,6 @@ export const ENDPOINTS = {
   GET_GAMES_HOME: "/games/home",
   GET_GAME: (id: string) => `/games/${id}`,
   GET_GAMES_DATATABLE: "/games/datatable",
+  GET_GAME_IMAGES: "/images/game",
+  SET_COVER: (imageId: number) => `/images/${imageId}/setCover`,
 };

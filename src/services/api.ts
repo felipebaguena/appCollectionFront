@@ -8,6 +8,10 @@ interface RequestConfig {
   body?: any;
 }
 
+const getAuthToken = () => {
+  return localStorage.getItem("access_token");
+};
+
 export const api = {
   request: async <T>(
     endpoint: string | ((id: string) => string),
@@ -16,21 +20,28 @@ export const api = {
   ): Promise<T> => {
     const finalEndpoint =
       typeof endpoint === "function" ? endpoint(id!) : endpoint;
+    const token = getAuthToken();
     const response = await fetch(`${API_BASE_URL}${finalEndpoint}`, {
       ...config,
       headers: {
         "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...config.headers,
       },
       body: config.body ? JSON.stringify(config.body) : undefined,
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Error en la petición");
+      const errorData = await response.text();
+      throw new Error(errorData || "Error en la petición");
     }
 
-    return response.json();
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return response.json();
+    } else {
+      return response.text() as unknown as T;
+    }
   },
 
   get: <T>(

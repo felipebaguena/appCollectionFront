@@ -29,8 +29,6 @@ export default function ManageGames() {
     console.log('Eliminar', game);
   };
 
-  const coverImage = selectedGame?.images.find(img => img.id === selectedGame.coverId);
-
   return (
     <div>
       <DataTableContainer>
