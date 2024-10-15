@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import { useDataTable } from '@/hooks/useDataTable';
 import { Column, DataTableParams } from '@/types/dataTable';
 import {
@@ -15,6 +16,19 @@ import {
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
 import CoverImageModal from '@/components/ui/CoverImageModal';
+
+// Nuevo componente para la miniatura de la portada
+const CoverThumbnail = styled.div`
+  width: 130px;
+  height: 130px;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  border: 1px solid #ddd;
+`;
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
 
 interface DataTableProps<T> {
     columns: Column<T>[];
@@ -79,13 +93,18 @@ function DataTable<T extends { id: number }>({
             if (column.key === 'coverId') {
                 return {
                     ...column,
-                    render: (_: unknown, item: T) => (
-                        <button onClick={() => {
-                            if ('title' in item && 'releaseYear' in item) {
-                                handleViewCover(item as unknown as Game);
-                            }
-                        }}>Ver portada</button>
-                    ),
+                    render: (_: unknown, item: T) => {
+                        const game = item as unknown as Game;
+                        const coverImage = game.images.find(img => img.isCover);
+                        const imageSrc = coverImage ? getImageUrl(coverImage.path) : NO_IMAGE_URL;
+
+                        return (
+                            <CoverThumbnail
+                                style={{ backgroundImage: `url(${imageSrc})` }}
+                                onClick={() => handleViewCover(game)}
+                            />
+                        );
+                    },
                 };
             }
             return column;
