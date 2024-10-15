@@ -7,6 +7,7 @@ interface Column<T> {
     key: keyof T;
     label: string;
     render?: (value: T[keyof T], item: T) => React.ReactNode;
+    sortable?: boolean;
 }
 
 interface DataTableProps<T> {
@@ -18,6 +19,8 @@ interface DataTableProps<T> {
     totalItems: number;
     totalPages: number;
     currentPage: number;
+    sortField: keyof T | '';
+    sortOrder: 'asc' | 'desc';
 }
 
 const Table = styled.table`
@@ -95,17 +98,15 @@ function DataTable<T extends Record<string, any>>({
     onSortChange,
     totalItems,
     totalPages,
-    currentPage
+    currentPage,
+    sortField,
+    sortOrder
 }: DataTableProps<T>) {
-    const [sortField, setSortField] = useState<keyof T | ''>('');
-    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-
-
-    const handleSort = (field: keyof T) => {
-        const newOrder = field === sortField && sortOrder === 'asc' ? 'desc' : 'asc';
-        setSortField(field);
-        setSortOrder(newOrder);
-        onSortChange(field, newOrder);
+    const handleSort = (field: keyof T, sortable: boolean | undefined) => {
+        if (sortable) {
+            const newOrder = field === sortField && sortOrder === 'asc' ? 'desc' : 'asc';
+            onSortChange(field, newOrder);
+        }
     };
 
     return (
@@ -116,9 +117,15 @@ function DataTable<T extends Record<string, any>>({
                     <thead>
                         <tr>
                             {columns.map((column) => (
-                                <Th key={String(column.key)} onClick={() => handleSort(column.key)}>
+                                <Th
+                                    key={String(column.key)}
+                                    onClick={() => handleSort(column.key, column.sortable)}
+                                    style={{ cursor: column.sortable ? 'pointer' : 'default' }}
+                                >
                                     {column.label}
-                                    {sortField === column.key && (sortOrder === 'asc' ? ' ▲' : ' ▼')}
+                                    {column.sortable && sortField === column.key && (
+                                        sortOrder === 'asc' ? ' ▲' : ' ▼'
+                                    )}
                                 </Th>
                             ))}
                         </tr>

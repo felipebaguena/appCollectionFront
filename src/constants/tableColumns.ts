@@ -16,7 +16,7 @@ export const gameColumns: Column<Game>[] = [
   {
     key: "genres",
     label: "Género",
-    sortable: true,
+    sortable: false,
   },
   {
     key: "platforms",

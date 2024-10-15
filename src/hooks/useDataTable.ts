@@ -12,7 +12,7 @@ interface DataTableParams<T> {
 interface DataTableResponse<T> {
   data: T[];
   totalItems: number;
-  totalPages: number; // Añadimos esta línea
+  totalPages: number;
 }
 
 export function useDataTable<T>(
@@ -24,7 +24,7 @@ export function useDataTable<T>(
   const [error, setError] = useState<string | null>(null);
   const [params, setParams] = useState<DataTableParams<T>>(initialParams);
   const [totalItems, setTotalItems] = useState(0);
-  const [totalPages, setTotalPages] = useState(0); // Añadimos esta línea
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,7 +40,7 @@ export function useDataTable<T>(
         });
         setData(response.data);
         setTotalItems(response.totalItems);
-        setTotalPages(response.totalPages); // Añadimos esta línea
+        setTotalPages(response.totalPages);
         setLoading(false);
       } catch (error) {
         setError("Error al cargar los datos");
@@ -56,7 +56,10 @@ export function useDataTable<T>(
   };
 
   const handleSortChange = (field: keyof T, order: "asc" | "desc") => {
-    setParams((prev) => ({ ...prev, sortField: field, sortOrder: order }));
+    setParams((prev) => {
+      const newParams = { ...prev, sortField: field, sortOrder: order };
+      return newParams;
+    });
   };
 
   return {
@@ -64,7 +67,7 @@ export function useDataTable<T>(
     loading,
     error,
     totalItems,
-    totalPages, // Añadimos esta línea
+    totalPages,
     handlePageChange,
     handleSortChange,
     params,

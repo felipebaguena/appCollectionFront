@@ -87,6 +87,8 @@ export default function ManageGames() {
         totalItems={totalItems}
         totalPages={totalPages}
         currentPage={params.page}
+        sortField={params.sortField}
+        sortOrder={params.sortOrder}
       />
     </div>
   );
