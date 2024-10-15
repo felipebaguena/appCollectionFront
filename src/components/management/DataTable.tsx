@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDataTable } from '@/hooks/useDataTable';
 import { Column, DataTableParams } from '@/types/dataTable';
 import {
@@ -12,6 +12,9 @@ import {
     TitleContainer,
     RefreshButton
 } from './DataTableElements';
+import { getImageUrl } from '@/services/api';
+import { Game } from '@/types/game';
+import CoverImageModal from '@/components/ui/CoverImageModal';
 
 interface DataTableProps<T> {
     columns: Column<T>[];
@@ -30,6 +33,9 @@ function DataTable<T extends { id: number }>({
     onEdit,
     onDelete
 }: DataTableProps<T>) {
+    const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+    const [shouldRefresh, setShouldRefresh] = useState(false);
+
     const defaultParams: DataTableParams<T> = {
         page: 1,
         limit: 10,
@@ -53,11 +59,37 @@ function DataTable<T extends { id: number }>({
         refreshData
     } = useDataTable<T>(endpoint, mergedParams);
 
-    if (loading) return <div>Cargando...</div>;
-    if (error) return <div>{error}</div>;
+    useEffect(() => {
+        if (shouldRefresh) {
+            refreshData();
+            setShouldRefresh(false);
+        }
+    }, [shouldRefresh, refreshData]);
+
+    const handleViewCover = (game: Game) => {
+        setSelectedGame(game);
+    };
+
+    const handleCoverUpdated = () => {
+        setShouldRefresh(true);
+    };
 
     const columnsWithActions: Column<T>[] = [
-        ...columns,
+        ...columns.map(column => {
+            if (column.key === 'coverId') {
+                return {
+                    ...column,
+                    render: (_: unknown, item: T) => (
+                        <button onClick={() => {
+                            if ('title' in item && 'releaseYear' in item) {
+                                handleViewCover(item as unknown as Game);
+                            }
+                        }}>Ver portada</button>
+                    ),
+                };
+            }
+            return column;
+        }),
         {
             key: 'actions' as keyof T,
             label: 'Acciones',
@@ -123,6 +155,13 @@ function DataTable<T extends { id: number }>({
                     Siguiente
                 </Button>
             </PaginationContainer>
+            <CoverImageModal
+                isOpen={!!selectedGame}
+                onClose={() => setSelectedGame(null)}
+                game={selectedGame}
+                getImageUrl={getImageUrl}
+                onCoverUpdated={handleCoverUpdated}
+            />
         </>
     );
 }

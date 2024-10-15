@@ -8,6 +8,7 @@ interface ImageModalProps {
     onClose: () => void;
     game: Game | null;
     getImageUrl: (path: string) => string;
+    onCoverUpdated: () => void;  // Nueva prop
 }
 
 const ModalOverlay = styled.div`
@@ -102,7 +103,7 @@ const GalleryImage = styled.img`
   }
 `;
 
-const ImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, game, getImageUrl }) => {
+const CoverImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, game, getImageUrl, onCoverUpdated }) => {
     const [showGallery, setShowGallery] = useState(false);
     const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
 
@@ -137,6 +138,7 @@ const ImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, game, getImage
         if (selectedImageId && game) {
             await setCover(selectedImageId);
             setShowGallery(false);
+            onCoverUpdated();
             onClose();
         }
     };
@@ -191,4 +193,4 @@ const ImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, game, getImage
     );
 };
 
-export default ImageModal;
+export default CoverImageModal;

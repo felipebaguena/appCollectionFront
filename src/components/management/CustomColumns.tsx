@@ -30,11 +30,6 @@ const gameColumns: Partial<Record<keyof Game, Partial<Column<Game>>>> = {
                 : String(value);
         },
     },
-    coverId: {
-        key: "coverId",
-        label: "Portada",
-        sortable: false,
-    },
 };
 
 export const customColumns = {
@@ -49,18 +44,9 @@ export function getCustomColumns<T extends CustomColumnTypes>(
     return customColumns[type];
 }
 
-export function getGameColumns(baseColumns: Column<Game>[], onViewCover: (game: Game) => void): Column<Game>[] {
+export function getGameColumns(baseColumns: Column<Game>[]): Column<Game>[] {
     return baseColumns.map((column) => {
         const customColumn = gameColumns[column.key as keyof Game];
-        if (column.key === 'coverId') {
-            return {
-                ...column,
-                ...customColumn,
-                render: (_, item: Game): JSX.Element => {
-                    return <button onClick={() => onViewCover(item)}>Ver portada</button>;
-                },
-            };
-        }
         return customColumn ? { ...column, ...customColumn } : column;
     });
 }

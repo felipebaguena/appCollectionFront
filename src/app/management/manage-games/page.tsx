@@ -1,25 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import DataTable from '@/components/management/DataTable';
 import { ENDPOINTS } from '@/constants/endpoints';
 import { gameColumns } from '@/constants/tableColumns';
 import { Game } from '@/types/game';
-
 import { DataTableContainer } from '@/components/management/DataTableElements';
-import ImageModal from '@/components/ui/ImageModal';
 import { getGameColumns } from '@/components/management/CustomColumns';
-import { getImageUrl } from '@/services/api';
 
 export default function ManageGames() {
-  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
-
-  const handleViewCover = (game: Game) => {
-    console.log('Ver portada', game);
-    setSelectedGame(game);
-  };
-
-  const columns = getGameColumns(gameColumns, handleViewCover);
+  const columns = getGameColumns(gameColumns);
 
   const handleEdit = (game: Game) => {
     console.log('Editar', game);
@@ -40,12 +30,6 @@ export default function ManageGames() {
           onDelete={handleDelete}
         />
       </DataTableContainer>
-      <ImageModal
-        isOpen={!!selectedGame}
-        onClose={() => setSelectedGame(null)}
-        game={selectedGame}
-        getImageUrl={getImageUrl}
-      />
     </div>
   );
 }
