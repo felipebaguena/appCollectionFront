@@ -46,6 +46,30 @@ export const Td = styled.td`
   }
 `;
 
+export const StyledTd = styled(Td)`
+  max-height: 75px;
+  vertical-align: top;
+  padding: 8px;
+`;
+
+export const CellContent = styled.div`
+  max-height: 75px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+`;
+
+export const CoverThumbnail = styled.div`
+  width: 75px;
+  height: 75px;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  border: 1px solid #ddd;
+`;
+
 export const PaginationContainer = styled.div`
   display: flex;
   justify-content: space-between;

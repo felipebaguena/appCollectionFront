@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { api } from "@/services/api";
-import { ENDPOINTS } from "@/constants/endpoints";
 
 interface DataTableParams<T> {
   page: number;

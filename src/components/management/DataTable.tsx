@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
 import { useDataTable } from '@/hooks/useDataTable';
 import { Column, DataTableParams } from '@/types/dataTable';
 import {
     Table,
     Th,
-    Td,
+    StyledTd,
+    CellContent,
+    CoverThumbnail,
     PaginationContainer,
     Button,
     TableContainer,
@@ -16,16 +17,6 @@ import {
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
 import CoverImageModal from '@/components/ui/CoverImageModal';
-
-// Nuevo componente para la miniatura de la portada
-const CoverThumbnail = styled.div`
-  width: 130px;
-  height: 130px;
-  background-size: cover;
-  background-position: center;
-  cursor: pointer;
-  border: 1px solid #ddd;
-`;
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -151,11 +142,13 @@ function DataTable<T extends { id: number }>({
                         {data.map((item, index) => (
                             <tr key={index}>
                                 {columnsWithActions.map((column) => (
-                                    <Td key={String(column.key)}>
-                                        {column.render
-                                            ? column.render(item[column.key], item)
-                                            : String(item[column.key])}
-                                    </Td>
+                                    <StyledTd key={String(column.key)}>
+                                        <CellContent>
+                                            {column.render
+                                                ? column.render(item[column.key], item)
+                                                : String(item[column.key])}
+                                        </CellContent>
+                                    </StyledTd>
                                 ))}
                             </tr>
                         ))}

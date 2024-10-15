@@ -8,7 +8,7 @@ interface ImageModalProps {
     onClose: () => void;
     game: Game | null;
     getImageUrl: (path: string) => string;
-    onCoverUpdated: () => void;  // Nueva prop
+    onCoverUpdated: () => void;
 }
 
 const ModalOverlay = styled.div`
