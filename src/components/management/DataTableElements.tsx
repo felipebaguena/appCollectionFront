@@ -250,17 +250,17 @@ export const ActionButton = styled.button`
 `;
 
 export const ActionViewButton = styled(ActionButton)`
-  background-color: #4caf50;
+  background-color: var(--mid-grey);
   color: white;
 `;
 
 export const ActionEditButton = styled(ActionButton)`
-  background-color: #ffc107;
-  color: #333; // Texto oscuro para mejor contraste
+  background-color: var(--app-yellow);
+  color: #333;
 `;
 
 export const ActionDeleteButton = styled(ActionButton)`
-  background-color: #8b0000;
+  background-color: var(--app-red);
   color: white;
 `;
 
