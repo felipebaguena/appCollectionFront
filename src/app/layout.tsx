@@ -31,7 +31,7 @@ export default function RootLayout({
           <StyledComponentsProvider>
             <PageWrapper>
               <Navbar />
-              <ClientLayout>{children}</ClientLayout>
+              <ClientLayout showLogs={false}>{children}</ClientLayout>
               <Footer />
             </PageWrapper>
           </StyledComponentsProvider>

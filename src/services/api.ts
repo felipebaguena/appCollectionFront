@@ -1,3 +1,5 @@
+import { logMessage } from "@/contexts/LogContext";
+
 export const API_BASE_URL = "http://localhost:3000";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
@@ -33,7 +35,16 @@ export const api = {
 
     if (!response.ok) {
       const errorData = await response.text();
+      if (config.method !== "GET") {
+        logMessage(`PETICION ERRONEA: ${config.method} ${finalEndpoint}`);
+      }
       throw new Error(errorData || "Error en la petición");
+    }
+
+    if (config.method !== "GET") {
+      logMessage(
+        `PETICIÓN EXITOSA ${response.status}: ${config.method} ${finalEndpoint}`
+      );
     }
 
     const contentType = response.headers.get("content-type");
