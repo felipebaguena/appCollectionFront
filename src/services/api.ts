@@ -1,4 +1,5 @@
 import { logMessage } from "@/contexts/LogContext";
+import { showNotification } from "@/contexts/NotificationContext";
 
 export const API_BASE_URL = "http://localhost:3000";
 
@@ -35,9 +36,8 @@ export const api = {
 
     if (!response.ok) {
       const errorData = await response.text();
-      if (config.method !== "GET") {
-        logMessage(`PETICION ERRONEA: ${config.method} ${finalEndpoint}`);
-      }
+      logMessage(`PETICION ERRONEA: ${config.method} ${finalEndpoint}`);
+      showNotification("Algo salió mal", "error");
       throw new Error(errorData || "Error en la petición");
     }
 
@@ -45,6 +45,7 @@ export const api = {
       logMessage(
         `PETICIÓN EXITOSA ${response.status}: ${config.method} ${finalEndpoint}`
       );
+      showNotification("Petición exitosa", "success");
     }
 
     const contentType = response.headers.get("content-type");
