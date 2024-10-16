@@ -5,6 +5,7 @@ import {
     Table,
     Th,
     StyledTd,
+    ActionsTd,
     CellContent,
     CoverThumbnail,
     PaginationContainer,
@@ -14,7 +15,11 @@ import {
     TitleContainer,
     RefreshButton,
     ModalOverlay,
-    ModalContent
+    ModalContent,
+    ActionViewButton,
+    ActionEditButton,
+    ActionDeleteButton,
+    ActionsContainer
 } from './DataTableElements';
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
@@ -121,11 +126,23 @@ function DataTable<T extends { id: number }>({
             key: 'actions' as keyof T,
             label: 'Acciones',
             render: (_, item: T) => (
-                <div>
-                    {ViewComponent && <button onClick={() => handleAction(item, 'view')}>Ver</button>}
-                    {EditComponent && <button onClick={() => handleAction(item, 'edit')}>Editar</button>}
-                    {DeleteComponent && <button onClick={() => handleAction(item, 'delete')}>Eliminar</button>}
-                </div>
+                <ActionsContainer>
+                    {ViewComponent && (
+                        <ActionViewButton onClick={() => handleAction(item, 'view')}>
+                            Ver
+                        </ActionViewButton>
+                    )}
+                    {EditComponent && (
+                        <ActionEditButton onClick={() => handleAction(item, 'edit')}>
+                            Editar
+                        </ActionEditButton>
+                    )}
+                    {DeleteComponent && (
+                        <ActionDeleteButton onClick={() => handleAction(item, 'delete')}>
+                            Borrar
+                        </ActionDeleteButton>
+                    )}
+                </ActionsContainer>
             ),
         },
     ];
@@ -160,13 +177,19 @@ function DataTable<T extends { id: number }>({
                         {data.map((item, index) => (
                             <tr key={index}>
                                 {columnsWithActions.map((column) => (
-                                    <StyledTd key={String(column.key)}>
-                                        <CellContent>
-                                            {column.render
-                                                ? column.render(item[column.key], item)
-                                                : String(item[column.key])}
-                                        </CellContent>
-                                    </StyledTd>
+                                    column.key === 'actions' ? (
+                                        <ActionsTd key={String(column.key)}>
+                                            <CellContent>
+                                                {column.render ? column.render(item[column.key], item) : String(item[column.key])}
+                                            </CellContent>
+                                        </ActionsTd>
+                                    ) : (
+                                        <StyledTd key={String(column.key)}>
+                                            <CellContent>
+                                                {column.render ? column.render(item[column.key], item) : String(item[column.key])}
+                                            </CellContent>
+                                        </StyledTd>
+                                    )
                                 ))}
                             </tr>
                         ))}

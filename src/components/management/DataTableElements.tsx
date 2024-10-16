@@ -230,3 +230,52 @@ export const DeleteButton = styled(SubmitButton)`
         background-color: #c82333;
     }
 `;
+
+export const ActionButton = styled.button`
+  flex: 0 0 auto;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  font-size: 12px;
+  font-weight: bold;
+  width: 100%;
+  padding: 4px 0;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+export const ActionViewButton = styled(ActionButton)`
+  background-color: #4caf50;
+  color: white;
+`;
+
+export const ActionEditButton = styled(ActionButton)`
+  background-color: #ffc107;
+  color: #333; // Texto oscuro para mejor contraste
+`;
+
+export const ActionDeleteButton = styled(ActionButton)`
+  background-color: #8b0000;
+  color: white;
+`;
+
+export const ActionsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  gap: 4px;
+`;
+
+export const ActionsTd = styled(StyledTd)`
+  width: 110px;
+  padding: 4px;
+  height: 100%;
+  vertical-align: middle;
+`;

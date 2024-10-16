@@ -26,7 +26,14 @@ interface Option {
 }
 
 const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
-    const [formData, setFormData] = useState(item);
+    const [formData, setFormData] = useState({
+        title: item.title,
+        description: item.description,
+        releaseYear: item.releaseYear,
+        genres: item.genres?.map(g => g.id) || [],
+        platforms: item.platforms?.map(p => p.id) || [],
+        developers: item.developers?.map(d => d.id) || []
+    });
     const [genres, setGenres] = useState<Option[]>([]);
     const [platforms, setPlatforms] = useState<Option[]>([]);
     const [developers, setDevelopers] = useState<Option[]>([]);
@@ -57,12 +64,13 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
     };
 
     const handleMultiSelectChange = (name: string) => (selected: Option[]) => {
-        setFormData(prev => ({ ...prev, [name]: selected }));
+        setFormData(prev => ({ ...prev, [name]: selected.map(item => item.id) }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log('Datos actualizados:', formData);
+        console.log('ID del juego:', item.id);
         onClose();
     };
 
@@ -103,7 +111,7 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
                     <ModalLabel htmlFor="genres">Géneros:</ModalLabel>
                     <MultiSelect
                         options={genres}
-                        selectedOptions={formData.genres || []}
+                        selectedOptions={genres.filter(g => formData.genres.includes(g.id))}
                         onChange={handleMultiSelectChange('genres')}
                         placeholder="Selecciona géneros"
                     />
@@ -112,7 +120,7 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
                     <ModalLabel htmlFor="platforms">Plataformas:</ModalLabel>
                     <MultiSelect
                         options={platforms}
-                        selectedOptions={formData.platforms || []}
+                        selectedOptions={platforms.filter(p => formData.platforms.includes(p.id))}
                         onChange={handleMultiSelectChange('platforms')}
                         placeholder="Selecciona plataformas"
                     />
@@ -121,7 +129,7 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
                     <ModalLabel htmlFor="developers">Desarrolladores:</ModalLabel>
                     <MultiSelect
                         options={developers}
-                        selectedOptions={formData.developers || []}
+                        selectedOptions={developers.filter(d => formData.developers.includes(d.id))}
                         onChange={handleMultiSelectChange('developers')}
                         placeholder="Selecciona desarrolladores"
                     />
