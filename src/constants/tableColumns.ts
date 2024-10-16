@@ -29,6 +29,11 @@ export const gameColumns: Column<Game>[] = [
     sortable: false,
   },
   {
+    key: "developers",
+    label: "Desarrolladores",
+    sortable: false,
+  },
+  {
     key: "description",
     label: "Descripción",
     sortable: false,

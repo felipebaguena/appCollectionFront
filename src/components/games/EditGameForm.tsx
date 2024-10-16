@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Game } from '@/types/game';
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
+import { useGame } from '@/hooks/useGame';
 import {
     ModalTitle,
     ModalLabel,
@@ -26,6 +27,8 @@ interface Option {
 }
 
 const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
+    const { updateGame } = useGame(item.id.toString());
+
     const [formData, setFormData] = useState({
         title: item.title,
         description: item.description,
@@ -37,6 +40,8 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
     const [genres, setGenres] = useState<Option[]>([]);
     const [platforms, setPlatforms] = useState<Option[]>([]);
     const [developers, setDevelopers] = useState<Option[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -52,6 +57,7 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
                 setDevelopers(developersData);
             } catch (error) {
                 console.error("Error al cargar los datos", error);
+                setError("Error al cargar los datos. Por favor, intenta de nuevo.");
             }
         };
 
@@ -69,10 +75,23 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Datos actualizados:', formData);
-        console.log('ID del juego:', item.id);
-        onClose();
+        setIsSubmitting(true);
+        setError(null);
+
+        try {
+            await updateGame(formData);
+            onClose();
+        } catch (error) {
+            console.error("Error al actualizar el juego", error);
+            setError("Error al actualizar el juego. Por favor, intenta de nuevo.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
+
+    if (error) {
+        return <div>{error}</div>;
+    }
 
     return (
         <ModalContent>
@@ -134,8 +153,12 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
                         placeholder="Selecciona desarrolladores"
                     />
                 </FormField>
-                <SubmitButton type="submit">Guardar cambios</SubmitButton>
-                <ModalCloseButton type="button" onClick={onClose}>Cancelar</ModalCloseButton>
+                <SubmitButton type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
+                </SubmitButton>
+                <ModalCloseButton type="button" onClick={onClose} disabled={isSubmitting}>
+                    Cancelar
+                </ModalCloseButton>
             </form>
         </ModalContent>
     );

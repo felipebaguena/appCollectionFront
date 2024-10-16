@@ -30,6 +30,15 @@ const gameColumns: Partial<Record<keyof Game, Partial<Column<Game>>>> = {
                 : String(value);
         },
     },
+    developers: {
+        key: "developers",
+        label: "Desarrolladores",
+        render: (value: Game[keyof Game]): string => {
+            return Array.isArray(value)
+                ? (value as Genre[]).map((g) => g.name).join(", ")
+                : String(value);
+        },
+    },
 };
 
 export const customColumns = {
