@@ -25,6 +25,13 @@ import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
 import CoverImageModal from '@/components/ui/CoverImageModal';
 
+// Importaciones dinámicas para los componentes de juegos
+import ViewGameForm from '@/components/games/ViewGameForm';
+import EditGameForm from '@/components/games/EditGameForm';
+import DeleteGameConfirmation from '@/components/games/DeleteGameConfirmation';
+
+// ... (otras importaciones que puedas necesitar para otros tipos de formularios)
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
 
@@ -33,9 +40,18 @@ interface DataTableProps<T> {
     endpoint: string;
     initialParams?: Partial<DataTableParams<T>>;
     title?: string;
-    viewComponent?: React.ComponentType<{ item: T; onClose: () => void }>;
-    editComponent?: React.ComponentType<{ item: T; onClose: () => void }>;
-    deleteComponent?: React.ComponentType<{ item: T; onClose: () => void }>;
+    form: 'game' | 'otherType';
+}
+
+type FormType = 'game' | 'otherType';
+
+type ItemType<F extends FormType> =
+    F extends 'game' ? Game :
+    never;
+
+interface ComponentProps<F extends FormType> {
+    item: ItemType<F>;
+    onClose: () => void;
 }
 
 function DataTable<T extends { id: number }>({
@@ -43,9 +59,7 @@ function DataTable<T extends { id: number }>({
     endpoint,
     initialParams = {},
     title,
-    viewComponent: ViewComponent,
-    editComponent: EditComponent,
-    deleteComponent: DeleteComponent
+    form
 }: DataTableProps<T>) {
     const [selectedItem, setSelectedItem] = useState<T | null>(null);
     const [selectedGame, setSelectedGame] = useState<Game | null>(null);
@@ -147,6 +161,30 @@ function DataTable<T extends { id: number }>({
         },
     ];
 
+    // Determinar los componentes a utilizar basados en el prop 'form'
+    let ViewComponent: React.ComponentType<ComponentProps<typeof form>> | null = null;
+    let EditComponent: React.ComponentType<ComponentProps<typeof form>> | null = null;
+    let DeleteComponent: React.ComponentType<ComponentProps<typeof form>> | null = null;
+
+    switch (form) {
+        case 'game':
+            ViewComponent = ViewGameForm as React.ComponentType<ComponentProps<'game'>>;
+            EditComponent = EditGameForm as React.ComponentType<ComponentProps<'game'>>;
+            DeleteComponent = DeleteGameConfirmation as React.ComponentType<ComponentProps<'game'>>;
+            break;
+        // Añade más casos aquí para otros tipos de formularios
+        default:
+            // Componentes por defecto o manejo de error
+            break;
+    }
+
+    const renderComponent = (Component: React.ComponentType<ComponentProps<typeof form>> | null, item: T) => {
+        if (Component) {
+            return <Component item={item as unknown as ItemType<typeof form>} onClose={handleCloseAction} />;
+        }
+        return null;
+    };
+
     return (
         <div style={{ position: 'relative' }}>
             {title && (
@@ -221,15 +259,9 @@ function DataTable<T extends { id: number }>({
             {selectedItem && (
                 <ModalOverlay>
                     <ModalContent>
-                        {actionType === 'view' && ViewComponent && (
-                            <ViewComponent item={selectedItem} onClose={handleCloseAction} />
-                        )}
-                        {actionType === 'edit' && EditComponent && (
-                            <EditComponent item={selectedItem} onClose={handleCloseAction} />
-                        )}
-                        {actionType === 'delete' && DeleteComponent && (
-                            <DeleteComponent item={selectedItem} onClose={handleCloseAction} />
-                        )}
+                        {actionType === 'view' && renderComponent(ViewComponent, selectedItem)}
+                        {actionType === 'edit' && renderComponent(EditComponent, selectedItem)}
+                        {actionType === 'delete' && renderComponent(DeleteComponent, selectedItem)}
                     </ModalContent>
                 </ModalOverlay>
             )}
