@@ -9,4 +9,7 @@ export const ENDPOINTS = {
   GET_GAMES_DATATABLE: "/games/datatable",
   GET_GAME_IMAGES: "/images/game",
   SET_COVER: (imageId: number) => `/images/${imageId}/setCover`,
+  GET_GENRES: "/genres",
+  GET_PLATFORMS: "/platforms",
+  GET_DEVELOPERS: "/developers",
 };
