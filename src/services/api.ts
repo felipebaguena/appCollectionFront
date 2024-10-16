@@ -9,6 +9,7 @@ interface RequestConfig {
   method: HttpMethod;
   headers?: Record<string, string>;
   body?: any;
+  silentSuccess?: boolean;
 }
 
 const getAuthToken = () => {
@@ -41,7 +42,7 @@ export const api = {
       throw new Error(errorData || "Error en la petición");
     }
 
-    if (config.method !== "GET") {
+    if (config.method !== "GET" && !config.silentSuccess) {
       logMessage(
         `PETICIÓN EXITOSA ${response.status}: ${config.method} ${finalEndpoint}`
       );
@@ -62,15 +63,22 @@ export const api = {
     id?: string
   ) => api.request<T>(endpoint, { method: "GET", ...config }, id),
 
-  post: <T>(endpoint: string, data: any) =>
-    api.request<T>(endpoint, { method: "POST", body: data }),
+  post: <T>(endpoint: string, data: any, silentSuccess: boolean = false) =>
+    api.request<T>(endpoint, { method: "POST", body: data, silentSuccess }),
+
   put: <T>(
     endpoint: string | ((id: string) => string),
     id: string,
-    data: any
-  ) => api.request<T>(endpoint, { method: "PUT", body: data }, id),
-  delete: <T>(endpoint: string | ((id: string) => string), id: string) =>
-    api.request<T>(endpoint, { method: "DELETE" }, id),
+    data: any,
+    silentSuccess: boolean = false
+  ) =>
+    api.request<T>(endpoint, { method: "PUT", body: data, silentSuccess }, id),
+
+  delete: <T>(
+    endpoint: string | ((id: string) => string),
+    id: string,
+    silentSuccess: boolean = false
+  ) => api.request<T>(endpoint, { method: "DELETE", silentSuccess }, id),
 };
 
 export const getImageUrl = (imagePath: string): string => {

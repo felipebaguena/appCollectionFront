@@ -29,14 +29,18 @@ export function useDataTable<T>(
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await api.post<DataTableResponse<T>>(endpoint, {
-          dataTable: {
-            page: params.page,
-            limit: params.limit,
-            sortField: params.sortField || undefined,
-            sortOrder: params.sortOrder.toUpperCase(),
+        const response = await api.post<DataTableResponse<T>>(
+          endpoint,
+          {
+            dataTable: {
+              page: params.page,
+              limit: params.limit,
+              sortField: params.sortField || undefined,
+              sortOrder: params.sortOrder.toUpperCase(),
+            },
           },
-        });
+          true
+        );
         setData(response.data);
         setTotalItems(response.totalItems);
         setTotalPages(response.totalPages);
