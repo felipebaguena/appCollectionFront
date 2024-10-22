@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Game } from '@/types/game';
 import { useGameImages } from '@/hooks/useGameImages';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaUpload } from 'react-icons/fa';
 import { Button, ButtonContainer, DeleteButton } from '@/components/management/DataTableElements';
 
 interface GalleryModalProps {
@@ -103,10 +103,22 @@ const NavigationIcon = styled.div<{ isVisible: boolean; direction: 'left' | 'rig
   ${props => props.direction === 'left' ? 'padding-right: 20px;' : 'padding-left: 20px;'}
 `;
 
+const UploadButton = styled(Button)`
+  background-color: #28a745;
+  &:hover {
+    background-color: #218838;
+  }
+`;
+
+const HiddenFileInput = styled.input`
+  display: none;
+`;
+
 const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, getImageUrl }) => {
-    const { gameImages, loading, error, fetchGameImages } = useGameImages(game.id);
+    const { gameImages, loading, error, fetchGameImages, uploadImage } = useGameImages(game.id);
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
     const [hoveredHalf, setHoveredHalf] = useState<'left' | 'right' | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -166,6 +178,22 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
         setHoveredHalf(null);
     };
 
+    const handleUploadClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            try {
+                await uploadImage(file);
+                fetchGameImages();
+            } catch (error) {
+                console.error("Error uploading image:", error);
+            }
+        }
+    };
+
     return (
         <GalleryModalContent onClick={(e) => e.stopPropagation()}>
             <h2>Galería del juego: {game.title}</h2>
@@ -184,6 +212,15 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                         ))}
                     </GalleryContainer>
                     <ButtonContainer>
+                        <UploadButton onClick={handleUploadClick}>
+                            <FaUpload /> Subir imagen
+                        </UploadButton>
+                        <HiddenFileInput
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept="image/*"
+                        />
                         <DeleteButton onClick={onClose}>Cerrar</DeleteButton>
                     </ButtonContainer>
                 </>

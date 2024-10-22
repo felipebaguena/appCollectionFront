@@ -65,5 +65,39 @@ export const useGameImages = (gameId: number) => {
     [gameId]
   );
 
-  return { gameImages, loading, error, fetchGameImages, setCover };
+  const uploadImage = useCallback(
+    async (file: File) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const formData = new FormData();
+        formData.append("image", file, file.name);
+        formData.append("gameId", gameId.toString());
+
+        console.log("Enviando formData:", {
+          image: file.name,
+          gameId: gameId.toString(),
+        });
+
+        const response = await api.postFormData<GameImage>(
+          ENDPOINTS.UPLOAD_GAME_IMAGE,
+          formData
+        );
+
+        console.log("Respuesta del servidor:", response);
+
+        setGameImages((prevImages) => [...prevImages, response]);
+        return response;
+      } catch (error) {
+        console.error("Error completo:", error);
+        setError("Error al subir la imagen");
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [gameId]
+  );
+
+  return { gameImages, loading, error, fetchGameImages, setCover, uploadImage };
 };

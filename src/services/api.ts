@@ -25,14 +25,24 @@ export const api = {
     const finalEndpoint =
       typeof endpoint === "function" ? endpoint(id!) : endpoint;
     const token = getAuthToken();
+
+    let headers: Record<string, string> = {
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...config.headers,
+    };
+
+    let body = config.body;
+
+    // Si no es FormData, asumimos que es JSON
+    if (!(config.body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+      body = config.body ? JSON.stringify(config.body) : undefined;
+    }
+
     const response = await fetch(`${API_BASE_URL}${finalEndpoint}`, {
       ...config,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...config.headers,
-      },
-      body: config.body ? JSON.stringify(config.body) : undefined,
+      headers,
+      body,
     });
 
     if (!response.ok) {
@@ -79,6 +89,18 @@ export const api = {
     id: string,
     silentSuccess: boolean = false
   ) => api.request<T>(endpoint, { method: "DELETE", silentSuccess }, id),
+
+  postFormData: <T>(
+    endpoint: string,
+    formData: FormData,
+    silentSuccess: boolean = false
+  ) =>
+    api.request<T>(endpoint, {
+      method: "POST",
+      body: formData,
+      headers: {},
+      silentSuccess,
+    }),
 };
 
 export const getImageUrl = (imagePath: string): string => {
