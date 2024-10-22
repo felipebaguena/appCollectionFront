@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Game } from '@/types/game';
 import { useGameImages } from '@/hooks/useGameImages';
-import { FaChevronLeft, FaChevronRight, FaUpload } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaClock, FaUpload } from 'react-icons/fa';
 import { Button, ButtonContainer, DeleteButton } from '@/components/management/DataTableElements';
 
 interface GalleryModalProps {
@@ -114,10 +114,39 @@ const HiddenFileInput = styled.input`
   display: none;
 `;
 
+interface PendingImage {
+    id: string;
+    file: File;
+    previewUrl: string;
+}
+
+const PendingImageWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 150px;
+`;
+
+const PendingImage = styled(GalleryImage)`
+  opacity: 0.6;
+`;
+
+const PendingIcon = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, getImageUrl }) => {
     const { gameImages, loading, error, fetchGameImages, uploadImage } = useGameImages(game.id);
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
     const [hoveredHalf, setHoveredHalf] = useState<'left' | 'right' | null>(null);
+    const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -182,16 +211,28 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
         fileInputRef.current?.click();
     };
 
-    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files) {
+            const newPendingImages = Array.from(files).map(file => ({
+                id: Math.random().toString(36).substr(2, 9),
+                file,
+                previewUrl: URL.createObjectURL(file)
+            }));
+            setPendingImages(prev => [...prev, ...newPendingImages]);
+        }
+    };
+
+    const handleConfirmUpload = async () => {
+        for (const pendingImage of pendingImages) {
             try {
-                await uploadImage(file);
-                fetchGameImages();
+                await uploadImage(pendingImage.file);
             } catch (error) {
                 console.error("Error uploading image:", error);
             }
         }
+        setPendingImages([]);
+        fetchGameImages();
     };
 
     return (
@@ -202,6 +243,17 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
             {!loading && !error && selectedImageIndex === null && (
                 <>
                     <GalleryContainer>
+                        {pendingImages.map((img) => (
+                            <PendingImageWrapper key={img.id}>
+                                <PendingImage
+                                    src={img.previewUrl}
+                                    alt="Pending upload"
+                                />
+                                <PendingIcon>
+                                    <FaClock />
+                                </PendingIcon>
+                            </PendingImageWrapper>
+                        ))}
                         {gameImages.map((img, index) => (
                             <GalleryImage
                                 key={img.id}
@@ -215,11 +267,17 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                         <UploadButton onClick={handleUploadClick}>
                             <FaUpload /> Subir imagen
                         </UploadButton>
+                        {pendingImages.length > 0 && (
+                            <Button onClick={handleConfirmUpload}>
+                                Confirmar subida ({pendingImages.length})
+                            </Button>
+                        )}
                         <HiddenFileInput
                             type="file"
                             ref={fileInputRef}
                             onChange={handleFileChange}
                             accept="image/*"
+                            multiple
                         />
                         <DeleteButton onClick={onClose}>Cerrar</DeleteButton>
                     </ButtonContainer>
