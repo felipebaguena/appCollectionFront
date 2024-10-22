@@ -107,11 +107,6 @@ const CoverImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, game, get
     const [showGallery, setShowGallery] = useState(false);
     const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
 
-    useEffect(() => {
-        console.log('selectedImageId', selectedImageId);
-
-    }, [selectedImageId])
-
     const {
         gameImages,
         loading,

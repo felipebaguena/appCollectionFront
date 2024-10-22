@@ -19,17 +19,18 @@ import {
     ActionsContainer,
     ViewButtonDataTable,
     EditButtonDataTable,
-    DeleteButtonDataTable
+    DeleteButtonDataTable,
+    GalleryButtonDataTable
 } from './DataTableElements';
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
 import CoverImageModal from '@/components/ui/CoverImageModal';
-import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 
 // Importaciones dinámicas para los componentes de juegos
 import ViewGameForm from '@/components/games/ViewGameForm';
 import EditGameForm from '@/components/games/EditGameForm';
 import DeleteGameConfirmation from '@/components/games/DeleteGameConfirmation';
+import GameGalleryModal from '@/components/games/GameGalleryModal';
 
 // ... (otras importaciones que puedas necesitar para otros tipos de formularios)
 
@@ -65,6 +66,7 @@ function DataTable<T extends { id: number }>({
     const [selectedItem, setSelectedItem] = useState<T | null>(null);
     const [selectedGame, setSelectedGame] = useState<Game | null>(null);
     const [actionType, setActionType] = useState<'view' | 'edit' | 'delete' | null>(null);
+    const [showGallery, setShowGallery] = useState(false);
     const [shouldRefresh, setShouldRefresh] = useState(false);
 
     const defaultParams: DataTableParams<T> = {
@@ -116,6 +118,16 @@ function DataTable<T extends { id: number }>({
         setShouldRefresh(true);
     };
 
+    const handleGalleryAction = (item: T) => {
+        setSelectedItem(item);
+        setShowGallery(true);
+    };
+
+    const handleCloseGallery = () => {
+        setSelectedItem(null);
+        setShowGallery(false);
+    };
+
     const columnsWithActions: Column<T>[] = [
         ...columns.map(column => {
             if (column.key === 'coverId') {
@@ -151,6 +163,7 @@ function DataTable<T extends { id: number }>({
                     {DeleteComponent && (
                         <DeleteButtonDataTable onClick={() => handleAction(item, 'delete')} title="Borrar" />
                     )}
+                    <GalleryButtonDataTable onClick={() => handleGalleryAction(item)} title="Galería" />
                 </ActionsContainer>
             ),
         },
@@ -259,6 +272,15 @@ function DataTable<T extends { id: number }>({
                         {actionType === 'delete' && renderComponent(DeleteComponent, selectedItem)}
                     </ModalContent>
                 </ModalOverlay>
+            )}
+
+            {showGallery && selectedItem && (
+                <GameGalleryModal
+                    isOpen={showGallery}
+                    onClose={handleCloseGallery}
+                    game={selectedItem as unknown as Game}
+                    getImageUrl={getImageUrl}
+                />
             )}
         </div>
     );

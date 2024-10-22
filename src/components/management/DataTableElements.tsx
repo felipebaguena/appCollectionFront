@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEye, FaEdit, FaTrash, FaImages } from 'react-icons/fa';
 
 export const DataTableContainer = styled.div`
   margin: 2rem;
@@ -141,7 +141,6 @@ export const ModalContent = styled.div`
   padding: 30px;
   border-radius: 8px;
   max-width: 500px;
-  width: 100%;
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -233,6 +232,18 @@ export const DeleteButton = styled(SubmitButton)`
     }
 `;
 
+
+export const ActionsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+export const ActionsTd = styled(StyledTd)`
+  vertical-align: middle;
+`;
+
 const BaseActionButton = styled.button`
   border: none;
   display: flex;
@@ -265,6 +276,11 @@ export const ActionDeleteButton = styled(BaseActionButton)`
   color: white;
 `;
 
+export const ActionGalleryButton = styled(BaseActionButton)`
+  background-color: var(--mid-grey);
+  color: white;
+`;
+
 export const ViewButtonDataTable = (props: React.ComponentProps<typeof ActionViewButton>) => (
   <ActionViewButton {...props}>
     <FaEye />
@@ -283,13 +299,9 @@ export const DeleteButtonDataTable = (props: React.ComponentProps<typeof ActionD
   </ActionDeleteButton>
 );
 
-export const ActionsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: center;
-`;
+export const GalleryButtonDataTable = (props: React.ComponentProps<typeof ActionGalleryButton>) => (
+  <ActionGalleryButton {...props}>
+    <FaImages />
+  </ActionGalleryButton>
+);
 
-export const ActionsTd = styled(StyledTd)`
-  vertical-align: middle;
-`;
