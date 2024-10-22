@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Game } from '@/types/game';
+import { useGame } from '@/hooks/useGame';
 import {
     ModalContent,
     ModalTitle,
@@ -15,10 +16,19 @@ interface DeleteGameConfirmationProps {
 }
 
 const DeleteGameConfirmation: React.FC<DeleteGameConfirmationProps> = ({ item, onClose }) => {
+    const [isDeleting, setIsDeleting] = useState(false);
+    const { deleteGame, error } = useGame(item.id.toString());
+
     const handleDelete = async () => {
-        // Aquí iría la lógica para eliminar el juego del servidor
-        console.log('Eliminando juego:', item.id);
-        onClose();
+        setIsDeleting(true);
+        try {
+            await deleteGame();
+            onClose();
+        } catch (error) {
+            console.error('Error al eliminar el juego:', error);
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     return (
@@ -27,9 +37,12 @@ const DeleteGameConfirmation: React.FC<DeleteGameConfirmationProps> = ({ item, o
             <ConfirmationText>
                 ¿Estás seguro de que quieres eliminar el juego "{item.title}"?
             </ConfirmationText>
+            {error && <ConfirmationText style={{ color: 'red' }}>{error}</ConfirmationText>}
             <ButtonContainer>
-                <DeleteButton onClick={handleDelete}>Sí, eliminar</DeleteButton>
-                <ModalCloseButton onClick={onClose}>Cancelar</ModalCloseButton>
+                <DeleteButton onClick={handleDelete} disabled={isDeleting}>
+                    {isDeleting ? 'Eliminando...' : 'Sí, eliminar'}
+                </DeleteButton>
+                <ModalCloseButton onClick={onClose} disabled={isDeleting}>Cancelar</ModalCloseButton>
             </ButtonContainer>
         </ModalContent>
     );

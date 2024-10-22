@@ -54,5 +54,25 @@ export const useGame = (id: string) => {
     }
   };
 
-  return { game, loading, error, updateGame, refetchGame: fetchGame };
+  const deleteGame = async () => {
+    setLoading(true);
+    try {
+      await api.delete(ENDPOINTS.DELETE_GAME(id), id);
+      setGame(null);
+      setLoading(false);
+    } catch (error) {
+      setError("Error al eliminar el juego");
+      setLoading(false);
+      throw error;
+    }
+  };
+
+  return {
+    game,
+    loading,
+    error,
+    updateGame,
+    deleteGame,
+    refetchGame: fetchGame,
+  };
 };
