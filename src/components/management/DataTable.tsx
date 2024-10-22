@@ -121,6 +121,7 @@ function DataTable<T extends { id: number }>({
     const handleGalleryAction = (item: T) => {
         setSelectedItem(item);
         setShowGallery(true);
+        setActionType(null);
     };
 
     const handleCloseGallery = () => {
@@ -264,23 +265,24 @@ function DataTable<T extends { id: number }>({
                 onCoverUpdated={handleCoverUpdated}
             />
 
-            {selectedItem && (
+            {(selectedItem || showGallery) && (
                 <ModalOverlay>
-                    <ModalContent>
-                        {actionType === 'view' && renderComponent(ViewComponent, selectedItem)}
-                        {actionType === 'edit' && renderComponent(EditComponent, selectedItem)}
-                        {actionType === 'delete' && renderComponent(DeleteComponent, selectedItem)}
-                    </ModalContent>
+                    {selectedItem && actionType && (
+                        <ModalContent>
+                            {actionType === 'view' && renderComponent(ViewComponent, selectedItem)}
+                            {actionType === 'edit' && renderComponent(EditComponent, selectedItem)}
+                            {actionType === 'delete' && renderComponent(DeleteComponent, selectedItem)}
+                        </ModalContent>
+                    )}
+                    {showGallery && selectedItem && (
+                        <GameGalleryModal
+                            isOpen={showGallery}
+                            onClose={handleCloseGallery}
+                            game={selectedItem as unknown as Game}
+                            getImageUrl={getImageUrl}
+                        />
+                    )}
                 </ModalOverlay>
-            )}
-
-            {showGallery && selectedItem && (
-                <GameGalleryModal
-                    isOpen={showGallery}
-                    onClose={handleCloseGallery}
-                    game={selectedItem as unknown as Game}
-                    getImageUrl={getImageUrl}
-                />
             )}
         </div>
     );

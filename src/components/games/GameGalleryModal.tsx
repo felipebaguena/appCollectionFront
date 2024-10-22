@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Game } from '@/types/game';
 import { useGameImages } from '@/hooks/useGameImages';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { Button, ButtonContainer, DeleteButton } from '@/components/management/DataTableElements';
 
 interface GalleryModalProps {
     isOpen: boolean;
@@ -11,20 +12,7 @@ interface GalleryModalProps {
     getImageUrl: (path: string) => string;
 }
 
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
+const GalleryModalContent = styled.div`
   background-color: white;
   padding: 20px;
   position: relative;
@@ -33,18 +21,7 @@ const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: black;
-  z-index: 1001;
+  z-index: 1002; // Aumenta este z-index para asegurarte de que esté por encima de otros modales
 `;
 
 const GalleryContainer = styled.div`
@@ -72,19 +49,6 @@ const FullSizeImage = styled.img`
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-`;
-
-const Button = styled.button`
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  &:hover {
-    background-color: #0056b3;
-  }
 `;
 
 const FullSizeImageContainer = styled.div`
@@ -137,25 +101,6 @@ const NavigationIcon = styled.div<{ isVisible: boolean; direction: 'left' | 'rig
   align-items: center;
   justify-content: center;
   ${props => props.direction === 'left' ? 'padding-right: 20px;' : 'padding-left: 20px;'}
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-`;
-
-const CloseButtonStyled = styled.button`
-  padding: 10px 20px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  &:hover {
-    background-color: #c82333;
-  }
 `;
 
 const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, getImageUrl }) => {
@@ -222,60 +167,58 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
     };
 
     return (
-        <ModalOverlay onClick={onClose}>
-            <ModalContent onClick={(e) => e.stopPropagation()}>
-                <h2>Galería del juego: {game.title}</h2>
-                {loading && <p>Cargando imágenes...</p>}
-                {error && <p>Error: {error}</p>}
-                {!loading && !error && selectedImageIndex === null && (
-                    <>
-                        <GalleryContainer>
-                            {gameImages.map((img, index) => (
-                                <GalleryImage
-                                    key={img.id}
-                                    src={getImageUrl(img.path)}
-                                    alt={img.filename}
-                                    onClick={() => handleImageClick(index)}
-                                />
-                            ))}
-                        </GalleryContainer>
-                        <ButtonContainer>
-                            <CloseButtonStyled onClick={onClose}>Cerrar</CloseButtonStyled>
-                        </ButtonContainer>
-                    </>
-                )}
-                {selectedImageIndex !== null && gameImages.length > 0 && (
-                    <FullSizeImageContainer>
-                        <ImageWrapper
-                            onClick={handleImageNavigation}
-                            onMouseMove={handleMouseMove}
-                            onMouseLeave={handleMouseLeave}
-                        >
-                            <FullSizeImage
-                                src={getImageUrl(gameImages[selectedImageIndex].path)}
-                                alt={gameImages[selectedImageIndex].filename}
+        <GalleryModalContent onClick={(e) => e.stopPropagation()}>
+            <h2>Galería del juego: {game.title}</h2>
+            {loading && <p>Cargando imágenes...</p>}
+            {error && <p>Error: {error}</p>}
+            {!loading && !error && selectedImageIndex === null && (
+                <>
+                    <GalleryContainer>
+                        {gameImages.map((img, index) => (
+                            <GalleryImage
+                                key={img.id}
+                                src={getImageUrl(img.path)}
+                                alt={img.filename}
+                                onClick={() => handleImageClick(index)}
                             />
-                            <NavigationOverlay>
-                                <NavigationHalf>
-                                    <NavigationIcon isVisible={hoveredHalf === 'left'} direction="left">
-                                        <FaChevronLeft />
-                                    </NavigationIcon>
-                                </NavigationHalf>
-                                <NavigationHalf>
-                                    <NavigationIcon isVisible={hoveredHalf === 'right'} direction="right">
-                                        <FaChevronRight />
-                                    </NavigationIcon>
-                                </NavigationHalf>
-                            </NavigationOverlay>
-                        </ImageWrapper>
-                        <ButtonContainer>
-                            <Button onClick={handleBackToGallery}>Volver a la galería</Button>
-                            <CloseButtonStyled onClick={onClose}>Cerrar</CloseButtonStyled>
-                        </ButtonContainer>
-                    </FullSizeImageContainer>
-                )}
-            </ModalContent>
-        </ModalOverlay>
+                        ))}
+                    </GalleryContainer>
+                    <ButtonContainer>
+                        <DeleteButton onClick={onClose}>Cerrar</DeleteButton>
+                    </ButtonContainer>
+                </>
+            )}
+            {selectedImageIndex !== null && gameImages.length > 0 && (
+                <FullSizeImageContainer>
+                    <ImageWrapper
+                        onClick={handleImageNavigation}
+                        onMouseMove={handleMouseMove}
+                        onMouseLeave={handleMouseLeave}
+                    >
+                        <FullSizeImage
+                            src={getImageUrl(gameImages[selectedImageIndex].path)}
+                            alt={gameImages[selectedImageIndex].filename}
+                        />
+                        <NavigationOverlay>
+                            <NavigationHalf>
+                                <NavigationIcon isVisible={hoveredHalf === 'left'} direction="left">
+                                    <FaChevronLeft />
+                                </NavigationIcon>
+                            </NavigationHalf>
+                            <NavigationHalf>
+                                <NavigationIcon isVisible={hoveredHalf === 'right'} direction="right">
+                                    <FaChevronRight />
+                                </NavigationIcon>
+                            </NavigationHalf>
+                        </NavigationOverlay>
+                    </ImageWrapper>
+                    <ButtonContainer>
+                        <Button onClick={handleBackToGallery}>Volver a la galería</Button>
+                        <DeleteButton onClick={onClose}>Cerrar</DeleteButton>
+                    </ButtonContainer>
+                </FullSizeImageContainer>
+            )}
+        </GalleryModalContent>
     );
 };
 
