@@ -1,10 +1,12 @@
 import styled from 'styled-components';
+import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 
 export const DataTableContainer = styled.div`
   margin: 2rem;
   padding: 1rem;
   background-color: #ffffff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 0.9rem;
 `;
 
 export const Table = styled.table`
@@ -47,13 +49,13 @@ export const Td = styled.td`
 `;
 
 export const StyledTd = styled(Td)`
-  max-height: 75px;
+  max-height: 4rem;
   vertical-align: top;
   padding: 8px;
 `;
 
 export const CellContent = styled.div`
-  max-height: 75px;
+  max-height: 4rem;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -62,8 +64,8 @@ export const CellContent = styled.div`
 `;
 
 export const CoverThumbnail = styled.div`
-  width: 75px;
-  height: 75px;
+  width: 4rem;
+  height: 4rem;
   background-size: cover;
   background-position: center;
   cursor: pointer;
@@ -231,51 +233,63 @@ export const DeleteButton = styled(SubmitButton)`
     }
 `;
 
-export const ActionButton = styled.button`
-  flex: 0 0 auto;
+const BaseActionButton = styled.button`
   border: none;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
   transition: opacity 0.3s;
-  font-size: 12px;
-  font-weight: bold;
-  width: 100%;
-  padding: 4px 0;
+  font-size: 1rem;
+  width: 1.8rem;
+  height: 1.8rem;
+  margin: 2px;
 
   &:hover {
     opacity: 0.8;
   }
 `;
 
-export const ActionViewButton = styled(ActionButton)`
+export const ActionViewButton = styled(BaseActionButton)`
   background-color: var(--mid-grey);
   color: white;
 `;
 
-export const ActionEditButton = styled(ActionButton)`
+export const ActionEditButton = styled(BaseActionButton)`
   background-color: var(--app-yellow);
   color: #333;
 `;
 
-export const ActionDeleteButton = styled(ActionButton)`
+export const ActionDeleteButton = styled(BaseActionButton)`
   background-color: var(--app-red);
   color: white;
 `;
 
+export const ViewButtonDataTable = (props: React.ComponentProps<typeof ActionViewButton>) => (
+  <ActionViewButton {...props}>
+    <FaEye />
+  </ActionViewButton>
+);
+
+export const EditButtonDataTable = (props: React.ComponentProps<typeof ActionEditButton>) => (
+  <ActionEditButton {...props}>
+    <FaEdit />
+  </ActionEditButton>
+);
+
+export const DeleteButtonDataTable = (props: React.ComponentProps<typeof ActionDeleteButton>) => (
+  <ActionDeleteButton {...props}>
+    <FaTrash />
+  </ActionDeleteButton>
+);
+
 export const ActionsContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
-  width: 100%;
-  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
 export const ActionsTd = styled(StyledTd)`
-  width: 110px;
-  padding: 4px;
-  height: 100%;
   vertical-align: middle;
 `;

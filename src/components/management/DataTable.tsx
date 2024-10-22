@@ -16,14 +16,15 @@ import {
     RefreshButton,
     ModalOverlay,
     ModalContent,
-    ActionViewButton,
-    ActionEditButton,
-    ActionDeleteButton,
-    ActionsContainer
+    ActionsContainer,
+    ViewButtonDataTable,
+    EditButtonDataTable,
+    DeleteButtonDataTable
 } from './DataTableElements';
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
 import CoverImageModal from '@/components/ui/CoverImageModal';
+import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 
 // Importaciones dinámicas para los componentes de juegos
 import ViewGameForm from '@/components/games/ViewGameForm';
@@ -142,19 +143,13 @@ function DataTable<T extends { id: number }>({
             render: (_, item: T) => (
                 <ActionsContainer>
                     {ViewComponent && (
-                        <ActionViewButton onClick={() => handleAction(item, 'view')}>
-                            Ver
-                        </ActionViewButton>
+                        <ViewButtonDataTable onClick={() => handleAction(item, 'view')} title="Ver" />
                     )}
                     {EditComponent && (
-                        <ActionEditButton onClick={() => handleAction(item, 'edit')}>
-                            Editar
-                        </ActionEditButton>
+                        <EditButtonDataTable onClick={() => handleAction(item, 'edit')} title="Editar" />
                     )}
                     {DeleteComponent && (
-                        <ActionDeleteButton onClick={() => handleAction(item, 'delete')}>
-                            Borrar
-                        </ActionDeleteButton>
+                        <DeleteButtonDataTable onClick={() => handleAction(item, 'delete')} title="Borrar" />
                     )}
                 </ActionsContainer>
             ),
