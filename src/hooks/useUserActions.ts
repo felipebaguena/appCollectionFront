@@ -1,7 +1,7 @@
-import { useState } from 'react';
-import { api } from '@/services/api';
-import { ENDPOINTS } from '@/constants/endpoints';
-import { API_BASE_URL } from '@/services/api';
+import { useState } from "react";
+import { api } from "@/services/api";
+import { ENDPOINTS } from "@/constants/endpoints";
+import { API_BASE_URL } from "@/services/api";
 
 interface User {
   name: string;
@@ -26,7 +26,7 @@ export const useUserActions = () => {
       setIsLoading(false);
       return true;
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Error desconocido');
+      setError(error instanceof Error ? error.message : "Error desconocido");
       setIsLoading(false);
       return false;
     }
@@ -35,26 +35,23 @@ export const useUserActions = () => {
   const getUser = async () => {
     setIsLoading(true);
     setError(null);
-  
+
     try {
-      const token = localStorage.getItem('access_token');
+      const token = localStorage.getItem("access_token");
       if (!token) {
-        throw new Error('No se encontró el token de acceso');
+        throw new Error("No se encontró el token de acceso");
       }
-  
-      const user = await api.get<User>(
-        ENDPOINTS.GET_USER_ME, 
-        { 
-          headers: { 
-            Authorization: `Bearer ${token}` 
-          } 
-        }
-      );
-  
+
+      const user = await api.get<User>(ENDPOINTS.GET_USER_ME, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       setIsLoading(false);
       return user;
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Error desconocido');
+      setError(error instanceof Error ? error.message : "Error desconocido");
       setIsLoading(false);
       return null;
     }
@@ -62,22 +59,22 @@ export const useUserActions = () => {
 
   const updateUser = async (userData: { name: string }) => {
     try {
-      const response = await fetch('http://localhost:3000/users/me', {
-        method: 'PUT',
+      const response = await fetch("http://localhost:3000/users/me", {
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
         body: JSON.stringify(userData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update user');
+        throw new Error("Failed to update user");
       }
 
       return true;
     } catch (error) {
-      console.error('Error updating user:', error);
+      console.error("Error updating user:", error);
       return false;
     }
   };
@@ -91,7 +88,7 @@ export const useUserActions = () => {
       setIsLoading(false);
       return true;
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Error desconocido');
+      setError(error instanceof Error ? error.message : "Error desconocido");
       setIsLoading(false);
       return false;
     }
@@ -102,23 +99,28 @@ export const useUserActions = () => {
     setError(null);
 
     try {
-      const response = await api.post<LoginResponse>(ENDPOINTS.LOGIN, credentials);
+      const response = await api.post<LoginResponse>(
+        ENDPOINTS.LOGIN,
+        credentials,
+        false, // silentSuccess
+        { skipAuthRedirect: true }
+      );
       setIsLoading(false);
       return { success: true, access_token: response.access_token };
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Error desconocido');
+      setError(error instanceof Error ? error.message : "Error desconocido");
       setIsLoading(false);
-      return { success: false, access_token: '' };
+      return { success: false, access_token: "" };
     }
   };
 
-  return { 
+  return {
     createUser,
     getUser,
     updateUser,
     deleteUser,
     login,
-    isLoading, 
-    error 
+    isLoading,
+    error,
   };
 };

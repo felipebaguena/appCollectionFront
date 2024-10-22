@@ -10,10 +10,20 @@ interface RequestConfig {
   headers?: Record<string, string>;
   body?: any;
   silentSuccess?: boolean;
+  skipAuthRedirect?: boolean;
 }
 
 const getAuthToken = () => {
   return localStorage.getItem("access_token");
+};
+
+const emitUnauthorizedEvent = () => {
+  if (typeof window !== "undefined") {
+    setTimeout(() => {
+      const event = new CustomEvent("unauthorized");
+      window.dispatchEvent(event);
+    }, 100);
+  }
 };
 
 export const api = {
@@ -33,7 +43,6 @@ export const api = {
 
     let body = config.body;
 
-    // Si no es FormData, asumimos que es JSON
     if (!(config.body instanceof FormData)) {
       headers["Content-Type"] = "application/json";
       body = config.body ? JSON.stringify(config.body) : undefined;
@@ -48,7 +57,19 @@ export const api = {
     if (!response.ok) {
       const errorData = await response.text();
       logMessage(`PETICION ERRONEA: ${config.method} ${finalEndpoint}`);
-      showNotification("Algo salió mal", "error");
+
+      if (response.status === 401 && !config.skipAuthRedirect) {
+        localStorage.removeItem("access_token");
+        showNotification(
+          "No autorizado. Por favor, inicie sesión nuevamente.",
+          "error"
+        );
+        emitUnauthorizedEvent();
+        throw new Error("No autorizado");
+      } else {
+        showNotification("Algo salió mal", "error");
+      }
+
       throw new Error(errorData || "Error en la petición");
     }
 
@@ -73,8 +94,18 @@ export const api = {
     id?: string
   ) => api.request<T>(endpoint, { method: "GET", ...config }, id),
 
-  post: <T>(endpoint: string, data: any, silentSuccess: boolean = false) =>
-    api.request<T>(endpoint, { method: "POST", body: data, silentSuccess }),
+  post: <T>(
+    endpoint: string,
+    data: any,
+    silentSuccess: boolean = false,
+    config: Partial<RequestConfig> = {}
+  ) =>
+    api.request<T>(endpoint, {
+      method: "POST",
+      body: data,
+      silentSuccess,
+      ...config,
+    }),
 
   put: <T>(
     endpoint: string | ((id: string) => string),

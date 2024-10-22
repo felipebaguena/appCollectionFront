@@ -7,6 +7,8 @@ import ClientLayout from "@/components/layout/ClientLayout";
 import { PageWrapper } from '@/components/layout/LayoutElements';
 import StyledComponentsRegistry from "@/components/StyledComponentsRegistry";
 import StyledComponentsProvider from '@/components/StyledComponentsProvider';
+import AuthRedirectHandler from "@/components/auth/AuthRedirectHandler";
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,6 +35,7 @@ export default function RootLayout({
               <Navbar />
               <ClientLayout showLogs={false}>{children}</ClientLayout>
               <Footer />
+              <AuthRedirectHandler />
             </PageWrapper>
           </StyledComponentsProvider>
         </StyledComponentsRegistry>
