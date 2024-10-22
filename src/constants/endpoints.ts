@@ -14,4 +14,5 @@ export const ENDPOINTS = {
   GET_PLATFORMS: "/platforms",
   GET_DEVELOPERS: "/developers",
   DELETE_GAME: (id: string) => `/games/${id}`,
+  CREATE_GAME: "/games",
 };

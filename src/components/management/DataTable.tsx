@@ -20,7 +20,9 @@ import {
     ViewButtonDataTable,
     EditButtonDataTable,
     DeleteButtonDataTable,
-    GalleryButtonDataTable
+    GalleryButtonDataTable,
+    CreateButtonDataTable,
+    DataTableButtonsContainer
 } from './DataTableElements';
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
@@ -31,8 +33,9 @@ import ViewGameForm from '@/components/games/ViewGameForm';
 import EditGameForm from '@/components/games/EditGameForm';
 import DeleteGameConfirmation from '@/components/games/DeleteGameConfirmation';
 import GameGalleryModal from '@/components/games/GameGalleryModal';
-
-// ... (otras importaciones que puedas necesitar para otros tipos de formularios)
+import CreateGameForm from '@/components/games/CreateGameForm';
+import { FaPlus } from 'react-icons/fa';
+import { useGames } from '@/hooks/useGames';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -56,6 +59,12 @@ interface ComponentProps<F extends FormType> {
     onClose: () => void;
 }
 
+interface Option {
+    id: number;
+    name: string;
+    code: string;
+}
+
 function DataTable<T extends { id: number }>({
     columns,
     endpoint,
@@ -68,6 +77,8 @@ function DataTable<T extends { id: number }>({
     const [actionType, setActionType] = useState<'view' | 'edit' | 'delete' | null>(null);
     const [showGallery, setShowGallery] = useState(false);
     const [shouldRefresh, setShouldRefresh] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const { genres, platforms, developers } = useGames();
 
     const defaultParams: DataTableParams<T> = {
         page: 1,
@@ -129,6 +140,27 @@ function DataTable<T extends { id: number }>({
         setShowGallery(false);
     };
 
+    const handleCreate = () => {
+        switch (form) {
+            case 'game':
+                setShowCreateModal(true);
+                break;
+            case 'otherType':
+                break;
+            default:
+                console.error('Tipo de formulario no reconocido');
+        }
+    };
+
+    const handleCloseCreateModal = () => {
+        setShowCreateModal(false);
+    };
+
+    const handleItemCreated = () => {
+        refreshData();
+        setShowCreateModal(false);
+    };
+
     const columnsWithActions: Column<T>[] = [
         ...columns.map(column => {
             if (column.key === 'coverId') {
@@ -181,9 +213,7 @@ function DataTable<T extends { id: number }>({
             EditComponent = EditGameForm as React.ComponentType<ComponentProps<'game'>>;
             DeleteComponent = DeleteGameConfirmation as React.ComponentType<ComponentProps<'game'>>;
             break;
-        // Añade más casos aquí para otros tipos de formularios
         default:
-            // Componentes por defecto o manejo de error
             break;
     }
 
@@ -194,12 +224,19 @@ function DataTable<T extends { id: number }>({
         return null;
     };
 
+    const genresOptions: Option[] = genres.map(g => ({ id: g.id, name: g.name, code: g.id.toString() }));
+    const platformsOptions: Option[] = platforms.map(p => ({ id: p.id, name: p.name, code: p.id.toString() }));
+    const developersOptions: Option[] = developers.map(d => ({ id: d.id, name: d.name, code: d.id.toString() }));
+
     return (
         <div style={{ position: 'relative' }}>
             {title && (
                 <TitleContainer>
                     <TableTitle>{title}</TableTitle>
-                    <RefreshButton onClick={refreshData}>Actualizar</RefreshButton>
+                    <DataTableButtonsContainer>
+                        <CreateButtonDataTable onClick={handleCreate} />
+                        <RefreshButton onClick={refreshData} />
+                    </DataTableButtonsContainer>
                 </TitleContainer>
             )}
             <TableContainer>
@@ -282,6 +319,19 @@ function DataTable<T extends { id: number }>({
                             getImageUrl={getImageUrl}
                         />
                     )}
+                </ModalOverlay>
+            )}
+
+            {/* Modal para la creación de un nuevo juego */}
+            {showCreateModal && form === 'game' && (
+                <ModalOverlay>
+                    <CreateGameForm
+                        onClose={handleCloseCreateModal}
+                        onGameCreated={handleItemCreated}
+                        genres={genresOptions}
+                        platforms={platformsOptions}
+                        developers={developersOptions}
+                    />
                 </ModalOverlay>
             )}
         </div>

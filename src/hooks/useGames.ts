@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
 
@@ -34,24 +34,39 @@ export const useGames = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchGames = useCallback(async () => {
+    try {
+      const gamesData = await api.get<Game[]>(ENDPOINTS.GET_GAMES_HOME);
+      setGames(gamesData);
+    } catch (error) {
+      setError("Error al cargar los juegos");
+    }
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        const [gamesData, genresData, platformsData, developersData] =
-          await Promise.all([
-            api.get<Game[]>(ENDPOINTS.GET_GAMES_HOME),
-            api.get<Genre[]>(ENDPOINTS.GET_GENRES),
-            api.get<Platform[]>(ENDPOINTS.GET_PLATFORMS),
-            api.get<Developer[]>(ENDPOINTS.GET_DEVELOPERS),
-          ]);
+        const gamesData = await api.get<Game[]>(ENDPOINTS.GET_GAMES_HOME);
+        const genresData = await api.get<Genre[]>(ENDPOINTS.GET_GENRES);
+        const platformsData = await api.get<Platform[]>(
+          ENDPOINTS.GET_PLATFORMS
+        );
+        const developersData = await api.get<Developer[]>(
+          ENDPOINTS.GET_DEVELOPERS
+        );
 
         setGames(gamesData);
-        setGenres(genresData);
-        setPlatforms(platformsData);
-        setDevelopers(developersData);
-        setLoading(false);
+        setGenres(genresData.map((g) => ({ ...g, code: g.id.toString() })));
+        setPlatforms(
+          platformsData.map((p) => ({ ...p, code: p.id.toString() }))
+        );
+        setDevelopers(
+          developersData.map((d) => ({ ...d, code: d.id.toString() }))
+        );
       } catch (error) {
         setError("Error al cargar los datos");
+      } finally {
         setLoading(false);
       }
     };
@@ -59,5 +74,25 @@ export const useGames = () => {
     fetchData();
   }, []);
 
-  return { games, genres, platforms, developers, loading, error };
+  const createGame = async (
+    gameData: Omit<Game, "id" | "coverId" | "images">
+  ) => {
+    try {
+      await api.post(ENDPOINTS.CREATE_GAME, gameData);
+      await fetchGames();
+    } catch (error) {
+      throw new Error("Error al crear el juego");
+    }
+  };
+
+  return {
+    games,
+    genres,
+    platforms,
+    developers,
+    loading,
+    error,
+    createGame,
+    // ... (otras funciones que puedas tener)
+  };
 };

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { FaEye, FaEdit, FaTrash, FaImages } from 'react-icons/fa';
+import { FaEye, FaEdit, FaTrash, FaImages, FaPlus, FaSync } from 'react-icons/fa';
 
 export const DataTableContainer = styled.div`
   margin: 2rem;
@@ -82,11 +82,10 @@ export const PaginationContainer = styled.div`
 `;
 
 export const Button = styled.button`
-  padding: 8px 12px;
+  padding: 10px 10px;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
   cursor: pointer;
   font-weight: bold;
 
@@ -116,11 +115,6 @@ export const TitleContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
-`;
-
-export const RefreshButton = styled(Button)`
-  padding: 6px 10px;
-  font-size: 14px;
 `;
 
 export const ModalOverlay = styled.div`
@@ -306,3 +300,40 @@ export const GalleryButtonDataTable = (props: React.ComponentProps<typeof Action
   </ActionGalleryButton>
 );
 
+export const DataTableButtonsContainer = styled.div`
+  display: flex;
+  gap: 0.2rem;
+  align-items: center;
+`;
+
+export const CreateButton = styled(Button)`
+  background-color: #28a745;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background-color: #218838;
+  }
+`;
+
+export const CreateButtonDataTable = (props: React.ComponentProps<typeof CreateButton>) => (
+  <CreateButton {...props}>
+    <FaPlus />
+  </CreateButton>
+);
+
+export const RefreshButtonDataTable = styled(Button)`
+  background-color: #17a2b8;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background-color: #138496;
+  }
+`;
+
+export const RefreshButton = (props: React.ComponentProps<typeof RefreshButtonDataTable>) => (
+  <RefreshButtonDataTable {...props}>
+    <FaSync />
+  </RefreshButtonDataTable>
+);
