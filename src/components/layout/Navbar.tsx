@@ -8,7 +8,14 @@ import LoginForm from '@/components/auth/LoginForm';
 import UserProfileModal from '@/components/user/UserProfileModal';
 import Modal from '@/components/ui/Modal';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
-import { NavbarContainer, NavbarContent, Logo, NavLink, NavbarSection } from '@/components/layout/NavbarElements';
+import {
+  NavbarContainer,
+  NavbarContent,
+  Logo,
+  LogoLink,
+  NavLink,
+  NavbarSection
+} from '@/components/layout/NavbarElements';
 
 interface DecodedToken {
   role: string;
@@ -76,14 +83,14 @@ const Navbar = () => {
         return (
           <>
             {userRole === 'SUPERUSER' && <NavLink href="/management">Gestión</NavLink>}
-            <NavLink onClick={() => setShowProfileModal(true)}>Mi Perfil</NavLink>
-            <NavLink onClick={handleLogoutClick} title="Cerrar Sesión">
+            <NavLink href="#" onClick={(e) => { e.preventDefault(); setShowProfileModal(true); }}>Mi Perfil</NavLink>
+            <NavLink href="#" onClick={(e) => { e.preventDefault(); handleLogoutClick(); }} title="Cerrar Sesión">
               <FiLogOut size={15} />
             </NavLink>
           </>
         );
       case 'unauthenticated':
-        return <NavLink onClick={() => setShowLoginForm(true)}>Iniciar Sesión</NavLink>;
+        return <NavLink href="#" onClick={(e) => { e.preventDefault(); setShowLoginForm(true); }}>Iniciar Sesión</NavLink>;
     }
   };
 
@@ -91,10 +98,12 @@ const Navbar = () => {
     <NavbarContainer>
       <NavbarContent>
         <NavbarSection $position='left'>
-          <Logo>LOGO</Logo>
+          <LogoLink href="/">
+            <Logo>LOGO</Logo>
+          </LogoLink>
         </NavbarSection>
         <NavbarSection $position="right">
-          <NavLink>Inicio</NavLink>
+          <NavLink href="/">Inicio</NavLink>
           {renderAuthButtons()}
         </NavbarSection>
         <Modal

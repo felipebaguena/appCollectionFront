@@ -2,6 +2,7 @@
 
 import styled from 'styled-components';
 import Button, { ButtonProps } from '@/components/ui/Button';
+import Link from 'next/link';
 
 export const NAVBAR_HEIGHT = '3.5rem';
 
@@ -46,6 +47,17 @@ export const Logo = styled.div`
   font-weight: bold;
 `;
 
+export const LogoLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
 export const NavButton = styled(Button) <ButtonProps>`
   padding: 8px 16px;
   transition: opacity 0.3s ease;
@@ -61,7 +73,7 @@ export const ButtonGroup = styled.div`
   align-items: center;
 `;
 
-export const NavLink = styled.a`
+export const NavLink = styled(Link)`
   display: flex;
   align-items: center;
   color: var(--grey);
@@ -76,6 +88,6 @@ export const NavLink = styled.a`
   }
 
   svg {
-    margin-right: 0.5rem; // Añade un pequeño margen a la derecha del icono si hay texto
+    margin-right: 0.5rem;
   }
 `;
