@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { api } from "@/services/api";
 
 interface DataTableParams<T> {
@@ -6,6 +6,7 @@ interface DataTableParams<T> {
   limit: number;
   sortField: keyof T | "";
   sortOrder: "asc" | "desc";
+  filters?: any;
 }
 
 interface DataTableResponse<T> {
@@ -14,10 +15,10 @@ interface DataTableResponse<T> {
   totalPages: number;
 }
 
-export function useDataTable<T>(
+export const useDataTable = <T>(
   endpoint: string,
   initialParams: DataTableParams<T>
-) {
+) => {
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,49 +26,54 @@ export function useDataTable<T>(
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = useCallback(
+    async (currentParams: DataTableParams<T>) => {
       setLoading(true);
       try {
         const response = await api.post<DataTableResponse<T>>(
           endpoint,
           {
             dataTable: {
-              page: params.page,
-              limit: params.limit,
-              sortField: params.sortField || undefined,
-              sortOrder: params.sortOrder.toUpperCase(),
+              page: currentParams.page,
+              limit: currentParams.limit,
+              sortField: currentParams.sortField || undefined,
+              sortOrder: currentParams.sortOrder.toUpperCase(),
             },
+            filter: currentParams.filters,
           },
           true
         );
         setData(response.data);
         setTotalItems(response.totalItems);
         setTotalPages(response.totalPages);
-        setLoading(false);
       } catch (error) {
         setError("Error al cargar los datos");
+      } finally {
         setLoading(false);
       }
-    };
+    },
+    [endpoint]
+  );
 
-    fetchData();
-  }, [endpoint, params]);
+  useEffect(() => {
+    fetchData(params);
+  }, [fetchData, params]);
 
   const handlePageChange = (page: number) => {
     setParams((prev) => ({ ...prev, page }));
   };
 
   const handleSortChange = (field: keyof T, order: "asc" | "desc") => {
-    setParams((prev) => {
-      const newParams = { ...prev, sortField: field, sortOrder: order };
-      return newParams;
-    });
+    setParams((prev) => ({ ...prev, sortField: field, sortOrder: order }));
   };
 
-  const refreshData = () => {
-    setParams((prev) => ({ ...prev }));
-  };
+  const refreshData = useCallback(
+    (newParams?: Partial<DataTableParams<T>>) => {
+      const updatedParams = newParams ? { ...params, ...newParams } : params;
+      setParams(updatedParams);
+    },
+    [params]
+  );
 
   return {
     data,
@@ -80,4 +86,4 @@ export function useDataTable<T>(
     params,
     refreshData,
   };
-}
+};

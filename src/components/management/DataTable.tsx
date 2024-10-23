@@ -36,16 +36,19 @@ import GameGalleryModal from '@/components/games/GameGalleryModal';
 import CreateGameForm from '@/components/games/CreateGameForm';
 import { FaPlus } from 'react-icons/fa';
 import { useGames } from '@/hooks/useGames';
+import { FilterPackage, BaseFilter } from '@/types/filters';
+import FilterInput from '../ui/FilterInput';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
 
-interface DataTableProps<T> {
+interface DataTableProps<T extends { id: number }, F extends BaseFilter> {
     columns: Column<T>[];
     endpoint: string;
     initialParams?: Partial<DataTableParams<T>>;
     title?: string;
     form: 'game' | 'otherType';
+    filterPackage?: FilterPackage<T, F>;
 }
 
 type FormType = 'game' | 'otherType';
@@ -65,13 +68,14 @@ interface Option {
     code: string;
 }
 
-function DataTable<T extends { id: number }>({
+function DataTable<T extends { id: number }, F extends BaseFilter>({
     columns,
     endpoint,
     initialParams = {},
     title,
-    form
-}: DataTableProps<T>) {
+    form,
+    filterPackage
+}: DataTableProps<T, F>) {
     const [selectedItem, setSelectedItem] = useState<T | null>(null);
     const [selectedGame, setSelectedGame] = useState<Game | null>(null);
     const [actionType, setActionType] = useState<'view' | 'edit' | 'delete' | null>(null);
@@ -79,6 +83,7 @@ function DataTable<T extends { id: number }>({
     const [shouldRefresh, setShouldRefresh] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const { genres, platforms, developers } = useGames();
+    const [filters, setFilters] = useState<F>((filterPackage?.filters || {}) as F);
 
     const defaultParams: DataTableParams<T> = {
         page: 1,
@@ -228,14 +233,34 @@ function DataTable<T extends { id: number }>({
     const platformsOptions: Option[] = platforms.map(p => ({ id: p.id, name: p.name, code: p.id.toString() }));
     const developersOptions: Option[] = developers.map(d => ({ id: d.id, name: d.name, code: d.id.toString() }));
 
+    const handleFilterChange = (key: keyof F, value: any) => {
+        setFilters(prev => ({ ...prev, [key]: value }));
+    };
+
+    const applyFilters = () => {
+        if (filterPackage) {
+            const newParams = filterPackage.applyFilters({ ...params, filters: filters });
+            refreshData(newParams);
+        }
+    };
+
     return (
         <div style={{ position: 'relative' }}>
             {title && (
                 <TitleContainer>
                     <TableTitle>{title}</TableTitle>
                     <DataTableButtonsContainer>
+                        {filterPackage && Object.entries(filterPackage.filters).map(([key, value]) => (
+                            <FilterInput
+                                key={key}
+                                label={key}
+                                value={filters[key as keyof F] ?? ''}
+                                onChange={(value) => handleFilterChange(key as keyof F, value)}
+                            />
+                        ))}
+                        <Button onClick={applyFilters}>Aplicar Filtros</Button>
                         <CreateButtonDataTable onClick={handleCreate} />
-                        <RefreshButton onClick={refreshData} />
+                        <RefreshButton onClick={() => refreshData()} />
                     </DataTableButtonsContainer>
                 </TitleContainer>
             )}

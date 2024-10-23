@@ -7,12 +7,12 @@ export interface Column<T> {
   align?: "left" | "center" | "right";
 }
 
-export interface DataTableParams<T> {
+export interface DataTableParams<T, F = Record<string, any>> {
   page: number;
   limit: number;
   sortField: keyof T | "";
   sortOrder: "asc" | "desc";
-  filters?: Partial<Record<keyof T, string | number | boolean>>;
+  filters: F;
   search?: string;
 }
 
