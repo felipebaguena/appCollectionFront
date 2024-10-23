@@ -3,50 +3,16 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useGameImages } from '@/hooks/useGameImages';
 import Button from '../ui/Button';
+import Modal from './Modal';
+import { ButtonContainer } from './FormElements';
 
-interface ImageModalProps {
+interface CoverImageModalProps {
     isOpen: boolean;
     onClose: () => void;
     game: Game | null;
     getImageUrl: (path: string) => string;
     onCoverUpdated: () => void;
 }
-
-const ModalOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-`;
-
-const ModalContent = styled.div`
-  background-color: white;
-  padding: 20px;
-  position: relative;
-  max-width: 90vw;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const CloseButton = styled.button`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: black;
-  z-index: 1001;
-`;
 
 const StyledImage = styled.img`
   max-width: 100%;
@@ -60,17 +26,6 @@ const NoImageText = styled.div`
   color: #666;
   text-align: center;
   margin-bottom: 20px;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-`;
-
-const StyledButton = styled(Button)`
-  padding: 10px 20px;
-  font-size: 1rem;
 `;
 
 const GalleryContainer = styled.div`
@@ -97,7 +52,7 @@ const GalleryImage = styled.img`
   }
 `;
 
-const CoverImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, game, getImageUrl, onCoverUpdated }) => {
+const CoverImageModal: React.FC<CoverImageModalProps> = ({ isOpen, onClose, game, getImageUrl, onCoverUpdated }) => {
     const [showGallery, setShowGallery] = useState(false);
     const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
 
@@ -132,53 +87,58 @@ const CoverImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, game, get
         }
     };
 
-    if (!isOpen || !game) return null;
+    if (!game) return null;
 
     const coverImage = game.images.find(img => img.isCover);
     const imageSrc = coverImage ? getImageUrl(coverImage.path) : null;
 
+    const modalContent = showGallery ? (
+        <>
+            <h2>Selecciona una nueva portada</h2>
+            {loading && <p>Cargando imágenes...</p>}
+            {error && <p>Error: {error}</p>}
+            <GalleryContainer>
+                {gameImages.map((img) => (
+                    <GalleryImage
+                        key={img.id}
+                        src={getImageUrl(img.path)}
+                        alt={img.filename}
+                        onClick={() => handleImageSelect(img.id)}
+                        className={selectedImageId === img.id ? 'selected' : ''}
+                    />
+                ))}
+            </GalleryContainer>
+            <ButtonContainer>
+                <Button $variant="primary" onClick={handleSaveNewCover} disabled={!selectedImageId || loading}>
+                    Guardar nueva portada
+                </Button>
+                <Button $variant="cancel" onClick={() => setShowGallery(false)}>Cancelar</Button>
+            </ButtonContainer>
+        </>
+    ) : (
+        <>
+            {imageSrc ? (
+                <StyledImage src={imageSrc} alt={`Portada de ${game.title}`} />
+            ) : (
+                <NoImageText>Sin portada</NoImageText>
+            )}
+            <ButtonContainer>
+                <Button $variant="primary" onClick={handleUpdateCover}>Actualizar portada</Button>
+                <Button $variant="cancel" onClick={onClose}>Cerrar</Button>
+            </ButtonContainer>
+        </>
+    );
+
     return (
-        <ModalOverlay onClick={onClose}>
-            <ModalContent onClick={(e) => e.stopPropagation()}>
-                <CloseButton onClick={onClose}>&times;</CloseButton>
-                {showGallery ? (
-                    <>
-                        <h2>Selecciona una nueva portada</h2>
-                        {loading && <p>Cargando imágenes...</p>}
-                        {error && <p>Error: {error}</p>}
-                        <GalleryContainer>
-                            {gameImages.map((img) => (
-                                <GalleryImage
-                                    key={img.id}
-                                    src={getImageUrl(img.path)}
-                                    alt={img.filename}
-                                    onClick={() => handleImageSelect(img.id)}
-                                    className={selectedImageId === img.id ? 'selected' : ''}
-                                />
-                            ))}
-                        </GalleryContainer>
-                        <ButtonContainer>
-                            <StyledButton $variant="primary" onClick={handleSaveNewCover} disabled={!selectedImageId || loading}>
-                                Guardar nueva portada
-                            </StyledButton>
-                            <StyledButton $variant="cancel" onClick={() => setShowGallery(false)}>Cancelar</StyledButton>
-                        </ButtonContainer>
-                    </>
-                ) : (
-                    <>
-                        {imageSrc ? (
-                            <StyledImage src={imageSrc} alt={`Portada de ${game.title}`} />
-                        ) : (
-                            <NoImageText>Sin portada</NoImageText>
-                        )}
-                        <ButtonContainer>
-                            <StyledButton $variant="primary" onClick={handleUpdateCover}>Actualizar portada</StyledButton>
-                            <StyledButton $variant="cancel" onClick={onClose}>Cerrar</StyledButton>
-                        </ButtonContainer>
-                    </>
-                )}
-            </ModalContent>
-        </ModalOverlay>
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={showGallery ? "Seleccionar nueva portada" : `Portada de ${game.title}`}
+            width="90%"
+            maxWidth="800px"
+        >
+            {modalContent}
+        </Modal>
     );
 };
 

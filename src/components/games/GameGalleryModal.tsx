@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Game } from '@/types/game';
 import { useGameImages } from '@/hooks/useGameImages';
 import { FaChevronLeft, FaChevronRight, FaClock, FaUpload, FaTrash, FaTimes } from 'react-icons/fa';
-import { ButtonContainer } from '@/components/management/DataTableElements';
+import { ButtonContainer } from '@/components/ui/FormElements';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import Button from '../ui/Button';
 
@@ -351,9 +351,9 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                         ))}
                     </GalleryContainer>
                     <ButtonContainer>
-                        <UploadButton onClick={handleUploadClick}>
+                        <Button $variant="upload" onClick={handleUploadClick}>
                             <FaUpload /> Subir imagen
-                        </UploadButton>
+                        </Button>
                         <Button $variant="primary" onClick={handleDeleteModeToggle}>
                             {isDeleteMode ? 'Salir del borrado' : <><FaTrash /> Borrar imágenes</>}
                         </Button>

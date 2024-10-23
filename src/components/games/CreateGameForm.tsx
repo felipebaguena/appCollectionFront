@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
+import styled from 'styled-components';
 import {
-    ModalTitle,
-    ModalLabel,
-    ModalContent,
-    FormField,
+    StyledForm,
+    InputGroup,
+    Label,
     Input,
-    TextArea,
-    ButtonContainer
-} from '@/components/management/DataTableElements';
+    ButtonContainer,
+    ErrorMessage
+} from '@/components/ui/FormElements';
 import MultiSelect from '../ui/Multiselect';
 import Button from '@/components/ui/Button';
+import Modal from '@/components/ui/Modal';
 
 interface CreateGameFormProps {
     onClose: () => void;
@@ -26,6 +27,24 @@ interface Option {
     name: string;
     code: string;
 }
+
+const FormContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+`;
+
+const FormColumn = styled.div`
+  flex: 1;
+  min-width: 250px;
+`;
+
+const TextArea = styled.textarea`
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  width: 100%;
+  min-height: 100px;
+`;
 
 const CreateGameForm: React.FC<CreateGameFormProps> = ({ onClose, onGameCreated, genres, platforms, developers }) => {
     const [formData, setFormData] = useState({
@@ -66,68 +85,81 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({ onClose, onGameCreated,
     };
 
     return (
-        <ModalContent>
-            <ModalTitle>Crear Nuevo Juego</ModalTitle>
-            <form onSubmit={handleSubmit}>
-                <FormField>
-                    <ModalLabel htmlFor="title">Título:</ModalLabel>
-                    <Input
-                        type="text"
-                        id="title"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        required
-                    />
-                </FormField>
-                <FormField>
-                    <ModalLabel htmlFor="description">Descripción:</ModalLabel>
-                    <TextArea
-                        id="description"
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        required
-                    />
-                </FormField>
-                <FormField>
-                    <ModalLabel htmlFor="releaseYear">Año de lanzamiento:</ModalLabel>
-                    <Input
-                        type="number"
-                        id="releaseYear"
-                        name="releaseYear"
-                        value={formData.releaseYear}
-                        onChange={handleChange}
-                        required
-                    />
-                </FormField>
-                <FormField>
-                    <ModalLabel htmlFor="genres">Géneros:</ModalLabel>
-                    <MultiSelect
-                        options={genres}
-                        selectedOptions={genres.filter(g => formData.genres.includes(g.id))}
-                        onChange={handleMultiSelectChange('genres')}
-                        placeholder="Selecciona géneros"
-                    />
-                </FormField>
-                <FormField>
-                    <ModalLabel htmlFor="platforms">Plataformas:</ModalLabel>
-                    <MultiSelect
-                        options={platforms}
-                        selectedOptions={platforms.filter(p => formData.platforms.includes(p.id))}
-                        onChange={handleMultiSelectChange('platforms')}
-                        placeholder="Selecciona plataformas"
-                    />
-                </FormField>
-                <FormField>
-                    <ModalLabel htmlFor="developers">Desarrolladores:</ModalLabel>
-                    <MultiSelect
-                        options={developers}
-                        selectedOptions={developers.filter(d => formData.developers.includes(d.id))}
-                        onChange={handleMultiSelectChange('developers')}
-                        placeholder="Selecciona desarrolladores"
-                    />
-                </FormField>
+        <Modal
+            isOpen={true}
+            onClose={onClose}
+            title="Crear Nuevo Juego"
+            width="95%"
+            maxWidth="50rem"
+            height="auto"
+            maxHeight="90vh"
+        >
+            <StyledForm onSubmit={handleSubmit}>
+                <FormContainer>
+                    <FormColumn>
+                        <InputGroup>
+                            <Label htmlFor="title">Título:</Label>
+                            <Input
+                                type="text"
+                                id="title"
+                                name="title"
+                                value={formData.title}
+                                onChange={handleChange}
+                                required
+                            />
+                        </InputGroup>
+                        <InputGroup>
+                            <Label htmlFor="description">Descripción:</Label>
+                            <TextArea
+                                id="description"
+                                name="description"
+                                value={formData.description}
+                                onChange={handleChange}
+                                required
+                            />
+                        </InputGroup>
+                        <InputGroup>
+                            <Label htmlFor="releaseYear">Año de lanzamiento:</Label>
+                            <Input
+                                type="number"
+                                id="releaseYear"
+                                name="releaseYear"
+                                value={formData.releaseYear}
+                                onChange={handleChange}
+                                required
+                            />
+                        </InputGroup>
+                    </FormColumn>
+                    <FormColumn>
+                        <InputGroup>
+                            <Label htmlFor="genres">Géneros:</Label>
+                            <MultiSelect
+                                options={genres}
+                                selectedOptions={genres.filter(g => formData.genres.includes(g.id))}
+                                onChange={handleMultiSelectChange('genres')}
+                                placeholder="Selecciona géneros"
+                            />
+                        </InputGroup>
+                        <InputGroup>
+                            <Label htmlFor="platforms">Plataformas:</Label>
+                            <MultiSelect
+                                options={platforms}
+                                selectedOptions={platforms.filter(p => formData.platforms.includes(p.id))}
+                                onChange={handleMultiSelectChange('platforms')}
+                                placeholder="Selecciona plataformas"
+                            />
+                        </InputGroup>
+                        <InputGroup>
+                            <Label htmlFor="developers">Desarrolladores:</Label>
+                            <MultiSelect
+                                options={developers}
+                                selectedOptions={developers.filter(d => formData.developers.includes(d.id))}
+                                onChange={handleMultiSelectChange('developers')}
+                                placeholder="Selecciona desarrolladores"
+                            />
+                        </InputGroup>
+                    </FormColumn>
+                </FormContainer>
                 <ButtonContainer>
                     <Button $variant="primary" type="submit" disabled={isSubmitting}>
                         {isSubmitting ? 'Creando...' : 'Crear juego'}
@@ -136,9 +168,9 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({ onClose, onGameCreated,
                         Cancelar
                     </Button>
                 </ButtonContainer>
-            </form>
-            {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
-        </ModalContent>
+            </StyledForm>
+            {error && <ErrorMessage>{error}</ErrorMessage>}
+        </Modal>
     );
 };
 

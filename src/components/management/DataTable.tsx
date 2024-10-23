@@ -70,18 +70,6 @@ interface Option {
     code: string;
 }
 
-const deleteFunctions = {
-    game: (id: string) => {
-        const { deleteGame } = useGame(id);
-        return deleteGame;
-    },
-    // Otras funciones de eliminación aquí, por ejemplo:
-    // user: (id: string) => {
-    //   const { deleteUser } = useUser(id);
-    //   return deleteUser;
-    // },
-};
-
 function DataTable<T extends { id: number }, F extends BaseFilter>({
     columns,
     endpoint,
@@ -102,6 +90,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         isOpen: false,
         itemToDelete: null as T | null,
     });
+    const { deleteGame } = useGame(deleteConfirmation.itemToDelete?.id.toString() || '');
 
     const defaultParams: DataTableParams<T> = {
         page: 1,
@@ -156,18 +145,13 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
 
     const handleDeleteConfirm = async () => {
         if (deleteConfirmation.itemToDelete) {
-            const deleteFunction = deleteFunctions[form as keyof typeof deleteFunctions];
-            if (deleteFunction) {
-                try {
-                    await deleteFunction(deleteConfirmation.itemToDelete.id.toString())();
-                    refreshDataAndResetPage();
-                } catch (error) {
-                    console.error(`Error al eliminar el ${form}:`, error);
-                } finally {
-                    setDeleteConfirmation({ isOpen: false, itemToDelete: null });
-                }
-            } else {
-                console.error(`No se encontró una función de eliminación para el tipo de formulario: ${form}`);
+            try {
+                await deleteGame();
+                refreshDataAndResetPage();
+            } catch (error) {
+                console.error('Error al eliminar el elemento:', error);
+            } finally {
+                setDeleteConfirmation({ isOpen: false, itemToDelete: null });
             }
         }
     };
@@ -286,6 +270,13 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
             return updatedFilters;
         });
     }, [refreshData]);
+
+    const applyFilters = () => {
+        if (filterPackage) {
+            const newParams = filterPackage.applyFilters({ ...params, filters: filters });
+            refreshData(newParams);
+        }
+    };
 
     const getItemIdentifier = (item: T | null): string => {
         if (!item) return '';
@@ -417,7 +408,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 onClose={() => setDeleteConfirmation({ isOpen: false, itemToDelete: null })}
                 onConfirm={handleDeleteConfirm}
                 title="Confirmar eliminación"
-                message={`¿Estás seguro de que quieres eliminar "${getItemIdentifier(deleteConfirmation.itemToDelete)}"?`}
+                message={`¿Estás seguro de que quieres eliminar el elemento "${getItemIdentifier(deleteConfirmation.itemToDelete)}"?`}
                 confirmText="Sí, eliminar"
                 cancelText="Cancelar"
                 confirmVariant="danger"

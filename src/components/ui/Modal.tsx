@@ -2,6 +2,14 @@
 
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
+import { NAVBAR_HEIGHT } from '../layout/NavbarElements';
+
+interface ModalContentProps {
+  $width?: string;
+  $maxWidth?: string;
+  $height?: string;
+  $maxHeight?: string;
+}
 
 const ModalOverlay = styled.div`
   position: fixed;
@@ -13,7 +21,8 @@ const ModalOverlay = styled.div`
   backdrop-filter: blur(8px) saturate(180%);
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  padding-top: calc(${NAVBAR_HEIGHT} + 1rem);
   z-index: 1000;
 `;
 
@@ -22,17 +31,24 @@ const ModalHeader = styled.div`
   padding: 0.9rem 1.5rem;
   font-size: 1.5rem;
   font-weight: bold;
+  color: white;
 `;
 
-const ModalContent = styled.div`
+const ModalContent = styled.div<ModalContentProps>`
   background-color: var(--mid-grey);
   border-radius: 1px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  max-width: 90%;
-  max-height: 90%;
-  width: 25rem;
+  width: ${props => props.$width || '90%'};
+  max-width: ${props => props.$maxWidth || '30rem'};
+  height: ${props => props.$height || 'auto'};
+  max-height: ${props => props.$maxHeight || `calc(100vh - ${NAVBAR_HEIGHT} - 2rem)`};
   display: flex;
   flex-direction: column;
+  color: white;
+
+  @media (min-width: 768px) {
+    width: 80%;
+  }
 `;
 
 const ModalBody = styled.div`
@@ -40,14 +56,27 @@ const ModalBody = styled.div`
   overflow-y: auto;
 `;
 
-interface ModalProps {
+export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  width?: string;
+  maxWidth?: string;
+  height?: string;
+  maxHeight?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  title,
+  children,
+  width,
+  maxWidth,
+  height,
+  maxHeight
+}) => {
   if (!isOpen) return null;
 
   const handleContentClick = useCallback((e: React.MouseEvent) => {
@@ -56,7 +85,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
 
   return (
     <ModalOverlay onClick={onClose}>
-      <ModalContent onClick={handleContentClick}>
+      <ModalContent onClick={handleContentClick} $width={width} $maxWidth={maxWidth} $height={height} $maxHeight={maxHeight}>
         <ModalHeader>{title}</ModalHeader>
         <ModalBody>{children}</ModalBody>
       </ModalContent>
