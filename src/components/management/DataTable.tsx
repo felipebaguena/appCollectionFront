@@ -193,6 +193,38 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         setShowCreateModal(false);
     }, [refreshDataAndResetPage]);
 
+    const getActionButtons = (form: FormType, item: T) => {
+        const buttons = [];
+
+        if (ViewComponent) {
+            buttons.push(
+                <ViewButtonDataTable key="view" onClick={() => handleAction(item, 'view')} title="Ver" />
+            );
+        }
+
+        if (EditComponent) {
+            buttons.push(
+                <EditButtonDataTable key="edit" onClick={() => handleAction(item, 'edit')} title="Editar" />
+            );
+        }
+
+        buttons.push(
+            <DeleteButtonDataTable
+                key="delete"
+                onClick={() => setDeleteConfirmation({ isOpen: true, itemToDelete: item })}
+                title="Borrar"
+            />
+        );
+
+        if (form === 'game') {
+            buttons.push(
+                <GalleryButtonDataTable key="gallery" onClick={() => handleGalleryAction(item)} title="Galería" />
+            );
+        }
+
+        return buttons;
+    };
+
     const columnsWithActions: Column<T>[] = [
         ...columns.map(column => {
             if (column.key === 'coverId') {
@@ -219,17 +251,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
             label: 'Acciones',
             render: (_, item: T) => (
                 <ActionsContainer>
-                    {ViewComponent && (
-                        <ViewButtonDataTable onClick={() => handleAction(item, 'view')} title="Ver" />
-                    )}
-                    {EditComponent && (
-                        <EditButtonDataTable onClick={() => handleAction(item, 'edit')} title="Editar" />
-                    )}
-                    <DeleteButtonDataTable
-                        onClick={() => setDeleteConfirmation({ isOpen: true, itemToDelete: item })}
-                        title="Borrar"
-                    />
-                    <GalleryButtonDataTable onClick={() => handleGalleryAction(item)} title="Galería" />
+                    {getActionButtons(form, item)}
                 </ActionsContainer>
             ),
         },
@@ -243,6 +265,11 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         case 'game':
             ViewComponent = ViewGameForm as React.ComponentType<ComponentProps<'game'>>;
             EditComponent = EditGameForm as React.ComponentType<ComponentProps<'game'>>;
+            break;
+        case 'platform':
+            // Componentes de vista y edición para plataformas
+            // ViewComponent = ViewPlatformForm as React.ComponentType<ComponentProps<'platform'>>;
+            // EditComponent = EditPlatformForm as React.ComponentType<ComponentProps<'platform'>>;
             break;
         default:
             break;
@@ -272,8 +299,8 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
 
     const getItemIdentifier = (item: T | null): string => {
         if (!item) return '';
-        // Intenta usar 'title' si existe, de lo contrario usa 'id'
-        return (item as any).title || `ID: ${item.id}`;
+        // Intenta usar 'title' si existe, luego 'name', y finalmente 'id'
+        return (item as any).title || (item as any).name || `ID: ${item.id}`;
     };
 
     return (
@@ -399,7 +426,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 onClose={() => setDeleteConfirmation({ isOpen: false, itemToDelete: null })}
                 onConfirm={handleDeleteConfirm}
                 title="Confirmar eliminación"
-                message={`¿Estás seguro de que quieres eliminar el elemento "${getItemIdentifier(deleteConfirmation.itemToDelete)}"?`}
+                message={`¿Estás seguro de que quieres eliminar "${getItemIdentifier(deleteConfirmation.itemToDelete)}"?`}
                 confirmText="Sí, eliminar"
                 cancelText="Cancelar"
                 confirmVariant="danger"
