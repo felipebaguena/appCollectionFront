@@ -29,11 +29,12 @@ import {
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
 import CoverImageModal from '@/components/ui/CoverImageModal';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import { useGame } from '@/hooks/useGame';
 
 // Importaciones dinámicas para los componentes de juegos
 import ViewGameForm from '@/components/games/ViewGameForm';
 import EditGameForm from '@/components/games/EditGameForm';
-import DeleteGameConfirmation from '@/components/games/DeleteGameConfirmation';
 import GameGalleryModal from '@/components/games/GameGalleryModal';
 import CreateGameForm from '@/components/games/CreateGameForm';
 import { useGames } from '@/hooks/useGames';
@@ -69,6 +70,18 @@ interface Option {
     code: string;
 }
 
+const deleteFunctions = {
+    game: (id: string) => {
+        const { deleteGame } = useGame(id);
+        return deleteGame;
+    },
+    // Otras funciones de eliminación aquí, por ejemplo:
+    // user: (id: string) => {
+    //   const { deleteUser } = useUser(id);
+    //   return deleteUser;
+    // },
+};
+
 function DataTable<T extends { id: number }, F extends BaseFilter>({
     columns,
     endpoint,
@@ -85,6 +98,10 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     const [showCreateModal, setShowCreateModal] = useState(false);
     const { genres, platforms, developers } = useGames();
     const [filters, setFilters] = useState<F>((filterPackage?.filters || {}) as F);
+    const [deleteConfirmation, setDeleteConfirmation] = useState({
+        isOpen: false,
+        itemToDelete: null as T | null,
+    });
 
     const defaultParams: DataTableParams<T> = {
         page: 1,
@@ -129,8 +146,30 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     };
 
     const handleAction = (item: T, type: 'view' | 'edit' | 'delete') => {
-        setSelectedItem(item);
-        setActionType(type);
+        if (type === 'delete') {
+            setDeleteConfirmation({ isOpen: true, itemToDelete: item });
+        } else {
+            setSelectedItem(item);
+            setActionType(type);
+        }
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (deleteConfirmation.itemToDelete) {
+            const deleteFunction = deleteFunctions[form as keyof typeof deleteFunctions];
+            if (deleteFunction) {
+                try {
+                    await deleteFunction(deleteConfirmation.itemToDelete.id.toString())();
+                    refreshDataAndResetPage();
+                } catch (error) {
+                    console.error(`Error al eliminar el ${form}:`, error);
+                } finally {
+                    setDeleteConfirmation({ isOpen: false, itemToDelete: null });
+                }
+            } else {
+                console.error(`No se encontró una función de eliminación para el tipo de formulario: ${form}`);
+            }
+        }
     };
 
     const handleCloseAction = useCallback(() => {
@@ -203,9 +242,10 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                     {EditComponent && (
                         <EditButtonDataTable onClick={() => handleAction(item, 'edit')} title="Editar" />
                     )}
-                    {DeleteComponent && (
-                        <DeleteButtonDataTable onClick={() => handleAction(item, 'delete')} title="Borrar" />
-                    )}
+                    <DeleteButtonDataTable
+                        onClick={() => setDeleteConfirmation({ isOpen: true, itemToDelete: item })}
+                        title="Borrar"
+                    />
                     <GalleryButtonDataTable onClick={() => handleGalleryAction(item)} title="Galería" />
                 </ActionsContainer>
             ),
@@ -215,13 +255,11 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     // Determinar los componentes a utilizar basados en el prop 'form'
     let ViewComponent: React.ComponentType<ComponentProps<typeof form>> | null = null;
     let EditComponent: React.ComponentType<ComponentProps<typeof form>> | null = null;
-    let DeleteComponent: React.ComponentType<ComponentProps<typeof form>> | null = null;
 
     switch (form) {
         case 'game':
             ViewComponent = ViewGameForm as React.ComponentType<ComponentProps<'game'>>;
             EditComponent = EditGameForm as React.ComponentType<ComponentProps<'game'>>;
-            DeleteComponent = DeleteGameConfirmation as React.ComponentType<ComponentProps<'game'>>;
             break;
         default:
             break;
@@ -249,11 +287,10 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         });
     }, [refreshData]);
 
-    const applyFilters = () => {
-        if (filterPackage) {
-            const newParams = filterPackage.applyFilters({ ...params, filters: filters });
-            refreshData(newParams);
-        }
+    const getItemIdentifier = (item: T | null): string => {
+        if (!item) return '';
+        // Intenta usar 'title' si existe, de lo contrario usa 'id'
+        return (item as any).title || `ID: ${item.id}`;
     };
 
     return (
@@ -349,7 +386,6 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                         <ModalContent>
                             {actionType === 'view' && renderComponent(ViewComponent, selectedItem)}
                             {actionType === 'edit' && renderComponent(EditComponent, selectedItem)}
-                            {actionType === 'delete' && renderComponent(DeleteComponent, selectedItem)}
                         </ModalContent>
                     )}
                     {showGallery && selectedItem && (
@@ -375,6 +411,17 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                     />
                 </ModalOverlay>
             )}
+
+            <ConfirmationModal
+                isOpen={deleteConfirmation.isOpen}
+                onClose={() => setDeleteConfirmation({ isOpen: false, itemToDelete: null })}
+                onConfirm={handleDeleteConfirm}
+                title="Confirmar eliminación"
+                message={`¿Estás seguro de que quieres eliminar "${getItemIdentifier(deleteConfirmation.itemToDelete)}"?`}
+                confirmText="Sí, eliminar"
+                cancelText="Cancelar"
+                confirmVariant="danger"
+            />
         </div>
     );
 }

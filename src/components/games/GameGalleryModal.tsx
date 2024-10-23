@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { Game } from '@/types/game';
 import { useGameImages } from '@/hooks/useGameImages';
 import { FaChevronLeft, FaChevronRight, FaClock, FaUpload, FaTrash, FaTimes } from 'react-icons/fa';
-import { ButtonDataTable, ButtonContainer, DeleteButton } from '@/components/management/DataTableElements';
-import DeleteImageConfirmationModal from '@/components/games/DeleteImageConfirmationModal';
+import { ButtonContainer } from '@/components/management/DataTableElements';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import Button from '../ui/Button';
 
 interface GalleryModalProps {
@@ -165,8 +165,9 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDeleteMode, setIsDeleteMode] = useState(false);
     const [selectedImages, setSelectedImages] = useState<number[]>([]);
-    const [deleteImageConfirmation, setDeleteImageConfirmation] = useState({
+    const [confirmationModal, setConfirmationModal] = useState({
         isOpen: false,
+        title: '',
         message: '',
         onConfirm: () => { },
     });
@@ -273,8 +274,9 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
     };
 
     const handleDeleteImage = async (imageId: number) => {
-        setDeleteImageConfirmation({
+        setConfirmationModal({
             isOpen: true,
+            title: 'Confirmar eliminación',
             message: "¿Seguro que deseas borrar la imagen?",
             onConfirm: async () => {
                 try {
@@ -282,14 +284,15 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                 } catch (error) {
                     console.error("Error al borrar la imagen:", error);
                 }
-                setDeleteImageConfirmation(prev => ({ ...prev, isOpen: false }));
+                setConfirmationModal(prev => ({ ...prev, isOpen: false }));
             },
         });
     };
 
     const handleDeleteSelectedImages = async () => {
-        setDeleteImageConfirmation({
+        setConfirmationModal({
             isOpen: true,
+            title: 'Confirmar eliminación múltiple',
             message: `¿Seguro que deseas borrar ${selectedImages.length} imágenes seleccionadas?`,
             onConfirm: async () => {
                 try {
@@ -298,7 +301,7 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                 } catch (error) {
                     console.error("Error al borrar las imágenes seleccionadas:", error);
                 }
-                setDeleteImageConfirmation(prev => ({ ...prev, isOpen: false }));
+                setConfirmationModal(prev => ({ ...prev, isOpen: false }));
             },
         });
     };
@@ -405,11 +408,15 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                     </ButtonContainer>
                 </FullSizeImageContainer>
             )}
-            <DeleteImageConfirmationModal
-                isOpen={deleteImageConfirmation.isOpen}
-                onClose={() => setDeleteImageConfirmation(prev => ({ ...prev, isOpen: false }))}
-                onConfirm={deleteImageConfirmation.onConfirm}
-                message={deleteImageConfirmation.message}
+            <ConfirmationModal
+                isOpen={confirmationModal.isOpen}
+                onClose={() => setConfirmationModal(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmationModal.onConfirm}
+                title={confirmationModal.title}
+                message={confirmationModal.message}
+                confirmText="Confirmar"
+                cancelText="Cancelar"
+                confirmVariant="danger"
             />
         </GalleryModalContent>
     );
