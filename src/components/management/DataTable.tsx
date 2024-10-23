@@ -9,7 +9,7 @@ import {
     CellContent,
     CoverThumbnail,
     PaginationContainer,
-    Button,
+    ButtonDataTable,
     TableContainer,
     TableTitle,
     TitleContainer,
@@ -322,16 +322,16 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 </Table>
             </TableContainer>
             <PaginationContainer>
-                <Button onClick={() => handlePageChange(params.page - 1)} disabled={params.page === 1}>
+                <ButtonDataTable onClick={() => handlePageChange(params.page - 1)} disabled={params.page === 1}>
                     Anterior
-                </Button>
+                </ButtonDataTable>
                 <span>
                     Página {params.page} de {totalPages} |
                     Mostrando {Math.min(params.limit, data.length)} de {totalItems} registros
                 </span>
-                <Button onClick={() => handlePageChange(params.page + 1)} disabled={params.page === totalPages}>
+                <ButtonDataTable onClick={() => handlePageChange(params.page + 1)} disabled={params.page === totalPages}>
                     Siguiente
-                </Button>
+                </ButtonDataTable>
             </PaginationContainer>
 
             {/* Modal para la imagen de portada */}

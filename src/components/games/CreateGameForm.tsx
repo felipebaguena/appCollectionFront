@@ -4,14 +4,14 @@ import { ENDPOINTS } from "@/constants/endpoints";
 import {
     ModalTitle,
     ModalLabel,
-    ModalCloseButton,
     ModalContent,
     FormField,
     Input,
     TextArea,
-    SubmitButton
+    ButtonContainer
 } from '@/components/management/DataTableElements';
 import MultiSelect from '../ui/Multiselect';
+import Button from '@/components/ui/Button';
 
 interface CreateGameFormProps {
     onClose: () => void;
@@ -128,12 +128,14 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({ onClose, onGameCreated,
                         placeholder="Selecciona desarrolladores"
                     />
                 </FormField>
-                <SubmitButton type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? 'Creando...' : 'Crear juego'}
-                </SubmitButton>
-                <ModalCloseButton type="button" onClick={onClose} disabled={isSubmitting}>
-                    Cancelar
-                </ModalCloseButton>
+                <ButtonContainer>
+                    <Button $variant="primary" type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? 'Creando...' : 'Crear juego'}
+                    </Button>
+                    <Button $variant="cancel" type="button" onClick={onClose} disabled={isSubmitting}>
+                        Cancelar
+                    </Button>
+                </ButtonContainer>
             </form>
             {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
         </ModalContent>

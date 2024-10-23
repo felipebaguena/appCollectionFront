@@ -78,10 +78,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onClose, onLoginSuccess, onRegist
             required
           />
         </InputGroup>
-        <Button type="submit" $primary $fullWidth disabled={isLoading}>
+        <Button type="submit" $variant="primary" $fullWidth disabled={isLoading}>
           {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
         </Button>
-        <Button type="button" $variant={'cancel'} $fullWidth onClick={onClose} disabled={isLoading}>Cancelar</Button>
+        <Button type="button" $variant="cancel" $fullWidth onClick={onClose} disabled={isLoading}>Cancelar</Button>
       </StyledForm>
       {message && <Message error={!!error}>{message}</Message>}
       <RegisterOption>

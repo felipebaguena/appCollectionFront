@@ -4,8 +4,9 @@ import {
     ModalTitle,
     ModalField,
     ModalLabel,
-    ModalCloseButton
+    ButtonContainer
 } from '@/components/management/DataTableElements';
+import Button from '@/components/ui/Button';
 
 interface ViewGameFormProps {
     item: Game;
@@ -25,7 +26,9 @@ const ViewGameForm: React.FC<ViewGameFormProps> = ({ item, onClose }) => {
             <ModalField>
                 <ModalLabel>Año de lanzamiento:</ModalLabel> {item.releaseYear}
             </ModalField>
-            <ModalCloseButton onClick={onClose}>Cerrar</ModalCloseButton>
+            <ButtonContainer>
+                <Button $variant="cancel" onClick={onClose}>Cerrar</Button>
+            </ButtonContainer>
         </>
     );
 };

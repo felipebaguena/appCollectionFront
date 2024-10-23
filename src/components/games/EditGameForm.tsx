@@ -6,14 +6,14 @@ import { useGame } from '@/hooks/useGame';
 import {
     ModalTitle,
     ModalLabel,
-    ModalCloseButton,
     ModalContent,
     FormField,
     Input,
     TextArea,
-    SubmitButton
+    ButtonContainer
 } from '@/components/management/DataTableElements';
 import MultiSelect from '../ui/Multiselect';
+import Button from '@/components/ui/Button';
 
 interface EditGameFormProps {
     item: Game;
@@ -153,12 +153,14 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
                         placeholder="Selecciona desarrolladores"
                     />
                 </FormField>
-                <SubmitButton type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
-                </SubmitButton>
-                <ModalCloseButton type="button" onClick={onClose} disabled={isSubmitting}>
-                    Cancelar
-                </ModalCloseButton>
+                <ButtonContainer>
+                    <Button $variant="primary" type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
+                    </Button>
+                    <Button $variant="cancel" type="button" onClick={onClose} disabled={isSubmitting}>
+                        Cancelar
+                    </Button>
+                </ButtonContainer>
             </form>
         </ModalContent>
     );

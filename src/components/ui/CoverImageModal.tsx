@@ -2,6 +2,7 @@ import { Game } from '@/types/game';
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useGameImages } from '@/hooks/useGameImages';
+import Button from '../ui/Button';
 
 interface ImageModalProps {
     isOpen: boolean;
@@ -67,16 +68,9 @@ const ButtonContainer = styled.div`
   margin-top: 20px;
 `;
 
-const Button = styled.button`
+const StyledButton = styled(Button)`
   padding: 10px 20px;
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
   font-size: 1rem;
-  &:hover {
-    background-color: #e0e0e0;
-  }
 `;
 
 const GalleryContainer = styled.div`
@@ -164,10 +158,10 @@ const CoverImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, game, get
                             ))}
                         </GalleryContainer>
                         <ButtonContainer>
-                            <Button onClick={handleSaveNewCover} disabled={!selectedImageId || loading}>
+                            <StyledButton $variant="primary" onClick={handleSaveNewCover} disabled={!selectedImageId || loading}>
                                 Guardar nueva portada
-                            </Button>
-                            <Button onClick={() => setShowGallery(false)}>Cancelar</Button>
+                            </StyledButton>
+                            <StyledButton $variant="cancel" onClick={() => setShowGallery(false)}>Cancelar</StyledButton>
                         </ButtonContainer>
                     </>
                 ) : (
@@ -178,8 +172,8 @@ const CoverImageModal: React.FC<ImageModalProps> = ({ isOpen, onClose, game, get
                             <NoImageText>Sin portada</NoImageText>
                         )}
                         <ButtonContainer>
-                            <Button onClick={handleUpdateCover}>Actualizar portada</Button>
-                            <Button onClick={onClose}>Cerrar</Button>
+                            <StyledButton $variant="primary" onClick={handleUpdateCover}>Actualizar portada</StyledButton>
+                            <StyledButton $variant="cancel" onClick={onClose}>Cerrar</StyledButton>
                         </ButtonContainer>
                     </>
                 )}

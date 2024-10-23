@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { FaEye, FaEdit, FaTrash, FaImages, FaPlus, FaSync, FaSortUp, FaSortDown, FaSort } from 'react-icons/fa';
+import Button from '../ui/Button';
 
 export const DataTableContainer = styled.div`
   margin: 2rem;
@@ -82,12 +83,10 @@ export const PaginationContainer = styled.div`
   color: #333;
 `;
 
-export const Button = styled.button`
+export const ButtonDataTable = styled(Button)`
   padding: 10px 10px;
   background-color: #007bff;
   color: white;
-  border: none;
-  cursor: pointer;
   font-weight: bold;
 
   &:hover {
@@ -162,23 +161,6 @@ export const ModalLabel = styled.label`
   font-weight: bold;
 `;
 
-export const ModalCloseButton = styled.button`
-  background-color: #f8f9fa;
-  border: 1px solid #ddd;
-  color: #333;
-  padding: 8px 16px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-top: 1rem;
-  transition: background-color 0.2s, color 0.2s;
-
-  &:hover {
-    background-color: #e9ecef;
-    color: #000;
-  }
-`;
-
 export const FormField = styled.div`
   margin-bottom: 1rem;
 `;
@@ -200,14 +182,8 @@ export const TextArea = styled.textarea`
   min-height: 100px;
 `;
 
-export const SubmitButton = styled(ModalCloseButton)`
-  background-color: #007bff;
-  color: white;
+export const SubmitButton = styled(Button).attrs({ $variant: 'primary' })`
   margin-right: 10px;
-
-  &:hover {
-    background-color: #0056b3;
-  }
 `;
 
 export const ConfirmationText = styled(ModalField)`
@@ -215,6 +191,7 @@ export const ConfirmationText = styled(ModalField)`
 `;
 
 export const ButtonContainer = styled.div`
+    margin-top: 1rem;
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
@@ -240,42 +217,21 @@ export const ActionsTd = styled(StyledTd)`
   vertical-align: middle;
 `;
 
-const BaseActionButton = styled.button`
-  border: none;
+export const ActionButton = styled(Button)`
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
-  transition: opacity 0.3s;
   font-size: 1rem;
   width: 1.8rem;
   height: 1.8rem;
   margin: 2px;
-
-  &:hover {
-    opacity: 0.8;
-  }
+  padding: 0;
 `;
 
-export const ActionViewButton = styled(BaseActionButton)`
-  background-color: var(--mid-grey);
-  color: white;
-`;
-
-export const ActionEditButton = styled(BaseActionButton)`
-  background-color: var(--app-yellow);
-  color: #333;
-`;
-
-export const ActionDeleteButton = styled(BaseActionButton)`
-  background-color: var(--app-red);
-  color: white;
-`;
-
-export const ActionGalleryButton = styled(BaseActionButton)`
-  background-color: var(--mid-grey);
-  color: white;
-`;
+export const ActionViewButton = styled(ActionButton).attrs({ $variant: 'dark' })``;
+export const ActionEditButton = styled(ActionButton).attrs({ $variant: 'primary' })``;
+export const ActionDeleteButton = styled(ActionButton).attrs({ $variant: 'danger' })``;
+export const ActionGalleryButton = styled(ActionButton).attrs({ $variant: 'dark' })``;
 
 export const ViewButtonDataTable = (props: React.ComponentProps<typeof ActionViewButton>) => (
   <ActionViewButton {...props}>
@@ -307,15 +263,7 @@ export const DataTableButtonsContainer = styled.div`
   align-items: center;
 `;
 
-export const CreateButton = styled(Button)`
-  background-color: #28a745;
-  display: flex;
-  align-items: center;
-
-  &:hover {
-    background-color: #218838;
-  }
-`;
+export const CreateButton = styled(ButtonDataTable).attrs({ $variant: 'primary' })``;
 
 export const CreateButtonDataTable = (props: React.ComponentProps<typeof CreateButton>) => (
   <CreateButton {...props}>
@@ -323,15 +271,7 @@ export const CreateButtonDataTable = (props: React.ComponentProps<typeof CreateB
   </CreateButton>
 );
 
-export const RefreshButtonDataTable = styled(Button)`
-  background-color: #17a2b8;
-  display: flex;
-  align-items: center;
-
-  &:hover {
-    background-color: #138496;
-  }
-`;
+export const RefreshButtonDataTable = styled(ButtonDataTable).attrs({ $variant: 'refresh' })``;
 
 export const RefreshButton = (props: React.ComponentProps<typeof RefreshButtonDataTable>) => (
   <RefreshButtonDataTable {...props}>
@@ -369,3 +309,4 @@ export const SortIconComponent: React.FC<{
 export const ThContent = styled.div`
   padding-right: 20px;
 `;
+

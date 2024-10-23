@@ -112,15 +112,15 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
                 </InputGroup>
                 {isEditing ? (
                     <ButtonContainer>
-                        <Button type="button" $variant={'cancel'} onClick={handleCancelEdit} disabled={isLoading}>Cancelar</Button>
-                        <Button type="submit" $primary disabled={isLoading}>
+                        <Button type="button" $variant="cancel" onClick={handleCancelEdit} disabled={isLoading}>Cancelar</Button>
+                        <Button type="submit" $variant="primary" disabled={isLoading}>
                             {isLoading ? 'Actualizando...' : 'Actualizar Perfil'}
                         </Button>
                     </ButtonContainer>
                 ) : (
                     <ButtonContainer>
-                        <Button type="button" $variant={'cancel'} onClick={handleCloseClick}>Cerrar</Button>
-                        <Button type="button" $primary onClick={handleEditClick}>Editar</Button>
+                        <Button type="button" $variant="cancel" onClick={handleCloseClick}>Cerrar</Button>
+                        <Button type="button" $variant="primary" onClick={handleEditClick}>Editar</Button>
                     </ButtonContainer>
                 )}
             </StyledForm>

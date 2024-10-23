@@ -5,10 +5,9 @@ import {
     ModalContent,
     ModalTitle,
     ConfirmationText,
-    ButtonContainer,
-    DeleteButton,
-    ModalCloseButton
+    ButtonContainer
 } from '@/components/management/DataTableElements';
+import Button from '@/components/ui/Button';
 
 interface DeleteGameConfirmationProps {
     item: Game;
@@ -39,10 +38,20 @@ const DeleteGameConfirmation: React.FC<DeleteGameConfirmationProps> = ({ item, o
             </ConfirmationText>
             {error && <ConfirmationText style={{ color: 'red' }}>{error}</ConfirmationText>}
             <ButtonContainer>
-                <DeleteButton onClick={handleDelete} disabled={isDeleting}>
+                <Button
+                    $variant="danger"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                >
                     {isDeleting ? 'Eliminando...' : 'Sí, eliminar'}
-                </DeleteButton>
-                <ModalCloseButton onClick={onClose} disabled={isDeleting}>Cancelar</ModalCloseButton>
+                </Button>
+                <Button
+                    $variant="cancel"
+                    onClick={onClose}
+                    disabled={isDeleting}
+                >
+                    Cancelar
+                </Button>
             </ButtonContainer>
         </ModalContent>
     );

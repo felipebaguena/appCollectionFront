@@ -97,10 +97,10 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose }) => {
           />
           {passwordError && <ErrorMessage>{passwordError}</ErrorMessage>}
         </InputGroup>
-        <Button type="submit" $primary $fullWidth disabled={isLoading}>
+        <Button type="submit" $variant="primary" $fullWidth disabled={isLoading}>
           {isLoading ? 'Creando...' : 'Crear Usuario'}
         </Button>
-        <Button type="button" $variant={'cancel'} $fullWidth onClick={onClose} disabled={isLoading}>Cancelar</Button>
+        <Button type="button" $variant="cancel" $fullWidth onClick={onClose} disabled={isLoading}>Cancelar</Button>
       </StyledForm>
       {message && <Message error={!!error}>{message}</Message>}
     </div>

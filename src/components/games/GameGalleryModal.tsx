@@ -3,8 +3,9 @@ import styled from 'styled-components';
 import { Game } from '@/types/game';
 import { useGameImages } from '@/hooks/useGameImages';
 import { FaChevronLeft, FaChevronRight, FaClock, FaUpload, FaTrash, FaTimes } from 'react-icons/fa';
-import { Button, ButtonContainer, DeleteButton } from '@/components/management/DataTableElements';
+import { ButtonDataTable, ButtonContainer, DeleteButton } from '@/components/management/DataTableElements';
 import DeleteImageConfirmationModal from '@/components/games/DeleteImageConfirmationModal';
+import Button from '../ui/Button';
 
 interface GalleryModalProps {
     isOpen: boolean;
@@ -104,12 +105,7 @@ const NavigationIcon = styled.div<{ isVisible: boolean; direction: 'left' | 'rig
   ${props => props.direction === 'left' ? 'padding-right: 20px;' : 'padding-left: 20px;'}
 `;
 
-const UploadButton = styled(Button)`
-  background-color: #28a745;
-  &:hover {
-    background-color: #218838;
-  }
-`;
+const UploadButton = styled(Button).attrs({ $variant: 'upload' })``;
 
 const HiddenFileInput = styled.input`
   display: none;
@@ -355,16 +351,16 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                         <UploadButton onClick={handleUploadClick}>
                             <FaUpload /> Subir imagen
                         </UploadButton>
-                        <Button onClick={handleDeleteModeToggle}>
+                        <Button $variant="primary" onClick={handleDeleteModeToggle}>
                             {isDeleteMode ? 'Salir del borrado' : <><FaTrash /> Borrar imágenes</>}
                         </Button>
                         {isDeleteMode && selectedImages.length > 0 && (
-                            <Button onClick={handleDeleteSelectedImages}>
+                            <Button $variant="danger" onClick={handleDeleteSelectedImages}>
                                 Borrar imágenes seleccionadas ({selectedImages.length})
                             </Button>
                         )}
                         {pendingImages.length > 0 && (
-                            <Button onClick={handleConfirmUpload}>
+                            <Button $variant="primary" onClick={handleConfirmUpload}>
                                 Confirmar subida ({pendingImages.length})
                             </Button>
                         )}
@@ -375,7 +371,7 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                             accept="image/*"
                             multiple
                         />
-                        <DeleteButton onClick={onClose}>Cerrar</DeleteButton>
+                        <Button $variant="danger" onClick={onClose}>Cerrar</Button>
                     </ButtonContainer>
                 </>
             )}
@@ -404,8 +400,8 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                         </NavigationOverlay>
                     </ImageWrapper>
                     <ButtonContainer>
-                        <Button onClick={handleBackToGallery}>Volver a la galería</Button>
-                        <DeleteButton onClick={onClose}>Cerrar</DeleteButton>
+                        <Button $variant="primary" onClick={handleBackToGallery}>Volver a la galería</Button>
+                        <Button $variant="danger" onClick={onClose}>Cerrar</Button>
                     </ButtonContainer>
                 </FullSizeImageContainer>
             )}
