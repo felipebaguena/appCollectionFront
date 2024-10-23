@@ -99,5 +99,52 @@ export const useGameImages = (gameId: number) => {
     [gameId]
   );
 
-  return { gameImages, loading, error, fetchGameImages, setCover, uploadImage };
+  const deleteImage = useCallback(async (imageId: number) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await api.delete(
+        ENDPOINTS.DELETE_IMAGE(imageId.toString()),
+        imageId.toString()
+      );
+      setGameImages((prevImages) =>
+        prevImages.filter((img) => img.id !== imageId)
+      );
+    } catch (error) {
+      setError("Error al borrar la imagen");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const deleteMultipleImages = useCallback(async (imageIds: number[]) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await api.request(ENDPOINTS.DELETE_MULTIPLE_IMAGES, {
+        method: "DELETE",
+        body: { ids: imageIds },
+      });
+      setGameImages((prevImages) =>
+        prevImages.filter((img) => !imageIds.includes(img.id))
+      );
+    } catch (error) {
+      setError("Error al borrar las imágenes seleccionadas");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return {
+    gameImages,
+    loading,
+    error,
+    fetchGameImages,
+    setCover,
+    uploadImage,
+    deleteImage,
+    deleteMultipleImages,
+  };
 };

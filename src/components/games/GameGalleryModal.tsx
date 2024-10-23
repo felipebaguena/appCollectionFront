@@ -2,8 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Game } from '@/types/game';
 import { useGameImages } from '@/hooks/useGameImages';
-import { FaChevronLeft, FaChevronRight, FaClock, FaUpload } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaClock, FaUpload, FaTrash, FaTimes } from 'react-icons/fa';
 import { Button, ButtonContainer, DeleteButton } from '@/components/management/DataTableElements';
+import DeleteImageConfirmationModal from '@/components/games/DeleteImageConfirmationModal';
 
 interface GalleryModalProps {
     isOpen: boolean;
@@ -142,12 +143,37 @@ const PendingIcon = styled.div`
   justify-content: center;
 `;
 
+const DeleteIcon = styled.div<{ isVisible: boolean }>`
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(255, 0, 0, 0.7);
+  color: white;
+  padding: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: ${props => props.isVisible ? 'flex' : 'none'};
+  align-items: center;
+  justify-content: center;
+`;
+
+const SelectedImage = styled(GalleryImage)`
+  border: 3px solid #007bff;
+`;
+
 const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, getImageUrl }) => {
-    const { gameImages, loading, error, fetchGameImages, uploadImage } = useGameImages(game.id);
+    const { gameImages, loading, error, fetchGameImages, uploadImage, deleteImage, deleteMultipleImages } = useGameImages(game.id);
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
     const [hoveredHalf, setHoveredHalf] = useState<'left' | 'right' | null>(null);
     const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isDeleteMode, setIsDeleteMode] = useState(false);
+    const [selectedImages, setSelectedImages] = useState<number[]>([]);
+    const [deleteImageConfirmation, setDeleteImageConfirmation] = useState({
+        isOpen: false,
+        message: '',
+        onConfirm: () => { },
+    });
 
     useEffect(() => {
         if (isOpen) {
@@ -235,6 +261,52 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
         fetchGameImages();
     };
 
+    const handleDeleteModeToggle = () => {
+        setIsDeleteMode(!isDeleteMode);
+        setSelectedImages([]);
+    };
+
+    const handleImageSelect = (imageId: number) => {
+        if (isDeleteMode) {
+            setSelectedImages(prev =>
+                prev.includes(imageId) ? prev.filter(id => id !== imageId) : [...prev, imageId]
+            );
+        } else {
+            handleImageClick(gameImages.findIndex(img => img.id === imageId));
+        }
+    };
+
+    const handleDeleteImage = async (imageId: number) => {
+        setDeleteImageConfirmation({
+            isOpen: true,
+            message: "¿Seguro que deseas borrar la imagen?",
+            onConfirm: async () => {
+                try {
+                    await deleteImage(imageId);
+                } catch (error) {
+                    console.error("Error al borrar la imagen:", error);
+                }
+                setDeleteImageConfirmation(prev => ({ ...prev, isOpen: false }));
+            },
+        });
+    };
+
+    const handleDeleteSelectedImages = async () => {
+        setDeleteImageConfirmation({
+            isOpen: true,
+            message: `¿Seguro que deseas borrar ${selectedImages.length} imágenes seleccionadas?`,
+            onConfirm: async () => {
+                try {
+                    await deleteMultipleImages(selectedImages);
+                    setSelectedImages([]);
+                } catch (error) {
+                    console.error("Error al borrar las imágenes seleccionadas:", error);
+                }
+                setDeleteImageConfirmation(prev => ({ ...prev, isOpen: false }));
+            },
+        });
+    };
+
     return (
         <GalleryModalContent onClick={(e) => e.stopPropagation()}>
             <h2>Galería del juego: {game.title}</h2>
@@ -254,19 +326,43 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                                 </PendingIcon>
                             </PendingImageWrapper>
                         ))}
-                        {gameImages.map((img, index) => (
-                            <GalleryImage
-                                key={img.id}
-                                src={getImageUrl(img.path)}
-                                alt={img.filename}
-                                onClick={() => handleImageClick(index)}
-                            />
+                        {gameImages.map((img) => (
+                            <div key={img.id} style={{ position: 'relative' }}>
+                                {isDeleteMode ? (
+                                    <SelectedImage
+                                        src={getImageUrl(img.path)}
+                                        alt={img.filename}
+                                        onClick={() => handleImageSelect(img.id)}
+                                        style={{ opacity: selectedImages.includes(img.id) ? 0.6 : 1 }}
+                                    />
+                                ) : (
+                                    <GalleryImage
+                                        src={getImageUrl(img.path)}
+                                        alt={img.filename}
+                                        onClick={() => handleImageClick(gameImages.indexOf(img))}
+                                    />
+                                )}
+                                <DeleteIcon
+                                    isVisible={isDeleteMode}
+                                    onClick={() => handleDeleteImage(img.id)}
+                                >
+                                    <FaTimes />
+                                </DeleteIcon>
+                            </div>
                         ))}
                     </GalleryContainer>
                     <ButtonContainer>
                         <UploadButton onClick={handleUploadClick}>
                             <FaUpload /> Subir imagen
                         </UploadButton>
+                        <Button onClick={handleDeleteModeToggle}>
+                            {isDeleteMode ? 'Salir del borrado' : <><FaTrash /> Borrar imágenes</>}
+                        </Button>
+                        {isDeleteMode && selectedImages.length > 0 && (
+                            <Button onClick={handleDeleteSelectedImages}>
+                                Borrar imágenes seleccionadas ({selectedImages.length})
+                            </Button>
+                        )}
                         {pendingImages.length > 0 && (
                             <Button onClick={handleConfirmUpload}>
                                 Confirmar subida ({pendingImages.length})
@@ -313,6 +409,12 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                     </ButtonContainer>
                 </FullSizeImageContainer>
             )}
+            <DeleteImageConfirmationModal
+                isOpen={deleteImageConfirmation.isOpen}
+                onClose={() => setDeleteImageConfirmation(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={deleteImageConfirmation.onConfirm}
+                message={deleteImageConfirmation.message}
+            />
         </GalleryModalContent>
     );
 };

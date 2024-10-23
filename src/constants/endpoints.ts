@@ -16,4 +16,6 @@ export const ENDPOINTS = {
   DELETE_GAME: (id: string) => `/games/${id}`,
   CREATE_GAME: "/games",
   UPLOAD_GAME_IMAGE: "/images",
+  DELETE_IMAGE: (id: string) => `/images/${id}`,
+  DELETE_MULTIPLE_IMAGES: "/images",
 };
