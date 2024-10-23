@@ -15,6 +15,8 @@ export const InputGroup = styled.div`
 
 export const Label = styled.label`
   margin-bottom: 0.3rem;
+  color: var(--light-grey);
+  font-weight: bold;
 `;
 
 export const Input = styled.input`
@@ -49,4 +51,35 @@ export const ButtonContainer = styled.div`
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1rem;
+`;
+
+// Nuevos componentes para ViewGameForm
+export const FormContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+`;
+
+export const FormColumn = styled.div`
+  flex: 1;
+  min-width: 250px;
+`;
+
+export const FieldValue = styled.div`
+  padding: 0.1rem;
+  background-color: var(--mid-grey);
+  border-radius: 4px;
+  color: var(--light-grey);
+  margin-bottom: 1rem;
+`;
+
+export const ViewForm = styled(StyledForm)`
+  color: var(--clear-grey);
+`;
+
+export const CoverImage = styled.img`
+  width: 100%;
+  max-height: 12rem;
+  object-fit: cover;
+  margin-bottom: 0.5rem;
 `;
