@@ -263,20 +263,22 @@ export const DataTableButtonsContainer = styled.div`
   align-items: center;
 `;
 
-export const CreateButton = styled(ButtonDataTable).attrs({ $variant: 'primary' })``;
-
-export const CreateButtonDataTable = (props: React.ComponentProps<typeof CreateButton>) => (
-  <CreateButton {...props}>
+export const CreateButtonDataTable = (props: React.ComponentProps<typeof Button>) => (
+  <Button
+    {...props}
+    $variant="primary"
+  >
     <FaPlus />
-  </CreateButton>
+  </Button>
 );
 
-export const RefreshButtonDataTable = styled(ButtonDataTable).attrs({ $variant: 'refresh' })``;
-
-export const RefreshButton = (props: React.ComponentProps<typeof RefreshButtonDataTable>) => (
-  <RefreshButtonDataTable {...props}>
+export const RefreshButton = (props: React.ComponentProps<typeof Button>) => (
+  <Button
+    {...props}
+    $variant="dark"
+  >
     <FaSync />
-  </RefreshButtonDataTable>
+  </Button>
 );
 
 export const SortIcon = styled.span`
@@ -309,4 +311,3 @@ export const SortIconComponent: React.FC<{
 export const ThContent = styled.div`
   padding-right: 20px;
 `;
-
