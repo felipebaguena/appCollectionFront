@@ -38,8 +38,7 @@ import EditGameForm from '@/components/games/EditGameForm';
 import GameGalleryModal from '@/components/games/GameGalleryModal';
 import CreateGameForm from '@/components/games/CreateGameForm';
 import { useGames } from '@/hooks/useGames';
-import { FilterPackage, BaseFilter } from '@/types/filters';
-import FilterInput from '../ui/FilterInput';
+import { BaseFilter, FilterPackage } from '@/types/filters';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -50,7 +49,7 @@ interface DataTableProps<T extends { id: number }, F extends BaseFilter> {
     initialParams?: Partial<DataTableParams<T>>;
     title?: string;
     form: 'game' | 'otherType';
-    filterPackage?: FilterPackage<T, F>;
+    filterPackage: FilterPackage<T, F>;
 }
 
 type FormType = 'game' | 'otherType';
@@ -76,7 +75,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     initialParams = {},
     title,
     form,
-    filterPackage
+    filterPackage,
 }: DataTableProps<T, F>) {
     const [selectedItem, setSelectedItem] = useState<T | null>(null);
     const [selectedGame, setSelectedGame] = useState<Game | null>(null);
@@ -271,13 +270,6 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         });
     }, [refreshData]);
 
-    const applyFilters = () => {
-        if (filterPackage) {
-            const newParams = filterPackage.applyFilters({ ...params, filters: filters });
-            refreshData(newParams);
-        }
-    };
-
     const getItemIdentifier = (item: T | null): string => {
         if (!item) return '';
         // Intenta usar 'title' si existe, de lo contrario usa 'id'
@@ -290,13 +282,12 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 <TitleContainer>
                     <TableTitle>{title}</TableTitle>
                     <DataTableButtonsContainer>
-                        {filterPackage && Object.entries(filterPackage.filters).map(([key, value]) => (
-                            <FilterInput
-                                key={key}
-                                label={key}
-                                value={filters[key as keyof F] ?? ''}
-                                onChange={(value) => handleFilterChange(key as keyof F, value)}
-                            />
+                        {filterPackage && Object.keys(filterPackage.filters).map((key) => (
+                            filterPackage.renderFilter(
+                                key as keyof F,
+                                filters[key as keyof F],
+                                (key, value) => handleFilterChange(key as keyof F, value)
+                            )
                         ))}
                         <CreateButtonDataTable onClick={handleCreate} />
                         <RefreshButton onClick={refreshDataAndResetPage} />

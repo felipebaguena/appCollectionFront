@@ -7,8 +7,8 @@ import { gameColumns } from '@/constants/tableColumns';
 import { Game } from '@/types/game';
 import { DataTableContainer } from '@/components/management/DataTableElements';
 import { getGameColumns } from '@/components/management/CustomColumns';
-import { gamesDataTableFilter } from '@/filters/gamesDataTableFilter';
-
+import { filterPackages } from '@/filters';
+import { FilterPackage } from '@/types/filters';
 
 export default function ManageGames() {
   const columns = getGameColumns(gameColumns);
@@ -16,12 +16,12 @@ export default function ManageGames() {
   return (
     <div>
       <DataTableContainer>
-        <DataTable<Game, typeof gamesDataTableFilter.filters>
+        <DataTable<Game, typeof filterPackages.game.filters>
           title="Listado de juegos"
           columns={columns}
           endpoint={ENDPOINTS.GET_GAMES_DATATABLE}
           form="game"
-          filterPackage={gamesDataTableFilter}
+          filterPackage={filterPackages.game as FilterPackage<Game, typeof filterPackages.game.filters>}
         />
       </DataTableContainer>
     </div>
