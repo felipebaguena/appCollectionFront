@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
 
@@ -11,23 +11,21 @@ interface Platform {
 
 export const usePlatform = (id: string) => {
   const [platform, setPlatform] = useState<Platform | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPlatform = useCallback(async () => {
+    setLoading(true);
     try {
       const data = await api.get<Platform>(ENDPOINTS.GET_PLATFORM(id));
       setPlatform(data);
-      setLoading(false);
+      setError(null);
     } catch (error) {
       setError("Error al cargar los detalles de la plataforma");
+    } finally {
       setLoading(false);
     }
   }, [id]);
-
-  useEffect(() => {
-    fetchPlatform();
-  }, [fetchPlatform]);
 
   const updatePlatform = async (updatedPlatformData: Partial<Platform>) => {
     setLoading(true);
@@ -38,12 +36,13 @@ export const usePlatform = (id: string) => {
         updatedPlatformData
       );
       setPlatform(updatedPlatform);
-      setLoading(false);
+      setError(null);
       return updatedPlatform;
     } catch (error) {
       setError("Error al actualizar la plataforma");
-      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,11 +51,12 @@ export const usePlatform = (id: string) => {
     try {
       await api.delete(ENDPOINTS.DELETE_PLATFORM(id), id);
       setPlatform(null);
-      setLoading(false);
+      setError(null);
     } catch (error) {
       setError("Error al eliminar la plataforma");
-      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,8 +64,8 @@ export const usePlatform = (id: string) => {
     platform,
     loading,
     error,
+    fetchPlatform,
     updatePlatform,
     deletePlatform,
-    refetchPlatform: fetchPlatform,
   };
 };

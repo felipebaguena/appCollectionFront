@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
 
@@ -18,23 +18,21 @@ interface Game {
 
 export const useGame = (id: string) => {
   const [game, setGame] = useState<Game | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchGame = useCallback(async () => {
+    setLoading(true);
     try {
       const data = await api.get<Game>(ENDPOINTS.GET_GAME(id));
       setGame(data);
-      setLoading(false);
+      setError(null);
     } catch (error) {
       setError("Error al cargar los detalles del juego");
+    } finally {
       setLoading(false);
     }
   }, [id]);
-
-  useEffect(() => {
-    fetchGame();
-  }, [fetchGame]);
 
   const updateGame = async (updatedGameData: Partial<Game>) => {
     setLoading(true);
@@ -45,12 +43,13 @@ export const useGame = (id: string) => {
         updatedGameData
       );
       setGame(updatedGame);
-      setLoading(false);
+      setError(null);
       return updatedGame;
     } catch (error) {
       setError("Error al actualizar el juego");
-      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,11 +58,12 @@ export const useGame = (id: string) => {
     try {
       await api.delete(ENDPOINTS.DELETE_GAME(id), id);
       setGame(null);
-      setLoading(false);
+      setError(null);
     } catch (error) {
       setError("Error al eliminar el juego");
-      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -71,8 +71,8 @@ export const useGame = (id: string) => {
     game,
     loading,
     error,
+    fetchGame,
     updateGame,
     deleteGame,
-    refetchGame: fetchGame,
   };
 };
