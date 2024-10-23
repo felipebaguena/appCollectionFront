@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { FaEye, FaEdit, FaTrash, FaImages, FaPlus, FaSync } from 'react-icons/fa';
+import { FaEye, FaEdit, FaTrash, FaImages, FaPlus, FaSync, FaSortUp, FaSortDown, FaSort } from 'react-icons/fa';
 
 export const DataTableContainer = styled.div`
   margin: 2rem;
@@ -25,6 +25,7 @@ export const Th = styled.th<{ sortable?: boolean }>`
   color: #333;
   border-right: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
+  position: relative;
 
   &:last-child {
     border-right: none;
@@ -337,3 +338,34 @@ export const RefreshButton = (props: React.ComponentProps<typeof RefreshButtonDa
     <FaSync />
   </RefreshButtonDataTable>
 );
+
+export const SortIcon = styled.span`
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+`;
+
+export const ActiveSortIcon = styled(SortIcon) <{ isAsc: boolean }>`
+  color: #007bff;
+`;
+
+export const InactiveSortIcon = styled(SortIcon)`
+  opacity: 0.5;
+`;
+
+export const SortIconComponent: React.FC<{
+  active: boolean;
+  direction: 'asc' | 'desc' | null;
+}> = ({ active, direction }) => {
+  if (!active) {
+    return <InactiveSortIcon as={FaSort} />;
+  }
+  return direction === 'asc' ?
+    <ActiveSortIcon as={FaSortUp} isAsc={true} /> :
+    <ActiveSortIcon as={FaSortDown} isAsc={false} />;
+};
+
+export const ThContent = styled.div`
+  padding-right: 20px;
+`;

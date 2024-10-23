@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDataTable } from '@/hooks/useDataTable';
 import { Column, DataTableParams } from '@/types/dataTable';
 import {
@@ -22,7 +22,9 @@ import {
     DeleteButtonDataTable,
     GalleryButtonDataTable,
     CreateButtonDataTable,
-    DataTableButtonsContainer
+    DataTableButtonsContainer,
+    SortIconComponent,
+    ThContent
 } from './DataTableElements';
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
@@ -34,7 +36,6 @@ import EditGameForm from '@/components/games/EditGameForm';
 import DeleteGameConfirmation from '@/components/games/DeleteGameConfirmation';
 import GameGalleryModal from '@/components/games/GameGalleryModal';
 import CreateGameForm from '@/components/games/CreateGameForm';
-import { FaPlus } from 'react-icons/fa';
 import { useGames } from '@/hooks/useGames';
 import { FilterPackage, BaseFilter } from '@/types/filters';
 import FilterInput from '../ui/FilterInput';
@@ -108,12 +109,16 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         refreshData
     } = useDataTable<T>(endpoint, mergedParams);
 
+    const refreshDataAndResetPage = useCallback(() => {
+        refreshData({ page: 1 });
+    }, [refreshData]);
+
     useEffect(() => {
         if (shouldRefresh) {
-            refreshData();
+            refreshDataAndResetPage();
             setShouldRefresh(false);
         }
-    }, [shouldRefresh, refreshData]);
+    }, [shouldRefresh, refreshDataAndResetPage]);
 
     const handleViewCover = (game: Game) => {
         setSelectedGame(game);
@@ -128,11 +133,11 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         setActionType(type);
     };
 
-    const handleCloseAction = () => {
+    const handleCloseAction = useCallback(() => {
         setSelectedItem(null);
         setActionType(null);
-        setShouldRefresh(true);
-    };
+        refreshDataAndResetPage();
+    }, [refreshDataAndResetPage]);
 
     const handleGalleryAction = (item: T) => {
         setSelectedItem(item);
@@ -161,10 +166,10 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         setShowCreateModal(false);
     };
 
-    const handleItemCreated = () => {
-        refreshData();
+    const handleItemCreated = useCallback(() => {
+        refreshDataAndResetPage();
         setShowCreateModal(false);
-    };
+    }, [refreshDataAndResetPage]);
 
     const columnsWithActions: Column<T>[] = [
         ...columns.map(column => {
@@ -233,9 +238,16 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     const platformsOptions: Option[] = platforms.map(p => ({ id: p.id, name: p.name, code: p.id.toString() }));
     const developersOptions: Option[] = developers.map(d => ({ id: d.id, name: d.name, code: d.id.toString() }));
 
-    const handleFilterChange = (key: keyof F, value: any) => {
-        setFilters(prev => ({ ...prev, [key]: value }));
-    };
+    const handleFilterChange = useCallback((key: keyof F, value: any) => {
+        setFilters((prevFilters) => {
+            const updatedFilters = { ...prevFilters, [key]: value };
+            refreshData({
+                page: 1,
+                filters: updatedFilters
+            });
+            return updatedFilters;
+        });
+    }, [refreshData]);
 
     const applyFilters = () => {
         if (filterPackage) {
@@ -258,9 +270,8 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                                 onChange={(value) => handleFilterChange(key as keyof F, value)}
                             />
                         ))}
-                        <Button onClick={applyFilters}>Aplicar Filtros</Button>
                         <CreateButtonDataTable onClick={handleCreate} />
-                        <RefreshButton onClick={() => refreshData()} />
+                        <RefreshButton onClick={refreshDataAndResetPage} />
                     </DataTableButtonsContainer>
                 </TitleContainer>
             )}
@@ -271,12 +282,17 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                             {columnsWithActions.map((column) => (
                                 <Th
                                     key={String(column.key)}
-                                    onClick={() => column.sortable && handleSortChange(column.key, params.sortOrder === 'asc' ? 'desc' : 'asc')}
+                                    onClick={() => column.sortable && handleSortChange(column.key, params.sortField === column.key ? (params.sortOrder === 'asc' ? 'desc' : 'asc') : 'asc')}
                                     sortable={column.sortable}
                                 >
-                                    {column.label}
-                                    {column.sortable && params.sortField === column.key && (
-                                        params.sortOrder === 'asc' ? ' ▲' : ' ▼'
+                                    <ThContent>
+                                        {column.label}
+                                    </ThContent>
+                                    {column.sortable && (
+                                        <SortIconComponent
+                                            active={params.sortField === column.key}
+                                            direction={params.sortField === column.key ? params.sortOrder : null}
+                                        />
                                     )}
                                 </Th>
                             ))}
