@@ -48,11 +48,11 @@ interface DataTableProps<T extends { id: number }, F extends BaseFilter> {
     endpoint: string;
     initialParams?: Partial<DataTableParams<T>>;
     title?: string;
-    form: 'game' | 'otherType';
+    form: 'game' | 'platform' | 'otherType';
     filterPackage: FilterPackage<T, F>;
 }
 
-type FormType = 'game' | 'otherType';
+type FormType = 'game' | 'platform' | 'otherType';
 
 type ItemType<F extends FormType> =
     F extends 'game' ? Game :

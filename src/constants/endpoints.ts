@@ -18,4 +18,5 @@ export const ENDPOINTS = {
   UPLOAD_GAME_IMAGE: "/images",
   DELETE_IMAGE: (id: string) => `/images/${id}`,
   DELETE_MULTIPLE_IMAGES: "/images",
+  GET_PLATFORMS_DATATABLE: "/platforms/datatable",
 };

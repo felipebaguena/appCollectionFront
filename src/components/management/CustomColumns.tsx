@@ -41,8 +41,14 @@ const gameColumns: Partial<Record<keyof Game, Partial<Column<Game>>>> = {
     },
 };
 
+// Columnas personalizadas para Platform
+const platformColumns: Partial<Record<keyof Platform, Partial<Column<Platform>>>> = {
+
+};
+
 export const customColumns = {
     Game: gameColumns,
+    Platform: platformColumns,
 } as const;
 
 export type CustomColumnTypes = keyof typeof customColumns;
@@ -56,6 +62,13 @@ export function getCustomColumns<T extends CustomColumnTypes>(
 export function getGameColumns(baseColumns: Column<Game>[]): Column<Game>[] {
     return baseColumns.map((column) => {
         const customColumn = gameColumns[column.key as keyof Game];
+        return customColumn ? { ...column, ...customColumn } : column;
+    });
+}
+
+export function getPlatformColumns(baseColumns: Column<Platform>[]): Column<Platform>[] {
+    return baseColumns.map((column) => {
+        const customColumn = platformColumns[column.key as keyof Platform];
         return customColumn ? { ...column, ...customColumn } : column;
     });
 }
