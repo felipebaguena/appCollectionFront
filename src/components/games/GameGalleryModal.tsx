@@ -2,10 +2,11 @@ import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { Game } from '@/types/game';
 import { useGameImages } from '@/hooks/useGameImages';
-import { FaChevronLeft, FaChevronRight, FaClock, FaUpload, FaTrash, FaTimes } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaClock, FaTimes } from 'react-icons/fa';
 import { ButtonContainer } from '@/components/ui/FormElements';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import Button from '../ui/Button';
+import Modal from '../ui/Modal';
 
 interface GalleryModalProps {
     isOpen: boolean;
@@ -14,23 +15,11 @@ interface GalleryModalProps {
     getImageUrl: (path: string) => string;
 }
 
-const GalleryModalContent = styled.div`
-  background-color: white;
-  padding: 20px;
-  position: relative;
-  max-width: 90vw;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 1002; // Aumenta este z-index para asegurarte de que esté por encima de otros modales
-`;
-
 const GalleryContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 10px;
-  max-height: calc(90vh - 200px);
+  max-height: calc(90vh - 300px);
   overflow-y: auto;
   width: 100%;
   padding: 10px;
@@ -43,7 +32,7 @@ const GalleryImage = styled.img`
   cursor: pointer;
   border: 2px solid transparent;
   &:hover {
-    border-color: #007bff;
+    border-color: var(--clear-grey);
   }
 `;
 
@@ -58,7 +47,7 @@ const FullSizeImageContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
 `;
 
 const ImageWrapper = styled.div`
@@ -105,8 +94,6 @@ const NavigationIcon = styled.div<{ isVisible: boolean; direction: 'left' | 'rig
   ${props => props.direction === 'left' ? 'padding-right: 20px;' : 'padding-left: 20px;'}
 `;
 
-const UploadButton = styled(Button).attrs({ $variant: 'upload' })``;
-
 const HiddenFileInput = styled.input`
   display: none;
 `;
@@ -127,42 +114,75 @@ const PendingImage = styled(GalleryImage)`
   opacity: 0.6;
 `;
 
-const PendingIcon = styled.div`
+const IconBase = styled.div`
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: rgba(0, 0, 0, 0.7);
+  top: 5px;
+  right: 5px;
   color: white;
-  padding: 6px;
+  padding: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
 `;
 
-const DeleteIcon = styled.div<{ isVisible: boolean }>`
-  position: absolute;
-  top: 5px;
-  right: 5px;
+const PendingIcon = styled(IconBase)`
+  background-color: rgba(0, 0, 0, 0.7);
+`;
+
+const DeleteIcon = styled(IconBase) <{ isVisible: boolean }>`
   background-color: rgba(255, 0, 0, 0.7);
-  color: white;
-  padding: 5px;
-  border-radius: 50%;
   cursor: pointer;
   display: ${props => props.isVisible ? 'flex' : 'none'};
-  align-items: center;
-  justify-content: center;
 `;
 
-const SelectedImage = styled(GalleryImage)`
-  border: 3px solid #007bff;
+const SelectedImage = styled(GalleryImage) <{ $isSelected: boolean }>`
+  position: relative;
+  border-color: ${props => props.$isSelected ? 'red' : 'transparent'};
+  opacity: ${props => props.$isSelected ? 0.5 : 1};
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: red;
+    opacity: ${props => props.$isSelected ? 1 : 0};
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  &:hover {
+    border-color: red;
+
+    &::after {
+      opacity: 1;
+    }
+  }
 `;
 
-const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, getImageUrl }) => {
-    const { gameImages, loading, error, fetchGameImages, uploadImage, deleteImage, deleteMultipleImages } = useGameImages(game.id);
+const GameGalleryModal: React.FC<GalleryModalProps> = ({
+    isOpen,
+    onClose,
+    game,
+    getImageUrl
+}) => {
+
+    const {
+        gameImages,
+        loading,
+        error,
+        fetchGameImages,
+        uploadImage,
+        deleteImage,
+        deleteMultipleImages
+    } = useGameImages(game.id);
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
     const [hoveredHalf, setHoveredHalf] = useState<'left' | 'right' | null>(null);
     const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDeleteMode, setIsDeleteMode] = useState(false);
     const [selectedImages, setSelectedImages] = useState<number[]>([]);
     const [confirmationModal, setConfirmationModal] = useState({
@@ -177,8 +197,6 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
             fetchGameImages();
         }
     }, [isOpen, fetchGameImages]);
-
-    if (!isOpen) return null;
 
     const handleImageClick = (index: number) => {
         setSelectedImageIndex(index);
@@ -306,9 +324,8 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
         });
     };
 
-    return (
-        <GalleryModalContent onClick={(e) => e.stopPropagation()}>
-            <h2>Galería del juego: {game.title}</h2>
+    const modalContent = (
+        <>
             {loading && <p>Cargando imágenes...</p>}
             {error && <p>Error: {error}</p>}
             {!loading && !error && selectedImageIndex === null && (
@@ -332,7 +349,7 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                                         src={getImageUrl(img.path)}
                                         alt={img.filename}
                                         onClick={() => handleImageSelect(img.id)}
-                                        style={{ opacity: selectedImages.includes(img.id) ? 0.6 : 1 }}
+                                        $isSelected={selectedImages.includes(img.id)}
                                     />
                                 ) : (
                                     <GalleryImage
@@ -351,11 +368,11 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                         ))}
                     </GalleryContainer>
                     <ButtonContainer>
-                        <Button $variant="upload" onClick={handleUploadClick}>
-                            <FaUpload /> Subir imagen
+                        <Button $variant="primary" onClick={handleUploadClick}>
+                            Subir imagen
                         </Button>
-                        <Button $variant="primary" onClick={handleDeleteModeToggle}>
-                            {isDeleteMode ? 'Salir del borrado' : <><FaTrash /> Borrar imágenes</>}
+                        <Button $variant="dark" onClick={handleDeleteModeToggle}>
+                            {isDeleteMode ? 'Salir del borrado' : 'Borrar imágenes'}
                         </Button>
                         {isDeleteMode && selectedImages.length > 0 && (
                             <Button $variant="danger" onClick={handleDeleteSelectedImages}>
@@ -367,6 +384,9 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                                 Confirmar subida ({pendingImages.length})
                             </Button>
                         )}
+                        <Button $variant="cancel" onClick={onClose}>
+                            Cerrar galería
+                        </Button>
                         <HiddenFileInput
                             type="file"
                             ref={fileInputRef}
@@ -374,7 +394,6 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                             accept="image/*"
                             multiple
                         />
-                        <Button $variant="danger" onClick={onClose}>Cerrar</Button>
                     </ButtonContainer>
                 </>
             )}
@@ -403,11 +422,29 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                         </NavigationOverlay>
                     </ImageWrapper>
                     <ButtonContainer>
-                        <Button $variant="primary" onClick={handleBackToGallery}>Volver a la galería</Button>
-                        <Button $variant="danger" onClick={onClose}>Cerrar</Button>
+                        <Button $variant="primary" onClick={handleBackToGallery}>
+                            Volver a la galería
+                        </Button>
+                        <Button $variant="cancel" onClick={onClose}>
+                            Cerrar galería
+                        </Button>
                     </ButtonContainer>
                 </FullSizeImageContainer>
             )}
+        </>
+    );
+
+    return (
+        <>
+            <Modal
+                isOpen={isOpen}
+                onClose={onClose}
+                title={`Galería del juego: ${game.title}`}
+                width="90%"
+                maxWidth="1200px"
+            >
+                {modalContent}
+            </Modal>
             <ConfirmationModal
                 isOpen={confirmationModal.isOpen}
                 onClose={() => setConfirmationModal(prev => ({ ...prev, isOpen: false }))}
@@ -418,7 +455,7 @@ const GameGalleryModal: React.FC<GalleryModalProps> = ({ isOpen, onClose, game, 
                 cancelText="Cancelar"
                 confirmVariant="danger"
             />
-        </GalleryModalContent>
+        </>
     );
 };
 

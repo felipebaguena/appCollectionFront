@@ -31,7 +31,7 @@ const getButtonStyles = (props: ButtonProps) => {
       `;
     case "dark":
       return css`
-        background-color: var(--dark-color, #343a40);
+        background-color: var(--dark-grey, #343a40);
         color: white;
       `;
     case "upload":
