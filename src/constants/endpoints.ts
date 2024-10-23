@@ -19,4 +19,8 @@ export const ENDPOINTS = {
   DELETE_IMAGE: (id: string) => `/images/${id}`,
   DELETE_MULTIPLE_IMAGES: "/images",
   GET_PLATFORMS_DATATABLE: "/platforms/datatable",
+  CREATE_PLATFORM: "/platforms",
+  GET_PLATFORM: (id: string) => `/platforms/${id}`,
+  SET_PLATFORM: (id: string) => `/platforms/${id}`,
+  DELETE_PLATFORM: (id: string) => `/platforms/${id}`,
 };

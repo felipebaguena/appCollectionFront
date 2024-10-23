@@ -37,8 +37,11 @@ import ViewGameForm from '@/components/games/ViewGameForm';
 import EditGameForm from '@/components/games/EditGameForm';
 import GameGalleryModal from '@/components/games/GameGalleryModal';
 import CreateGameForm from '@/components/games/CreateGameForm';
+import CreatePlatformForm from '@/components/platforms/CreatePlatformForm';
 import { useGames } from '@/hooks/useGames';
+import { usePlatforms } from '@/hooks/usePlatforms';
 import { BaseFilter, FilterPackage } from '@/types/filters';
+import { usePlatform } from '@/hooks/usePlatform';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -84,12 +87,16 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     const [shouldRefresh, setShouldRefresh] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const { genres, platforms, developers } = useGames();
+    const { fetchPlatforms } = usePlatforms();
     const [filters, setFilters] = useState<F>((filterPackage?.filters || {}) as F);
     const [deleteConfirmation, setDeleteConfirmation] = useState({
         isOpen: false,
         itemToDelete: null as T | null,
     });
-    const { deleteGame } = useGame(deleteConfirmation.itemToDelete?.id.toString() || '');
+
+    const deleteItemId = deleteConfirmation.itemToDelete?.id.toString() || '';
+    const { deleteGame } = form === 'game' ? useGame(deleteItemId) : { deleteGame: null };
+    const { deletePlatform } = form === 'platform' ? usePlatform(deleteItemId) : { deletePlatform: null };
 
     const defaultParams: DataTableParams<T> = {
         page: 1,
@@ -145,7 +152,27 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     const handleDeleteConfirm = async () => {
         if (deleteConfirmation.itemToDelete) {
             try {
-                await deleteGame();
+                switch (form) {
+                    case 'game':
+                        if (deleteGame) {
+                            await deleteGame();
+                        }
+                        break;
+                    case 'platform':
+                        if (deletePlatform) {
+                            await deletePlatform();
+                        }
+                        break;
+                    // Futuros tipos de formularios
+                    // case 'otherType':
+                    //     if (deleteOtherType) {
+                    //         await deleteOtherType();
+                    //     }
+                    //     break;
+                    default:
+                        console.error('Tipo de formulario no reconocido:', form);
+                        return;
+                }
                 refreshDataAndResetPage();
             } catch (error) {
                 console.error('Error al eliminar el elemento:', error);
@@ -173,15 +200,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     };
 
     const handleCreate = () => {
-        switch (form) {
-            case 'game':
-                setShowCreateModal(true);
-                break;
-            case 'otherType':
-                break;
-            default:
-                console.error('Tipo de formulario no reconocido');
-        }
+        setShowCreateModal(true);
     };
 
     const handleCloseCreateModal = () => {
@@ -191,7 +210,10 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     const handleItemCreated = useCallback(() => {
         refreshDataAndResetPage();
         setShowCreateModal(false);
-    }, [refreshDataAndResetPage]);
+        if (form === 'platform') {
+            fetchPlatforms();
+        }
+    }, [refreshDataAndResetPage, form, fetchPlatforms]);
 
     const getActionButtons = (form: FormType, item: T) => {
         const buttons = [];
@@ -408,16 +430,24 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 </ModalOverlay>
             )}
 
-            {/* Modal para la creación de un nuevo juego */}
-            {showCreateModal && form === 'game' && (
+            {/* Modal para la creación de un nuevo juego o plataforma */}
+            {showCreateModal && (
                 <ModalOverlay>
-                    <CreateGameForm
-                        onClose={handleCloseCreateModal}
-                        onGameCreated={handleItemCreated}
-                        genres={genresOptions}
-                        platforms={platformsOptions}
-                        developers={developersOptions}
-                    />
+                    {form === 'game' && (
+                        <CreateGameForm
+                            onClose={handleCloseCreateModal}
+                            onGameCreated={handleItemCreated}
+                            genres={genresOptions}
+                            platforms={platformsOptions}
+                            developers={developersOptions}
+                        />
+                    )}
+                    {form === 'platform' && (
+                        <CreatePlatformForm
+                            onClose={handleCloseCreateModal}
+                            onPlatformCreated={handleItemCreated}
+                        />
+                    )}
                 </ModalOverlay>
             )}
 
