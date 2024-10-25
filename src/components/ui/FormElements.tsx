@@ -54,8 +54,9 @@ export const ButtonContainer = styled.div`
 `;
 
 // Nuevos componentes para ViewGameForm
-export const FormContainer = styled.div`
+export const FormContainer = styled.div<{ direction?: 'row' | 'column' }>`
   display: flex;
+  flex-direction: ${props => props.direction || 'row'};
   flex-wrap: wrap;
   gap: 1rem;
 `;

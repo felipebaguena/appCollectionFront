@@ -42,6 +42,7 @@ import { useGames } from '@/hooks/useGames';
 import { usePlatforms } from '@/hooks/usePlatforms';
 import { BaseFilter, FilterPackage } from '@/types/filters';
 import { usePlatform } from '@/hooks/usePlatform';
+import EditPlatformForm from '@/components/platforms/EditPlatformForm';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -289,9 +290,8 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
             EditComponent = EditGameForm as React.ComponentType<ComponentProps<'game'>>;
             break;
         case 'platform':
-            // Componentes de vista y edición para plataformas
             // ViewComponent = ViewPlatformForm as React.ComponentType<ComponentProps<'platform'>>;
-            // EditComponent = EditPlatformForm as React.ComponentType<ComponentProps<'platform'>>;
+            EditComponent = EditPlatformForm as React.ComponentType<ComponentProps<'platform'>>;
             break;
         default:
             break;
