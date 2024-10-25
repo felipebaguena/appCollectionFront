@@ -3,14 +3,16 @@ import { Game } from '@/types/game';
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
 import { useGame } from '@/hooks/useGame';
-import styled from 'styled-components';
 import {
     StyledForm,
     InputGroup,
     Label,
     Input,
     ButtonContainer,
-    ErrorMessage
+    ErrorMessage,
+    FormContainer,
+    FormColumn,
+    TextArea
 } from '@/components/ui/FormElements';
 import MultiSelect from '../ui/Multiselect';
 import Button from '@/components/ui/Button';
@@ -26,24 +28,6 @@ interface Option {
     name: string;
     code: string;
 }
-
-const FormContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const FormColumn = styled.div`
-  flex: 1;
-  min-width: 250px;
-`;
-
-const TextArea = styled.textarea`
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  width: 100%;
-  min-height: 100px;
-`;
 
 const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
     const { updateGame } = useGame(item.id.toString());

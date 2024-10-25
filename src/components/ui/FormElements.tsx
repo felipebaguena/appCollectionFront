@@ -84,3 +84,10 @@ export const CoverImage = styled.img`
   object-fit: cover;
   margin-bottom: 0.5rem;
 `;
+
+export const TextArea = styled.textarea`
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  width: 100%;
+  min-height: 100px;
+`;
