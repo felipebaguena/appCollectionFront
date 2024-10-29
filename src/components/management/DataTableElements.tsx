@@ -3,8 +3,7 @@ import { FaEye, FaEdit, FaTrash, FaImages, FaPlus, FaSync, FaSortUp, FaSortDown,
 import Button from '../ui/Button';
 
 export const DataTableContainer = styled.div`
-  margin: 2rem;
-  padding: 1rem;
+  position: relative;
   background-color: #ffffff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   font-size: 0.9rem;
@@ -19,7 +18,7 @@ export const Table = styled.table`
 
 export const Th = styled.th<{ sortable?: boolean }>`
   padding: 12px;
-  background-color: ${props => props.sortable ? '#e6f2ff' : '#f8f9fa'};
+  background-color: ${props => props.sortable ? '#e8e8e8' : '#f8f9fa'};
   text-align: left;
   cursor: ${props => props.sortable ? 'pointer' : 'default'};
   font-weight: bold;
@@ -34,7 +33,7 @@ export const Th = styled.th<{ sortable?: boolean }>`
 
   ${props => props.sortable && `
     &:hover {
-      background-color: #d4e9ff;
+      background-color: #d0d0d0;
     }
   `}
 `;
@@ -78,15 +77,15 @@ export const PaginationContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 20px;
   font-size: 14px;
   color: #333;
 `;
 
 export const ButtonDataTable = styled(Button)`
+  margin: 0 1rem 1rem;
   padding: 10px 10px;
-  background-color: #007bff;
-  color: white;
+  background-color: var(--app-yellow);
+  color: var(--dark-grey);
   font-weight: bold;
 
   &:hover {
@@ -100,21 +99,34 @@ export const ButtonDataTable = styled(Button)`
 `;
 
 export const TableContainer = styled.div`
-  margin-bottom: 20px;
+  padding: 1rem;
   overflow: hidden;
 `;
 
 export const TableTitle = styled.h2`
   font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 1rem;
+  margin: 0;
+  color: var(--dark-grey);
 `;
 
 export const TitleContainer = styled.div`
+  background-color: var(--app-yellow);
+  padding: 0.3rem 1rem 0.3rem 1rem;
+  width: 100%;
+`;
+
+export const FiltersContainer = styled.div`
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+`;
+
+export const DataTableButtonsContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  gap: 0.5rem;
   align-items: center;
-  margin-bottom: 1rem;
+  justify-content: space-between;
+  flex-wrap: wrap;
 `;
 
 export const ActionsContainer = styled.div`
@@ -168,12 +180,6 @@ export const GalleryButtonDataTable = (props: React.ComponentProps<typeof Action
   </ActionGalleryButton>
 );
 
-export const DataTableButtonsContainer = styled.div`
-  display: flex;
-  gap: 0.2rem;
-  align-items: center;
-`;
-
 export const CreateButtonDataTable = (props: React.ComponentProps<typeof Button>) => (
   <Button
     {...props}
@@ -200,11 +206,12 @@ export const SortIcon = styled.span`
 `;
 
 export const ActiveSortIcon = styled(SortIcon) <{ isAsc: boolean }>`
-  color: #007bff;
+  color: #444;
 `;
 
 export const InactiveSortIcon = styled(SortIcon)`
-  opacity: 0.5;
+  color: #777;
+  opacity: 0.7;
 `;
 
 export const SortIconComponent: React.FC<{

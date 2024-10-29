@@ -22,7 +22,9 @@ import {
     CreateButtonDataTable,
     DataTableButtonsContainer,
     SortIconComponent,
-    ThContent
+    ThContent,
+    DataTableContainer,
+    FiltersContainer
 } from './DataTableElements';
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
@@ -341,23 +343,27 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     };
 
     return (
-        <div style={{ position: 'relative' }}>
+        <DataTableContainer>
             {title && (
                 <TitleContainer>
                     <TableTitle>{title}</TableTitle>
-                    <DataTableButtonsContainer>
-                        {filterPackage && Object.keys(filterPackage.filters).map((key) => (
-                            filterPackage.renderFilter(
-                                key as keyof F,
-                                filters[key as keyof F],
-                                (key, value) => handleFilterChange(key as keyof F, value)
-                            )
-                        ))}
-                        <CreateButtonDataTable onClick={handleCreate} />
-                        <RefreshButton onClick={refreshDataAndResetPage} />
-                    </DataTableButtonsContainer>
                 </TitleContainer>
             )}
+            <FiltersContainer>
+                <DataTableButtonsContainer>
+                    {filterPackage && Object.keys(filterPackage.filters).map((key) => (
+                        filterPackage.renderFilter(
+                            key as keyof F,
+                            filters[key as keyof F],
+                            (key, value) => handleFilterChange(key as keyof F, value)
+                        )
+                    ))}
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <CreateButtonDataTable onClick={handleCreate} />
+                        <RefreshButton onClick={refreshDataAndResetPage} />
+                    </div>
+                </DataTableButtonsContainer>
+            </FiltersContainer>
             <TableContainer>
                 <Table>
                     <thead>
@@ -480,7 +486,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 cancelText="Cancelar"
                 confirmVariant="danger"
             />
-        </div>
+        </DataTableContainer>
     );
 }
 
