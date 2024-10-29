@@ -24,7 +24,11 @@ import {
     SortIconComponent,
     ThContent,
     DataTableContainer,
-    FiltersContainer
+    FiltersContainer,
+    ResponsiveTable,
+    ResponsiveContainer,
+    ResponsivePaginationContainer,
+    ResponsiveActionsContainer
 } from './DataTableElements';
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
@@ -60,6 +64,7 @@ interface DataTableProps<T extends { id: number }, F extends BaseFilter> {
     title?: string;
     form: 'game' | 'platform' | 'genre' | 'developer' | 'otherType';
     filterPackage: FilterPackage<T, F>;
+    breakpoint?: number;
 }
 
 type FormType = 'game' | 'platform' | 'genre' | 'developer' | 'otherType';
@@ -86,6 +91,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     title,
     form,
     filterPackage,
+    breakpoint = 768,
 }: DataTableProps<T, F>) {
     const [selectedItem, setSelectedItem] = useState<T | null>(null);
     const [selectedGame, setSelectedGame] = useState<Game | null>(null);
@@ -364,8 +370,8 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                     </div>
                 </DataTableButtonsContainer>
             </FiltersContainer>
-            <TableContainer>
-                <Table>
+            <ResponsiveContainer $breakpoint={breakpoint}>
+                <ResponsiveTable $breakpoint={breakpoint}>
                     <thead>
                         <tr>
                             {columnsWithActions.map((column) => (
@@ -392,13 +398,21 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                             <tr key={index}>
                                 {columnsWithActions.map((column) => (
                                     column.key === 'actions' ? (
-                                        <ActionsTd key={String(column.key)}>
+                                        <ActionsTd
+                                            key={String(column.key)}
+                                            data-label={column.label}
+                                        >
                                             <CellContent>
-                                                {column.render ? column.render(item[column.key], item) : String(item[column.key])}
+                                                <ResponsiveActionsContainer>
+                                                    {column.render ? column.render(item[column.key], item) : String(item[column.key])}
+                                                </ResponsiveActionsContainer>
                                             </CellContent>
                                         </ActionsTd>
                                     ) : (
-                                        <StyledTd key={String(column.key)}>
+                                        <StyledTd
+                                            key={String(column.key)}
+                                            data-label={column.label}
+                                        >
                                             <CellContent>
                                                 {column.render ? column.render(item[column.key], item) : String(item[column.key])}
                                             </CellContent>
@@ -408,9 +422,9 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                             </tr>
                         ))}
                     </tbody>
-                </Table>
-            </TableContainer>
-            <PaginationContainer>
+                </ResponsiveTable>
+            </ResponsiveContainer>
+            <ResponsivePaginationContainer $breakpoint={breakpoint}>
                 <ButtonDataTable onClick={() => handlePageChange(params.page - 1)} disabled={params.page === 1}>
                     Anterior
                 </ButtonDataTable>
@@ -421,7 +435,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 <ButtonDataTable onClick={() => handlePageChange(params.page + 1)} disabled={params.page === totalPages}>
                     Siguiente
                 </ButtonDataTable>
-            </PaginationContainer>
+            </ResponsivePaginationContainer>
 
             {/* Modal para la imagen de portada */}
             <CoverImageModal

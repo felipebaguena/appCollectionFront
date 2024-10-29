@@ -89,19 +89,34 @@ export const Td = styled.td`
   }
 `;
 
-export const StyledTd = styled(Td)`
+export const StyledTd = styled(Td) <ResponsiveProps>`
   max-height: 4rem;
   vertical-align: top;
   padding: 8px;
+
+  @media (max-width: ${props => props.$breakpoint || 768}px) {
+    padding: 0.5rem;
+    min-height: 3.5rem;
+  }
 `;
 
-export const CellContent = styled.div`
+export const CellContent = styled.div<ResponsiveProps>`
   max-height: 4rem;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+  word-wrap: break-word;
+  word-break: break-word;
+
+  @media (max-width: ${props => props.$breakpoint || 768}px) {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    max-height: 3rem;
+    -webkit-line-clamp: 2;
+  }
 `;
 
 export const CoverThumbnail = styled.div`
@@ -282,4 +297,81 @@ export const SortIconComponent: React.FC<{
 
 export const ThContent = styled.div`
   padding-right: 20px;
+`;
+
+interface ResponsiveProps {
+  $breakpoint?: number;
+}
+
+export const ResponsiveTable = styled(Table) <ResponsiveProps>`
+  @media (max-width: ${props => props.$breakpoint || 768}px) {
+    display: block;
+    border: none;
+    
+    thead {
+      display: none;
+    }
+    
+    tbody {
+      display: block;
+    }
+    
+    tr {
+      display: block;
+      margin-bottom: 1rem;
+      background: #fff;
+      border: 1px solid #ddd;
+    }
+    
+    td {
+      display: flex;
+      align-items: flex-start;
+      padding: 0.5rem 1rem 0.5rem 1rem;
+      border-bottom: 1px solid #ddd;
+      border-right: 1px solid #ddd;
+      text-align: left;
+      
+      &:before {
+        content: attr(data-label);
+        font-weight: bold;
+        width: 30%;
+        min-width: 100px;
+        padding-right: 1rem;
+        color: #666;
+        flex-shrink: 0;
+      }
+
+      &:last-child {
+        border-bottom: none;
+        border-right: none;
+      }
+    }
+  }
+`;
+
+export const ResponsiveContainer = styled(TableContainer) <ResponsiveProps>`
+  @media (max-width: ${props => props.$breakpoint || 768}px) {
+    padding: 0.5rem;
+    overflow-x: hidden;
+  }
+`;
+
+export const ResponsivePaginationContainer = styled(PaginationContainer) <ResponsiveProps>`
+  @media (max-width: ${props => props.$breakpoint || 768}px) {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem;
+    
+    span {
+      text-align: center;
+    }
+  }
+`;
+
+export const ResponsiveActionsContainer = styled(ActionsContainer) <ResponsiveProps>`
+  @media (max-width: ${props => props.$breakpoint || 768}px) {
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
 `;

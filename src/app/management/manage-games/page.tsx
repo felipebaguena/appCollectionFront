@@ -22,6 +22,7 @@ export default function ManageGames() {
           endpoint={ENDPOINTS.GET_GAMES_DATATABLE}
           form="game"
           filterPackage={filterPackages.game as FilterPackage<Game, typeof filterPackages.game.filters>}
+          breakpoint={968}
         />
       </DataTableContainer>
     </div>
