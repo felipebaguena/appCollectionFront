@@ -18,6 +18,15 @@ import MultiSelect from '../ui/Multiselect';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 
+interface UpdateGameData {
+    title: string;
+    description: string;
+    releaseYear: number;
+    genres: number[];
+    platforms: number[];
+    developers: number[];
+}
+
 interface EditGameFormProps {
     item: Game;
     onClose: () => void;
@@ -32,7 +41,7 @@ interface Option {
 const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
     const { updateGame } = useGame(item.id.toString());
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<UpdateGameData>({
         title: item.title,
         description: item.description,
         releaseYear: item.releaseYear,
@@ -82,7 +91,7 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
         setError(null);
 
         try {
-            await updateGame(formData);
+            await updateGame(formData as unknown as Partial<Game>);
             onClose();
         } catch (error) {
             console.error("Error al actualizar el juego", error);

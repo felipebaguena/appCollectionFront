@@ -4,16 +4,40 @@ import { useState, useCallback } from "react";
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
 
+interface Platform {
+  id: number;
+  name: string;
+  code: string;
+}
+
+interface Genre {
+  id: number;
+  name: string;
+  code: string;
+}
+
+interface Developer {
+  id: number;
+  name: string;
+  code: string;
+}
+
 interface Game {
   id: number;
   title: string;
   releaseYear: number;
   description: string;
   coverId: number | null;
-  images: { id: number; path: string; isCover: boolean }[];
-  platforms?: number[];
-  genres?: number[];
-  developers?: number[];
+  images: {
+    id: number;
+    filename: string;
+    path: string;
+    isCover: boolean;
+    gameId: number;
+  }[];
+  platforms: Platform[];
+  genres: Genre[];
+  developers: Developer[];
 }
 
 export const useGame = (id: string) => {
