@@ -46,6 +46,9 @@ import EditPlatformForm from '@/components/platforms/EditPlatformForm';
 import EditGenreForm from '@/components/genres/EditGenreForm';
 import CreateGenreForm from '@/components/genres/CreateGenreForm';
 import { useGenre } from '@/hooks/useGenre';
+import EditDeveloperForm from '@/components/developers/EditDeveloperForm';
+import CreateDeveloperForm from '@/components/developers/CreateDeveloperForm';
+import { useDeveloper } from '@/hooks/useDeveloper';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -55,11 +58,11 @@ interface DataTableProps<T extends { id: number }, F extends BaseFilter> {
     endpoint: string;
     initialParams?: Partial<DataTableParams<T>>;
     title?: string;
-    form: 'game' | 'platform' | 'genre' | 'otherType';
+    form: 'game' | 'platform' | 'genre' | 'developer' | 'otherType';
     filterPackage: FilterPackage<T, F>;
 }
 
-type FormType = 'game' | 'platform' | "genre" | 'otherType';
+type FormType = 'game' | 'platform' | 'genre' | 'developer' | 'otherType';
 
 type ItemType<F extends FormType> =
     F extends 'game' ? Game :
@@ -102,6 +105,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     const { deleteGame } = form === 'game' ? useGame(deleteItemId) : { deleteGame: null };
     const { deletePlatform } = form === 'platform' ? usePlatform(deleteItemId) : { deletePlatform: null };
     const { deleteGenre } = form === 'genre' ? useGenre(deleteItemId) : { deleteGenre: null };
+    const { deleteDeveloper } = form === 'developer' ? useDeveloper(deleteItemId) : { deleteDeveloper: null };
 
     const defaultParams: DataTableParams<T> = {
         page: 1,
@@ -171,6 +175,11 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                     case 'genre':
                         if (deleteGenre) {
                             await deleteGenre();
+                        }
+                        break;
+                    case 'developer':
+                        if (deleteDeveloper) {
+                            await deleteDeveloper();
                         }
                         break;
                     default:
@@ -297,6 +306,9 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
             break;
         case 'genre':
             EditComponent = EditGenreForm as React.ComponentType<ComponentProps<'genre'>>;
+            break;
+        case 'developer':
+            EditComponent = EditDeveloperForm as React.ComponentType<ComponentProps<'developer'>>;
             break;
         default:
             break;
@@ -457,6 +469,12 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                         <CreateGenreForm
                             onClose={handleCloseCreateModal}
                             onGenreCreated={handleItemCreated}
+                        />
+                    )}
+                    {form === 'developer' && (
+                        <CreateDeveloperForm
+                            onClose={handleCloseCreateModal}
+                            onDeveloperCreated={handleItemCreated}
                         />
                     )}
                 </ModalOverlay>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Column } from "@/types/dataTable";
-import { Game } from "@/types/game";
+import { Developer, Game } from "@/types/game";
 import { Platform } from "@/types/platform";
 import { Genre } from "@/types/genre";
 
@@ -54,6 +54,12 @@ export const platformColumns: Column<Platform>[] = [
 ];
 
 export const genreColumns: Column<Genre>[] = [
+  { key: "id", label: "ID", sortable: true },
+  { key: "name", label: "Nombre", sortable: true },
+  { key: "code", label: "Código", sortable: true },
+];
+
+export const developerColumns: Column<Developer>[] = [
   { key: "id", label: "ID", sortable: true },
   { key: "name", label: "Nombre", sortable: true },
   { key: "code", label: "Código", sortable: true },

@@ -28,4 +28,9 @@ export const ENDPOINTS = {
   GET_PLATFORM: (id: string) => `/platforms/${id}`,
   SET_PLATFORM: (id: string) => `/platforms/${id}`,
   DELETE_PLATFORM: (id: string) => `/platforms/${id}`,
+  GET_DEVELOPERS_DATATABLE: "/developers/datatable",
+  CREATE_DEVELOPER: "/developers",
+  GET_DEVELOPER: (id: string) => `/developers/${id}`,
+  UPDATE_DEVELOPER: (id: string) => `/developers/${id}`,
+  DELETE_DEVELOPER: (id: string) => `/developers/${id}`,
 };
