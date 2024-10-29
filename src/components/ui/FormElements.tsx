@@ -89,5 +89,5 @@ export const TextArea = styled.textarea`
   padding: 0.5rem;
   border: 1px solid #ccc;
   width: 100%;
-  min-height: 100px;
+  min-height: 10rem;
 `;

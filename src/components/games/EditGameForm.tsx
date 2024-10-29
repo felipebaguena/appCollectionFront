@@ -18,6 +18,7 @@ import MultiSelect from '../ui/Multiselect';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import { handleDescriptionKeyDown } from '@/helpers/textFormatting';
+import styled from 'styled-components';
 
 interface UpdateGameData {
     title: string;
@@ -38,6 +39,27 @@ interface Option {
     name: string;
     code: string;
 }
+
+const TopSection = styled.div`
+  display: flex;
+  gap: 2rem;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
+const LeftColumn = styled.div`
+  flex: 1;
+`;
+
+const RightColumn = styled.div`
+  flex: 1;
+`;
+
+const DescriptionSection = styled.div`
+  width: 100%;
+`;
 
 const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
     const { updateGame } = useGame(item.id.toString());
@@ -113,13 +135,12 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
             onClose={onClose}
             title={`Editar Juego: ${item.title}`}
             width="95%"
-            maxWidth="50rem"
+            maxWidth="70rem"
             height="auto"
-            maxHeight="90vh"
         >
             <StyledForm onSubmit={handleSubmit}>
-                <FormContainer>
-                    <FormColumn>
+                <TopSection>
+                    <LeftColumn>
                         <InputGroup>
                             <Label htmlFor="title">Título:</Label>
                             <Input
@@ -128,18 +149,6 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
-                                required
-                            />
-                        </InputGroup>
-                        <InputGroup>
-                            <Label htmlFor="description">Descripción:</Label>
-                            <TextArea
-                                ref={textareaRef}
-                                id="description"
-                                name="description"
-                                value={formData.description}
-                                onChange={handleChange}
-                                onKeyDown={handleKeyDown}
                                 required
                             />
                         </InputGroup>
@@ -154,8 +163,17 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
                                 required
                             />
                         </InputGroup>
-                    </FormColumn>
-                    <FormColumn>
+                        <InputGroup>
+                            <Label htmlFor="developers">Desarrolladores:</Label>
+                            <MultiSelect
+                                options={developers}
+                                selectedOptions={developers.filter(d => formData.developers.includes(d.id))}
+                                onChange={handleMultiSelectChange('developers')}
+                                placeholder="Selecciona desarrolladores"
+                            />
+                        </InputGroup>
+                    </LeftColumn>
+                    <RightColumn>
                         <InputGroup>
                             <Label htmlFor="genres">Géneros:</Label>
                             <MultiSelect
@@ -174,17 +192,24 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
                                 placeholder="Selecciona plataformas"
                             />
                         </InputGroup>
-                        <InputGroup>
-                            <Label htmlFor="developers">Desarrolladores:</Label>
-                            <MultiSelect
-                                options={developers}
-                                selectedOptions={developers.filter(d => formData.developers.includes(d.id))}
-                                onChange={handleMultiSelectChange('developers')}
-                                placeholder="Selecciona desarrolladores"
-                            />
-                        </InputGroup>
-                    </FormColumn>
-                </FormContainer>
+                    </RightColumn>
+                </TopSection>
+
+                <DescriptionSection>
+                    <InputGroup>
+                        <Label htmlFor="description">Descripción:</Label>
+                        <TextArea
+                            ref={textareaRef}
+                            id="description"
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            onKeyDown={handleKeyDown}
+                            required
+                        />
+                    </InputGroup>
+                </DescriptionSection>
+
                 <ButtonContainer>
                     <Button $variant="primary" type="submit" disabled={isSubmitting}>
                         {isSubmitting ? 'Guardando...' : 'Guardar cambios'}

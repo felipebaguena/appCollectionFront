@@ -3,6 +3,7 @@
 import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import { NAVBAR_HEIGHT } from '../layout/NavbarElements';
+import { FOOTER_HEIGHT } from '../layout/FooterElements';
 
 interface ModalContentProps {
   $width?: string;
@@ -41,7 +42,7 @@ const ModalContent = styled.div<ModalContentProps>`
   width: ${props => props.$width || '90%'};
   max-width: ${props => props.$maxWidth || '30rem'};
   height: ${props => props.$height || 'auto'};
-  max-height: ${props => props.$maxHeight || `calc(100vh - ${NAVBAR_HEIGHT} - 2rem)`};
+  max-height: ${props => props.$maxHeight || `calc(100vh - ${NAVBAR_HEIGHT} - ${FOOTER_HEIGHT} - 2rem)`};
   display: flex;
   flex-direction: column;
   color: white;
