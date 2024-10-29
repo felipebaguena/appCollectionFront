@@ -17,7 +17,7 @@ export interface FilterPackage<T, F extends BaseFilter> {
   ) => React.ReactNode;
 }
 
-export type FilterType = "game" | "platform" | "otherType";
+export type FilterType = "game" | "platform" | "genre" | "otherType";
 
 export type FilterPackages = {
   [K in FilterType]: FilterPackage<any, any>;

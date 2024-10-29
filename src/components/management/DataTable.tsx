@@ -43,6 +43,9 @@ import { usePlatforms } from '@/hooks/usePlatforms';
 import { BaseFilter, FilterPackage } from '@/types/filters';
 import { usePlatform } from '@/hooks/usePlatform';
 import EditPlatformForm from '@/components/platforms/EditPlatformForm';
+import EditGenreForm from '@/components/genres/EditGenreForm';
+import CreateGenreForm from '@/components/genres/CreateGenreForm';
+import { useGenre } from '@/hooks/useGenre';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -52,11 +55,11 @@ interface DataTableProps<T extends { id: number }, F extends BaseFilter> {
     endpoint: string;
     initialParams?: Partial<DataTableParams<T>>;
     title?: string;
-    form: 'game' | 'platform' | 'otherType';
+    form: 'game' | 'platform' | 'genre' | 'otherType';
     filterPackage: FilterPackage<T, F>;
 }
 
-type FormType = 'game' | 'platform' | 'otherType';
+type FormType = 'game' | 'platform' | "genre" | 'otherType';
 
 type ItemType<F extends FormType> =
     F extends 'game' ? Game :
@@ -98,6 +101,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     const deleteItemId = deleteConfirmation.itemToDelete?.id.toString() || '';
     const { deleteGame } = form === 'game' ? useGame(deleteItemId) : { deleteGame: null };
     const { deletePlatform } = form === 'platform' ? usePlatform(deleteItemId) : { deletePlatform: null };
+    const { deleteGenre } = form === 'genre' ? useGenre(deleteItemId) : { deleteGenre: null };
 
     const defaultParams: DataTableParams<T> = {
         page: 1,
@@ -164,12 +168,11 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                             await deletePlatform();
                         }
                         break;
-                    // Futuros tipos de formularios
-                    // case 'otherType':
-                    //     if (deleteOtherType) {
-                    //         await deleteOtherType();
-                    //     }
-                    //     break;
+                    case 'genre':
+                        if (deleteGenre) {
+                            await deleteGenre();
+                        }
+                        break;
                     default:
                         console.error('Tipo de formulario no reconocido:', form);
                         return;
@@ -290,8 +293,10 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
             EditComponent = EditGameForm as React.ComponentType<ComponentProps<'game'>>;
             break;
         case 'platform':
-            // ViewComponent = ViewPlatformForm as React.ComponentType<ComponentProps<'platform'>>;
             EditComponent = EditPlatformForm as React.ComponentType<ComponentProps<'platform'>>;
+            break;
+        case 'genre':
+            EditComponent = EditGenreForm as React.ComponentType<ComponentProps<'genre'>>;
             break;
         default:
             break;
@@ -446,6 +451,12 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                         <CreatePlatformForm
                             onClose={handleCloseCreateModal}
                             onPlatformCreated={handleItemCreated}
+                        />
+                    )}
+                    {form === 'genre' && (
+                        <CreateGenreForm
+                            onClose={handleCloseCreateModal}
+                            onGenreCreated={handleItemCreated}
                         />
                     )}
                 </ModalOverlay>
