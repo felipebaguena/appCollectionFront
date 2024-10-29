@@ -1,6 +1,46 @@
 import styled from 'styled-components';
 import { FaEye, FaEdit, FaTrash, FaImages, FaPlus, FaSync, FaSortUp, FaSortDown, FaSort } from 'react-icons/fa';
 import Button from '../ui/Button';
+import { keyframes } from 'styled-components';
+import { useState } from 'react';
+
+const fadeInOut = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-20px);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+`;
+
+const RefreshMessage = styled.span<{ $isVisible: boolean }>`
+  position: absolute;
+  top: -1rem;
+  left: -3rem;
+  transform: translateY(-100%);
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: var(--dark-grey);
+  pointer-events: none;
+  animation: ${fadeInOut} 1.5s ease-in-out;
+  opacity: 0;
+  white-space: nowrap;
+`;
+
+const RefreshButtonContainer = styled.div`
+  position: relative;
+  display: inline-block;
+`;
 
 export const DataTableContainer = styled.div`
   position: relative;
@@ -189,14 +229,28 @@ export const CreateButtonDataTable = (props: React.ComponentProps<typeof Button>
   </Button>
 );
 
-export const RefreshButton = (props: React.ComponentProps<typeof Button>) => (
-  <Button
-    {...props}
-    $variant="dark"
-  >
-    <FaSync />
-  </Button>
-);
+export const RefreshButton = (props: React.ComponentProps<typeof Button>) => {
+  const [showMessage, setShowMessage] = useState(false);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    props.onClick?.(e);
+    setShowMessage(true);
+    setTimeout(() => setShowMessage(false), 1500);
+  };
+
+  return (
+    <RefreshButtonContainer>
+      {showMessage && <RefreshMessage $isVisible={showMessage}>¡Refrescando!</RefreshMessage>}
+      <Button
+        {...props}
+        $variant="dark"
+        onClick={handleClick}
+      >
+        <FaSync />
+      </Button>
+    </RefreshButtonContainer>
+  );
+};
 
 export const SortIcon = styled.span`
   position: absolute;

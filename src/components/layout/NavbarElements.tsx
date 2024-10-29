@@ -3,6 +3,9 @@
 import styled from 'styled-components';
 import Button, { ButtonProps } from '@/components/ui/Button';
 import Link from 'next/link';
+import { useState } from 'react';
+import { keyframes } from 'styled-components';
+import { FaSync } from 'react-icons/fa';
 
 export const NAVBAR_HEIGHT = '3.5rem';
 
@@ -155,17 +158,80 @@ export const DropdownContent = styled.div`
 `;
 
 export const DropdownItem = styled(NavLink)`
-  display: block;
-  padding: 0.5rem 1rem;
-  color: var(--grey);
-  text-decoration: none;
-  width: 100%;
-  text-align: left;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    background-color: var(--app-yellow);
-    color: var(--dark-grey);
-    opacity: 1;
+  && {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: var(--grey);
+    text-decoration: none;
+    width: 100%;
+    text-align: left;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: var(--app-yellow);
+      color: var(--dark-grey);
+      opacity: 1;
+    }
   }
 `;
+
+const fadeInOut = keyframes`
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-20px);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+`;
+
+const RefreshMessage = styled.span<{ $isVisible: boolean }>`
+  position: absolute;
+  top: 0;
+  left: -50px;
+  transform: translateY(-100%);
+  font-size: 0.8rem;
+  color: var(--dark-grey);
+  pointer-events: none;
+  animation: ${fadeInOut} 1.5s ease-in-out;
+  opacity: 0;
+  white-space: nowrap;
+`;
+
+const RefreshButtonContainer = styled.div`
+  position: relative;
+  display: inline-block;
+  margin-left: 0.5rem;
+`;
+
+export const RefreshButton = (props: React.ComponentProps<typeof Button>) => {
+  const [showMessage, setShowMessage] = useState(false);
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    props.onClick?.(e);
+    setShowMessage(true);
+    setTimeout(() => setShowMessage(false), 1500);
+  };
+
+  return (
+    <RefreshButtonContainer>
+      {showMessage && <RefreshMessage $isVisible={showMessage}>¡Refrescado!</RefreshMessage>}
+      <Button
+        {...props}
+        $variant="dark"
+        onClick={handleClick}
+      >
+        <FaSync />
+      </Button>
+    </RefreshButtonContainer>
+  );
+};
