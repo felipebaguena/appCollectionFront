@@ -5,7 +5,9 @@ import styled from 'styled-components';
 import { useGame } from '@/hooks/useGame';
 import { useGameImages } from '@/hooks/useGameImages';
 import { getImageUrl } from '@/services/api';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
+import { NAVBAR_HEIGHT } from '../layout/NavbarElements';
+import { FOOTER_HEIGHT } from '../layout/FooterElements';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -64,7 +66,7 @@ const GalleryImage = styled.img`
 
 const LightboxOverlay = styled.div`
   position: fixed;
-  top: 0;
+  top: ${NAVBAR_HEIGHT};
   left: 0;
   right: 0;
   bottom: 0;
@@ -84,7 +86,7 @@ const LightboxContent = styled.div`
 
 const LightboxImage = styled.img`
   max-width: 100%;
-  max-height: 90vh;
+  max-height: calc(100vh - ${NAVBAR_HEIGHT} - ${FOOTER_HEIGHT} - 4rem);
   object-fit: contain;
 `;
 
@@ -197,6 +199,20 @@ const HeaderLabel = styled(Label)`
 
 const HeaderValue = styled(Value)`
   color: white;
+`;
+
+const GameDetailImageCloseButton = styled.div`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--mid-grey);
+  color: white;
+  padding: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
 `;
 
 const GameDetails: React.FC<{ id: string }> = ({ id }) => {
@@ -364,12 +380,12 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
 
       <GallerySection>
         <GalleryGrid>
-          {nonCoverImages.slice(2).map((image, index) => (
+          {gameImages.map((image, index) => (
             <GalleryImage
               key={image.id}
               src={getImageUrl(image.path)}
               alt={image.filename}
-              onClick={() => handleImageClick(index + 2)}
+              onClick={() => handleImageClick(index)}
             />
           ))}
         </GalleryGrid>
@@ -377,6 +393,9 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
 
       {selectedImageIndex !== null && (
         <LightboxOverlay onClick={handleClose}>
+          <GameDetailImageCloseButton onClick={handleClose}>
+            <FaTimes size={24} />
+          </GameDetailImageCloseButton>
           <LightboxContent
             onClick={(e) => {
               e.stopPropagation();
