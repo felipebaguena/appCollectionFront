@@ -11,7 +11,15 @@ const StyledInput = styled.input`
   padding: 8px;
   padding-right: 30px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  outline: none;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--app-yellow);
+    box-shadow: 0 0 0 2px var(--app-yellow-focus);
+    border-radius: 0;
+  }
+  
   &::placeholder {
     color: #999;
   }

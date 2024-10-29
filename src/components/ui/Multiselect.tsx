@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 interface Option {
@@ -23,7 +23,6 @@ const SelectButton = styled.button`
   width: 100%;
   padding: 8px;
   border: 1px solid #ddd;
-  border-radius: 4px;
   background-color: white;
   text-align: left;
   cursor: pointer;
@@ -38,7 +37,6 @@ const OptionsList = styled.ul`
   overflow-y: auto;
   border: 1px solid #ddd;
   border-top: none;
-  border-radius: 0 0 4px 4px;
   background-color: white;
   z-index: 1;
   padding: 0;
@@ -49,16 +47,30 @@ const OptionsList = styled.ul`
 const OptionItem = styled.li<{ isSelected: boolean }>`
   padding: 8px;
   cursor: pointer;
-  background-color: ${props => props.isSelected ? '#007bff' : 'white'};
-  color: ${props => props.isSelected ? 'white' : 'black'};
+  background-color: ${props => props.isSelected ? 'var(--app-yellow)' : 'white'};
+  color: ${props => props.isSelected ? 'var(--dark-grey)' : 'black'};
 
   &:hover {
-    background-color: ${props => props.isSelected ? '#0056b3' : '#e9ecef'};
+    background-color: ${props => props.isSelected ? '#e6c200' : '#e9ecef'};
   }
 `;
 
 const MultiSelect: React.FC<MultiSelectProps> = ({ options, selectedOptions, onChange, placeholder }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const toggleOption = (option: Option, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -77,7 +89,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ options, selectedOptions, onC
     };
 
     return (
-        <SelectContainer>
+        <SelectContainer ref={containerRef}>
             <SelectButton onClick={handleButtonClick}>
                 {selectedOptions.length > 0 ? selectedOptions.map(o => o.name).join(', ') : placeholder}
             </SelectButton>

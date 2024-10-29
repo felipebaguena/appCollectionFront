@@ -96,6 +96,7 @@ const Navbar = () => {
           <>
             {userRole === 'SUPERUSER' && (
               <DropdownContainer
+                data-open={showManagementMenu}
                 onMouseEnter={() => setShowManagementMenu(true)}
                 onMouseLeave={() => setShowManagementMenu(false)}
               >

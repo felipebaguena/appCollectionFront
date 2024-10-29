@@ -79,16 +79,31 @@ export const NavLink = styled(Link)`
   color: var(--grey);
   text-decoration: none;
   padding: 0.5rem 1rem;
-  transition: opacity 0.3s ease;
+  transition: color 0.3s ease;
   cursor: pointer;
   font-size: 0.9rem;
 
   &:hover {
-    opacity: 0.7;
+    opacity: 1;
+    color: var(--app-yellow);
   }
 
-  svg {
-    margin-right: 0.5rem;
+`;
+
+export const DropdownTrigger = styled(NavLink)`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    opacity: 1;
+    color: var(--app-yellow);
+
+    svg {
+      color: var(--app-yellow);
+    }
   }
 `;
 
@@ -104,6 +119,14 @@ export const DropdownContainer = styled.div`
     right: 0;
     height: 20px;
     background: transparent;
+  }
+
+  &[data-open="true"] ${DropdownTrigger} {
+    color: var(--app-yellow);
+    
+    svg {
+      color: var(--app-yellow);
+    }
   }
 `;
 
@@ -138,15 +161,11 @@ export const DropdownItem = styled(NavLink)`
   text-decoration: none;
   width: 100%;
   text-align: left;
+  transition: all 0.2s ease;
   
   &:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--app-yellow);
+    color: var(--dark-grey);
+    opacity: 1;
   }
-`;
-
-export const DropdownTrigger = styled(NavLink)`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
 `;
