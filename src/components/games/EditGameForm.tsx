@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Game } from '@/types/game';
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
@@ -17,6 +17,7 @@ import {
 import MultiSelect from '../ui/Multiselect';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
+import { handleDescriptionKeyDown } from '@/helpers/textFormatting';
 
 interface UpdateGameData {
     title: string;
@@ -54,6 +55,7 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
     const [developers, setDevelopers] = useState<Option[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -101,6 +103,10 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
         }
     };
 
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        handleDescriptionKeyDown(e, formData.description, textareaRef, setFormData);
+    };
+
     return (
         <Modal
             isOpen={true}
@@ -128,10 +134,12 @@ const EditGameForm: React.FC<EditGameFormProps> = ({ item, onClose }) => {
                         <InputGroup>
                             <Label htmlFor="description">Descripción:</Label>
                             <TextArea
+                                ref={textareaRef}
                                 id="description"
                                 name="description"
                                 value={formData.description}
                                 onChange={handleChange}
+                                onKeyDown={handleKeyDown}
                                 required
                             />
                         </InputGroup>

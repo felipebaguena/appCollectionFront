@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
 import styled from 'styled-components';
@@ -13,6 +13,7 @@ import {
 import MultiSelect from '../ui/Multiselect';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
+import { handleDescriptionKeyDown } from '@/helpers/textFormatting';
 
 interface CreateGameFormProps {
     onClose: () => void;
@@ -57,6 +58,7 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({ onClose, onGameCreated,
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -82,6 +84,10 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({ onClose, onGameCreated,
         } finally {
             setIsSubmitting(false);
         }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        handleDescriptionKeyDown(e, formData.description, textareaRef, setFormData);
     };
 
     return (
@@ -111,10 +117,12 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({ onClose, onGameCreated,
                         <InputGroup>
                             <Label htmlFor="description">Descripción:</Label>
                             <TextArea
+                                ref={textareaRef}
                                 id="description"
                                 name="description"
                                 value={formData.description}
                                 onChange={handleChange}
+                                onKeyDown={handleKeyDown}
                                 required
                             />
                         </InputGroup>
