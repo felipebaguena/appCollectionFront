@@ -16,7 +16,7 @@ const PageContainer = styled.div`
 const InfoContainer = styled.div`
   display: flex;
   gap: 3rem;
-  margin-bottom: 3rem;
+  margin-bottom: 0.5rem;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -35,7 +35,7 @@ const Cover = styled.img`
 `;
 
 const Title = styled.h1`
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
   color: var(--dark-grey);
 `;
@@ -52,7 +52,6 @@ const InfoGroup = styled.div`
 const Label = styled.span`
   font-weight: bold;
   display: block;
-  margin-bottom: 0.5rem;
   color: var(--dark-grey);
 `;
 
@@ -100,6 +99,7 @@ const LightboxContent = styled.div`
   position: relative;
   max-width: 90vw;
   max-height: 90vh;
+  cursor: pointer;
 `;
 
 const LightboxImage = styled.img`
@@ -108,23 +108,56 @@ const LightboxImage = styled.img`
   object-fit: contain;
 `;
 
-const NavigationButton = styled.button<{ position: 'left' | 'right' }>`
+const NavigationButton = styled.div<{ position: 'left' | 'right', isVisible: boolean }>`
   position: absolute;
   top: 50%;
   ${props => props.position}: 20px;
   transform: translateY(-50%);
   background: rgba(0, 0, 0, 0.5);
-  border: none;
   color: white;
   padding: 1rem;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  opacity: ${props => props.isVisible ? 1 : 0};
+  transition: opacity 0.3s ease;
+`;
 
+const Description = styled.div`
+  margin: 0 0 2rem 0;
+  padding: 0 1rem;
+  overflow: hidden;
+`;
+
+const DescriptionContent = styled.div`
+  position: relative;
+`;
+
+const DescriptionLabel = styled(Label)`
+  margin-bottom: 1rem;
+`;
+
+const DescriptionText = styled(Value)`
+  line-height: 1.6;
+`;
+
+const FeatureImage = styled.img`
+  float: right;
+  width: 400px;
+  height: auto;
+  margin: 0 0 1rem 2rem;
+  object-fit: cover;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  
   &:hover {
-    background: rgba(0, 0, 0, 0.8);
+    opacity: 0.8;
+  }
+
+  @media (max-width: 768px) {
+    float: none;
+    width: 100%;
+    margin: 1rem 0;
   }
 `;
 
@@ -132,6 +165,7 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
   const { game, loading, error, fetchGame } = useGame(id);
   const { gameImages, loading: imagesLoading, fetchGameImages } = useGameImages(Number(id));
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [hoveredHalf, setHoveredHalf] = useState<'left' | 'right' | null>(null);
 
   useEffect(() => {
     fetchGame();
@@ -165,15 +199,47 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
     );
   };
 
+  const handleImageNavigation = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { clientX, currentTarget } = e;
+    const { left, width } = currentTarget.getBoundingClientRect();
+    const clickPosition = clientX - left;
+
+    if (clickPosition < width / 2) {
+      handlePrevImage();
+    } else {
+      handleNextImage();
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { clientX, currentTarget } = e;
+    const { left, width } = currentTarget.getBoundingClientRect();
+    const mousePosition = clientX - left;
+
+    if (mousePosition < width / 2) {
+      setHoveredHalf('left');
+    } else {
+      setHoveredHalf('right');
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredHalf(null);
+  };
+
+  const nonCoverImages = gameImages.filter(img => !img.isCover);
+  const firstGalleryImage = nonCoverImages[0];
+
   return (
     <PageContainer>
       <InfoContainer>
         <Column>
           <Cover src={coverUrl} alt={`Portada de ${game.title}`} />
-          <Title>{game.title}</Title>
-          <Developer>{game.developers?.map(d => d.name).join(', ')}</Developer>
         </Column>
         <Column>
+          <Title>{game.title}</Title>
+          <Developer>{game.developers?.map(d => d.name).join(', ')}</Developer>
+
           <InfoGroup>
             <Label>Año de lanzamiento</Label>
             <Value>{game.releaseYear}</Value>
@@ -186,21 +252,31 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
             <Label>Plataformas</Label>
             <Value>{game.platforms?.map(p => p.name).join(', ') || 'N/A'}</Value>
           </InfoGroup>
-          <InfoGroup>
-            <Label>Descripción</Label>
-            <Value>{game.description}</Value>
-          </InfoGroup>
         </Column>
       </InfoContainer>
 
+      <Description>
+        <DescriptionLabel>Descripción</DescriptionLabel>
+        <DescriptionContent>
+          {firstGalleryImage && (
+            <FeatureImage
+              src={getImageUrl(firstGalleryImage.path)}
+              alt={firstGalleryImage.filename}
+              onClick={() => handleImageClick(0)}
+            />
+          )}
+          <DescriptionText>{game.description}</DescriptionText>
+        </DescriptionContent>
+      </Description>
+
       <GallerySection>
         <GalleryGrid>
-          {gameImages.filter(img => !img.isCover).map((image, index) => (
+          {nonCoverImages.slice(1).map((image, index) => (
             <GalleryImage
               key={image.id}
               src={getImageUrl(image.path)}
               alt={image.filename}
-              onClick={() => handleImageClick(index)}
+              onClick={() => handleImageClick(index + 1)}
             />
           ))}
         </GalleryGrid>
@@ -208,15 +284,28 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
 
       {selectedImageIndex !== null && (
         <LightboxOverlay onClick={handleClose}>
-          <LightboxContent onClick={e => e.stopPropagation()}>
+          <LightboxContent
+            onClick={(e) => {
+              e.stopPropagation();
+              handleImageNavigation(e);
+            }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
             <LightboxImage
               src={getImageUrl(gameImages[selectedImageIndex].path)}
               alt={gameImages[selectedImageIndex].filename}
             />
-            <NavigationButton position="left" onClick={handlePrevImage}>
+            <NavigationButton
+              position="left"
+              isVisible={hoveredHalf === 'left'}
+            >
               <FaChevronLeft size={24} />
             </NavigationButton>
-            <NavigationButton position="right" onClick={handleNextImage}>
+            <NavigationButton
+              position="right"
+              isVisible={hoveredHalf === 'right'}
+            >
               <FaChevronRight size={24} />
             </NavigationButton>
           </LightboxContent>
