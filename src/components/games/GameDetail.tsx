@@ -13,27 +13,6 @@ const PageContainer = styled.div`
   padding: 2rem;
 `;
 
-const InfoContainer = styled.div`
-  display: flex;
-  gap: 3rem;
-  margin-bottom: 0.5rem;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 2rem;
-  }
-`;
-
-const Column = styled.div`
-  flex: 1;
-`;
-
-const Cover = styled.img`
-  width: 100%;
-  height: auto;
-  margin-bottom: 0.5rem;
-`;
-
 const Title = styled.h1`
   font-size: 1.5rem;
   font-weight: bold;
@@ -43,10 +22,11 @@ const Title = styled.h1`
 const Developer = styled.div`
   font-size: 1.2rem;
   color: var(--grey);
+  margin-bottom: 2rem;
 `;
 
 const InfoGroup = styled.div`
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
 `;
 
 const Label = styled.span`
@@ -124,8 +104,7 @@ const NavigationButton = styled.div<{ position: 'left' | 'right', isVisible: boo
 `;
 
 const Description = styled.div`
-  margin: 0 0 2rem 0;
-  padding: 0 1rem;
+  margin: 2rem 0 2rem 0;
   overflow: hidden;
 `;
 
@@ -133,12 +112,16 @@ const DescriptionContent = styled.div`
   position: relative;
 `;
 
-const DescriptionLabel = styled(Label)`
-  margin-bottom: 1rem;
-`;
-
 const DescriptionText = styled(Value)`
   line-height: 1.6;
+`;
+
+const DescriptionParagraph = styled.p`
+  margin-bottom: 1rem;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
 const FeatureImage = styled.img`
@@ -159,6 +142,61 @@ const FeatureImage = styled.img`
     width: 100%;
     margin: 1rem 0;
   }
+`;
+
+const FeatureImageLeft = styled(FeatureImage)`
+  float: left;
+  margin: 0 2rem 1rem 0;
+`;
+
+const HeaderContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 400px;
+  margin-bottom: 2rem;
+  overflow: hidden;
+`;
+
+const HeaderImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const HeaderOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2rem;
+`;
+
+const HeaderTitle = styled(Title)`
+  color: white;
+  font-size: 2.5rem;
+`;
+
+const HeaderDeveloper = styled(Developer)`
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+`;
+
+const HeaderInfoGroup = styled(InfoGroup)`
+  color: white;
+`;
+
+const HeaderLabel = styled(Label)`
+  color: rgba(255, 255, 255, 0.8);
+`;
+
+const HeaderValue = styled(Value)`
+  color: white;
 `;
 
 const GameDetails: React.FC<{ id: string }> = ({ id }) => {
@@ -230,53 +268,108 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
   const nonCoverImages = gameImages.filter(img => !img.isCover);
   const firstGalleryImage = nonCoverImages[0];
 
-  return (
-    <PageContainer>
-      <InfoContainer>
-        <Column>
-          <Cover src={coverUrl} alt={`Portada de ${game.title}`} />
-        </Column>
-        <Column>
-          <Title>{game.title}</Title>
-          <Developer>{game.developers?.map(d => d.name).join(', ')}</Developer>
+  const formatDescription = (text: string) => {
+    const paragraphs = text.split('\\n\\n');
+    const secondGalleryImage = nonCoverImages[1];
 
-          <InfoGroup>
-            <Label>Año de lanzamiento</Label>
-            <Value>{game.releaseYear}</Value>
-          </InfoGroup>
-          <InfoGroup>
-            <Label>Géneros</Label>
-            <Value>{game.genres?.map(g => g.name).join(', ') || 'N/A'}</Value>
-          </InfoGroup>
-          <InfoGroup>
-            <Label>Plataformas</Label>
-            <Value>{game.platforms?.map(p => p.name).join(', ') || 'N/A'}</Value>
-          </InfoGroup>
-        </Column>
-      </InfoContainer>
+    // Si hay 5 o más párrafos y existe una segunda imagen, la insertaremos
+    const shouldInsertSecondImage = paragraphs.length >= 5 && secondGalleryImage;
 
-      <Description>
-        <DescriptionLabel>Descripción</DescriptionLabel>
-        <DescriptionContent>
-          {firstGalleryImage && (
+    return paragraphs.map((paragraph, i) => {
+      // Si estamos en el primer párrafo y hay una primera imagen
+      if (i === 1 && firstGalleryImage) {
+        return (
+          <React.Fragment key={i}>
             <FeatureImage
               src={getImageUrl(firstGalleryImage.path)}
               alt={firstGalleryImage.filename}
               onClick={() => handleImageClick(0)}
             />
-          )}
-          <DescriptionText>{game.description}</DescriptionText>
+            <DescriptionParagraph>
+              {paragraph.split('\\n').map((line, j) => (
+                <React.Fragment key={j}>
+                  {line}
+                  {j < paragraph.split('\\n').length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </DescriptionParagraph>
+          </React.Fragment>
+        );
+      }
+
+      // Si estamos después del tercer párrafo y debemos insertar la segunda imagen
+      if (i === 3 && shouldInsertSecondImage) {
+        return (
+          <React.Fragment key={i}>
+            <FeatureImageLeft
+              src={getImageUrl(secondGalleryImage.path)}
+              alt={secondGalleryImage.filename}
+              onClick={() => handleImageClick(1)}
+            />
+            <DescriptionParagraph>
+              {paragraph.split('\\n').map((line, j) => (
+                <React.Fragment key={j}>
+                  {line}
+                  {j < paragraph.split('\\n').length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </DescriptionParagraph>
+          </React.Fragment>
+        );
+      }
+
+      return (
+        <DescriptionParagraph key={i}>
+          {paragraph.split('\\n').map((line, j) => (
+            <React.Fragment key={j}>
+              {line}
+              {j < paragraph.split('\\n').length - 1 && <br />}
+            </React.Fragment>
+          ))}
+        </DescriptionParagraph>
+      );
+    });
+  };
+
+  return (
+    <PageContainer>
+      <HeaderContainer>
+        <HeaderImage src={coverUrl} alt={`Portada de ${game.title}`} />
+        <HeaderOverlay>
+          <HeaderTitle>{game.title}</HeaderTitle>
+          <HeaderDeveloper>{game.developers?.map(d => d.name).join(', ')}</HeaderDeveloper>
+
+          <HeaderInfoGroup>
+            <HeaderLabel>Año de lanzamiento</HeaderLabel>
+            <HeaderValue>{game.releaseYear}</HeaderValue>
+          </HeaderInfoGroup>
+          <HeaderInfoGroup>
+            <HeaderLabel>Géneros</HeaderLabel>
+            <HeaderValue>{game.genres?.map(g => g.name).join(', ') || 'N/A'}</HeaderValue>
+          </HeaderInfoGroup>
+          <HeaderInfoGroup>
+            <HeaderLabel>Plataformas</HeaderLabel>
+            <HeaderValue>{game.platforms?.map(p => p.name).join(', ') || 'N/A'}</HeaderValue>
+          </HeaderInfoGroup>
+        </HeaderOverlay>
+      </HeaderContainer>
+
+      <Description>
+        <DescriptionContent>
+          <DescriptionText>
+            {formatDescription(game.description)}
+          </DescriptionText>
         </DescriptionContent>
       </Description>
 
       <GallerySection>
         <GalleryGrid>
-          {nonCoverImages.slice(1).map((image, index) => (
+          {nonCoverImages.slice(2).map((image, index) => (
             <GalleryImage
               key={image.id}
               src={getImageUrl(image.path)}
               alt={image.filename}
-              onClick={() => handleImageClick(index + 1)}
+              onClick={() => handleImageClick(index + 2)}
             />
           ))}
         </GalleryGrid>
