@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FiLogOut } from 'react-icons/fi';
+import { FiLogOut, FiChevronDown } from 'react-icons/fi';
 import { jwtDecode } from "jwt-decode";
 import CreateUserForm from '@/components/user/CreateUserForm';
 import LoginForm from '@/components/auth/LoginForm';
@@ -14,7 +14,11 @@ import {
   Logo,
   LogoLink,
   NavLink,
-  NavbarSection
+  NavbarSection,
+  DropdownContainer,
+  DropdownMenu,
+  DropdownItem,
+  DropdownTrigger
 } from '@/components/layout/NavbarElements';
 
 interface DecodedToken {
@@ -28,6 +32,7 @@ const Navbar = () => {
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [authState, setAuthState] = useState<'loading' | 'authenticated' | 'unauthenticated'>('loading');
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [showManagementMenu, setShowManagementMenu] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -75,6 +80,13 @@ const Navbar = () => {
     setShowRegisterForm(true);
   };
 
+  const managementOptions = [
+    { name: "Juegos", route: "/management/manage-games" },
+    { name: "Plataformas", route: "/management/manage-platforms" },
+    { name: "Géneros", route: "/management/manage-genres" },
+    { name: "Desarrolladores", route: "/management/manage-developers" }
+  ];
+
   const renderAuthButtons = () => {
     switch (authState) {
       case 'loading':
@@ -82,9 +94,44 @@ const Navbar = () => {
       case 'authenticated':
         return (
           <>
-            {userRole === 'SUPERUSER' && <NavLink href="/management">Gestión</NavLink>}
-            <NavLink href="#" onClick={(e) => { e.preventDefault(); setShowProfileModal(true); }}>Mi Perfil</NavLink>
-            <NavLink href="#" onClick={(e) => { e.preventDefault(); handleLogoutClick(); }} title="Cerrar Sesión">
+            {userRole === 'SUPERUSER' && (
+              <DropdownContainer
+                onMouseEnter={() => setShowManagementMenu(true)}
+                onMouseLeave={() => setShowManagementMenu(false)}
+              >
+                <DropdownTrigger href="#">
+                  Gestión <FiChevronDown />
+                </DropdownTrigger>
+                <DropdownMenu $isOpen={showManagementMenu}>
+                  {managementOptions.map((option) => (
+                    <DropdownItem
+                      key={option.name}
+                      href={option.route}
+                      onClick={() => setShowManagementMenu(false)}
+                    >
+                      {option.name}
+                    </DropdownItem>
+                  ))}
+                </DropdownMenu>
+              </DropdownContainer>
+            )}
+            <NavLink
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setShowProfileModal(true);
+              }}
+            >
+              Mi Perfil
+            </NavLink>
+            <NavLink
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handleLogoutClick();
+              }}
+              title="Cerrar Sesión"
+            >
               <FiLogOut size={15} />
             </NavLink>
           </>

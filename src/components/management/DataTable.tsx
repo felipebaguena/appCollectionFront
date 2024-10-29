@@ -14,8 +14,6 @@ import {
     TableTitle,
     TitleContainer,
     RefreshButton,
-    ModalOverlay,
-    ModalContent,
     ActionsContainer,
     ViewButtonDataTable,
     EditButtonDataTable,
@@ -428,28 +426,20 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 onCoverUpdated={handleCoverUpdated}
             />
 
-            {(selectedItem || showGallery) && (
-                <ModalOverlay>
-                    {selectedItem && actionType && (
-                        <ModalContent>
-                            {actionType === 'view' && renderComponent(ViewComponent, selectedItem)}
-                            {actionType === 'edit' && renderComponent(EditComponent, selectedItem)}
-                        </ModalContent>
-                    )}
-                    {showGallery && selectedItem && (
-                        <GameGalleryModal
-                            isOpen={showGallery}
-                            onClose={handleCloseGallery}
-                            game={selectedItem as unknown as Game}
-                            getImageUrl={getImageUrl}
-                        />
-                    )}
-                </ModalOverlay>
+            {selectedItem && actionType === 'view' && renderComponent(ViewComponent, selectedItem)}
+            {selectedItem && actionType === 'edit' && renderComponent(EditComponent, selectedItem)}
+            {showGallery && selectedItem && (
+                <GameGalleryModal
+                    isOpen={showGallery}
+                    onClose={handleCloseGallery}
+                    game={selectedItem as unknown as Game}
+                    getImageUrl={getImageUrl}
+                />
             )}
 
-            {/* Modal para la creación de un nuevo juego o plataforma */}
+            {/* Modal para la creación */}
             {showCreateModal && (
-                <ModalOverlay>
+                <>
                     {form === 'game' && (
                         <CreateGameForm
                             onClose={handleCloseCreateModal}
@@ -477,7 +467,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                             onDeveloperCreated={handleItemCreated}
                         />
                     )}
-                </ModalOverlay>
+                </>
             )}
 
             <ConfirmationModal

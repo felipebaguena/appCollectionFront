@@ -91,3 +91,62 @@ export const NavLink = styled(Link)`
     margin-right: 0.5rem;
   }
 `;
+
+export const DropdownContainer = styled.div`
+  position: relative;
+  display: inline-block;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: transparent;
+  }
+`;
+
+export const DropdownMenu = styled.div<{ $isOpen: boolean }>`
+  position: absolute;
+  top: calc(${NAVBAR_HEIGHT} - 0.5rem);
+  right: 0;
+  background-color: var(--dark-grey);
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  padding: 0.5rem 0;
+  min-width: 200px;
+  display: ${props => props.$isOpen ? 'block' : 'none'};
+  z-index: 1000;
+
+  margin-top: -20px;
+  padding-top: 20px;
+`;
+
+export const DropdownContent = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  gap: 1rem;
+`;
+
+export const DropdownItem = styled(NavLink)`
+  display: block;
+  padding: 0.5rem 1rem;
+  color: var(--grey);
+  text-decoration: none;
+  width: 100%;
+  text-align: left;
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+`;
+
+export const DropdownTrigger = styled(NavLink)`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+`;
