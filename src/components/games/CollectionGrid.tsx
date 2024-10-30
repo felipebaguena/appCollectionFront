@@ -29,29 +29,6 @@ const Controls = styled.div`
   padding: 20px;
 `;
 
-const SelectContainer = styled.div`
-  position: relative;
-  width: 300px;
-`;
-
-const SelectWrapper = styled.div`
-  position: relative;
-  
-  &::after {
-    content: '';
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border-left: 5px solid transparent;
-    border-right: 5px solid transparent;
-    border-top: 5px solid var(--grey);
-    pointer-events: none;
-  }
-`;
-
 const Pagination = styled.div`
   display: flex;
   gap: 10px;
