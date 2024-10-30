@@ -28,7 +28,9 @@ import {
     ResponsiveTable,
     ResponsiveContainer,
     ResponsivePaginationContainer,
-    ResponsiveActionsContainer
+    ResponsiveActionsContainer,
+    FiltersSection,
+    ButtonsSection
 } from './DataTableElements';
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
@@ -356,7 +358,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 </TitleContainer>
             )}
             <FiltersContainer>
-                <DataTableButtonsContainer>
+                <FiltersSection>
                     {filterPackage && Object.keys(filterPackage.filters).map((key) => (
                         filterPackage.renderFilter(
                             key as keyof F,
@@ -364,11 +366,11 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                             (key, value) => handleFilterChange(key as keyof F, value)
                         )
                     ))}
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <CreateButtonDataTable onClick={handleCreate} />
-                        <RefreshButton onClick={refreshDataAndResetPage} />
-                    </div>
-                </DataTableButtonsContainer>
+                </FiltersSection>
+                <ButtonsSection>
+                    <CreateButtonDataTable onClick={handleCreate} />
+                    <RefreshButton onClick={refreshDataAndResetPage} />
+                </ButtonsSection>
             </FiltersContainer>
             <ResponsiveContainer $breakpoint={breakpoint}>
                 <ResponsiveTable $breakpoint={breakpoint}>

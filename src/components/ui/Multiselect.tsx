@@ -22,10 +22,19 @@ const SelectContainer = styled.div`
 const SelectButton = styled.button`
   width: 100%;
   padding: 8px;
+  color: var(--grey);
   border: 1px solid #ddd;
   background-color: white;
   text-align: left;
   cursor: pointer;
+  outline: none;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--app-yellow);
+    box-shadow: 0 0 0 2px var(--app-yellow-focus);
+    border-radius: 0;
+  }
 `;
 
 const OptionsList = styled.ul`
@@ -42,6 +51,10 @@ const OptionsList = styled.ul`
   padding: 0;
   margin: 0;
   list-style: none;
+  
+  ${SelectButton}:focus + & {
+    border-color: var(--app-yellow);
+  }
 `;
 
 const OptionItem = styled.li<{ isSelected: boolean }>`

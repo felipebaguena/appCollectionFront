@@ -174,6 +174,22 @@ export const FiltersContainer = styled.div`
   padding: 1rem;
   background-color: #f8f9fa;
   border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+`;
+
+export const FiltersSection = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+export const ButtonsSection = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 `;
 
 export const DataTableButtonsContainer = styled.div`
@@ -374,4 +390,17 @@ export const ResponsiveActionsContainer = styled(ActionsContainer) <ResponsivePr
     justify-content: flex-start;
     gap: 0.5rem;
   }
+`;
+
+export const FilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 13rem;
+  flex: 0 0 auto;
+`;
+
+export const FilterLabel = styled.label`
+  font-weight: bold;
+  color: var(--dark-grey);
 `;
