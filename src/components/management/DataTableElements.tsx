@@ -182,7 +182,7 @@ export const FiltersContainer = styled.div`
 export const FiltersSection = styled.div`
   display: flex;
   gap: 0.5rem;
-  align-items: center;
+  align-items: end;
   flex-wrap: wrap;
 `;
 
@@ -403,4 +403,19 @@ export const FilterGroup = styled.div`
 export const FilterLabel = styled.label`
   font-weight: bold;
   color: var(--dark-grey);
+`;
+
+export const FilterButton = styled(Button)`
+  align-self: flex-end;
+  padding: 0.55rem;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+`;
+
+export const CompactFilterGroup = styled(FilterGroup)`
+    width: auto;
 `;

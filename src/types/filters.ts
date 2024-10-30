@@ -7,14 +7,13 @@ export interface BaseFilter {
 
 export interface FilterPackage<T, F extends BaseFilter> {
   filters: F;
-  applyFilters: (
-    params: DataTableParams<T, F>
-  ) => Partial<DataTableParams<T, F>>;
+  applyFilters: (params: DataTableParams<T, F>) => { filters: F };
   renderFilter: (
     key: keyof F,
     value: any,
     onChange: (key: keyof F, value: any) => void
   ) => React.ReactNode;
+  clearFilters?: (onChange: (key: keyof F, value: any) => void) => void;
 }
 
 export type FilterType =

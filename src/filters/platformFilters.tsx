@@ -20,6 +20,9 @@ export const platformFilters: FilterPackage<Platform, PlatformFilter> = {
             },
         };
     },
+    clearFilters: (onChange: (key: keyof PlatformFilter, value: any) => void) => {
+        onChange('search', '');
+    },
     renderFilter: (key: keyof PlatformFilter, value: any, onChange: (key: keyof PlatformFilter, value: any) => void) => {
         switch (key) {
             case 'search':

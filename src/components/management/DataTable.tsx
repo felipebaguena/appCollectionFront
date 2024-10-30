@@ -30,7 +30,11 @@ import {
     ResponsivePaginationContainer,
     ResponsiveActionsContainer,
     FiltersSection,
-    ButtonsSection
+    ButtonsSection,
+    FilterButton,
+    FilterGroup,
+    FilterLabel,
+    CompactFilterGroup
 } from './DataTableElements';
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
@@ -350,6 +354,25 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         return (item as any).title || (item as any).name || `ID: ${item.id}`;
     };
 
+    // Añadir esta función que verifica si hay algún filtro activo
+    const hasActiveFilters = (currentFilters: F): boolean => {
+        return Object.entries(currentFilters).some(([_, value]) => {
+            if (Array.isArray(value)) {
+                return value.length > 0;
+            }
+            if (typeof value === 'string') {
+                return value !== '';
+            }
+            if (value === null) {
+                return false;
+            }
+            if (typeof value === 'object') {
+                return Object.values(value).some(v => v !== null && v !== undefined);
+            }
+            return !!value;
+        });
+    };
+
     return (
         <DataTableContainer>
             {title && (
@@ -366,6 +389,16 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                             (key, value) => handleFilterChange(key as keyof F, value)
                         )
                     ))}
+                    <CompactFilterGroup>
+                        <FilterLabel>&nbsp;</FilterLabel>
+                        <FilterButton
+                            onClick={() => filterPackage.clearFilters?.(handleFilterChange)}
+                            $variant="dark"
+                            disabled={!hasActiveFilters(filters)}
+                        >
+                            Limpiar
+                        </FilterButton>
+                    </CompactFilterGroup>
                 </FiltersSection>
                 <ButtonsSection>
                     <CreateButtonDataTable onClick={handleCreate} />

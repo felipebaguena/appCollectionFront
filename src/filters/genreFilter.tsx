@@ -20,6 +20,9 @@ export const genreFilters: FilterPackage<Genre, GenreFilter> = {
             },
         };
     },
+    clearFilters: (onChange: (key: keyof GenreFilter, value: any) => void) => {
+        onChange('search', '');
+    },
     renderFilter: (key: keyof GenreFilter, value: any, onChange: (key: keyof GenreFilter, value: any) => void) => {
         switch (key) {
             case 'search':

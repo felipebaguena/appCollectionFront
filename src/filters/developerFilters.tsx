@@ -20,6 +20,9 @@ export const developerFilters: FilterPackage<Developer, DeveloperFilter> = {
       },
     };
   },
+  clearFilters: (onChange: (key: keyof DeveloperFilter, value: any) => void) => {
+    onChange('search', '');
+  },
   renderFilter: (
     key: keyof DeveloperFilter,
     value: any,

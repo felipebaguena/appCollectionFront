@@ -39,6 +39,13 @@ export const gameFilters: FilterPackage<Game, GameFilter> = {
       },
     };
   },
+  clearFilters: (onChange: (key: keyof GameFilter, value: any) => void) => {
+    onChange('search', '');
+    onChange('platformIds', []);
+    onChange('genreIds', []);
+    onChange('developerIds', []);
+    onChange('yearRange', null);
+  },
   renderFilter: (key: keyof GameFilter, value: any, onChange: (key: keyof GameFilter, value: any) => void) => {
     const { genres, platforms, developers } = useGames();
 
