@@ -3,8 +3,17 @@ import styled from 'styled-components';
 import { usePlatforms } from '@/hooks/usePlatforms';
 
 const FilterContainer = styled.div`
-  width: 300px;
-  margin-right: 1rem;
+  width: 15rem;
+
+  @media (max-width: 568px) {
+    margin-top: 0.8rem;
+  }
+`;
+
+const FilterCard = styled.div`
+  background: white;
+  border: 1px solid #ddd;
+  padding: 1rem;
 `;
 
 const FilterTitle = styled.h3`
@@ -28,13 +37,28 @@ const SearchInput = styled.input`
 `;
 
 const PlatformList = styled.div`
-  max-height: 200px;
+  max-height: 14rem;
   overflow-y: auto;
-  border: 1px solid #ddd;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #ddd;
+
+    &:hover {
+      background: #ccc;
+    }
+  }
 `;
 
 const PlatformItem = styled.div<{ isSelected: boolean }>`
-  padding: 8px;
+  padding: 3px 8px;
   cursor: pointer;
   background-color: ${props => props.isSelected ? 'var(--app-yellow)' : 'white'};
   color: var(--dark-grey);
@@ -85,24 +109,26 @@ const CollectionPlatformFilter: React.FC<CollectionPlatformFilterProps> = ({ onP
 
     return (
         <FilterContainer>
-            <FilterTitle>Plataforma</FilterTitle>
-            <SearchInput
-                type="text"
-                placeholder="Buscar plataforma"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <PlatformList>
-                {platforms.map(platform => (
-                    <PlatformItem
-                        key={platform.id}
-                        isSelected={selectedPlatforms.some(p => p.id === platform.id)}
-                        onClick={() => handlePlatformToggle(platform)}
-                    >
-                        {platform.name}
-                    </PlatformItem>
-                ))}
-            </PlatformList>
+            <FilterCard>
+                <FilterTitle>Plataforma</FilterTitle>
+                <SearchInput
+                    type="text"
+                    placeholder="Buscar plataforma"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <PlatformList>
+                    {platforms.map(platform => (
+                        <PlatformItem
+                            key={platform.id}
+                            isSelected={selectedPlatforms.some(p => p.id === platform.id)}
+                            onClick={() => handlePlatformToggle(platform)}
+                        >
+                            {platform.name}
+                        </PlatformItem>
+                    ))}
+                </PlatformList>
+            </FilterCard>
         </FilterContainer>
     );
 };

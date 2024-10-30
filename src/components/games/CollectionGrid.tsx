@@ -8,27 +8,25 @@ import Link from 'next/link';
 import CustomSelect from '@/components/ui/CustomSelect';
 import CollectionPlatformFilter from '@/components/collection/CollectionPlatformFilter';
 import { Platform } from '@/types/platform';
+import { NAVBAR_HEIGHT } from '../layout/NavbarElements';
+import { IoClose, IoFilter } from 'react-icons/io5';
 
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   padding: 0 1rem;
+  min-width: 0;
+  width: 100%;
+  transition: all 0.3s ease-in-out;
 
-  @media (max-width: 900px) {
+  @media (max-width: 1200px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
-`;
-
-const Controls = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 20px;
 `;
 
 const Pagination = styled.div`
@@ -44,7 +42,6 @@ const PageButton = styled.button<{ active?: boolean; disabled?: boolean }>`
   border: none;
   background-color: ${props => props.active ? 'var(--app-yellow)' : 'var(--background)'};
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  border-radius: 4px;
   opacity: ${props => props.disabled ? 0.5 : 1};
 
   &:hover {
@@ -149,6 +146,79 @@ const Content = styled.div`
   flex: 1;
 `;
 
+const GridSection = styled.div`
+  display: flex;
+  gap: 20px;
+  min-width: 0;
+  transition: gap 0.3s ease-in-out;
+`;
+
+const FiltersPanel = styled.div<{ isOpen: boolean }>`
+  width: ${props => props.isOpen ? 'auto' : '0'};
+  min-width: ${props => props.isOpen ? 'auto' : '0'};
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  padding: ${props => props.isOpen ? '20px' : '0'};
+  margin-top: 20px;
+  opacity: ${props => props.isOpen ? '1' : '0'};
+  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
+
+  @media (max-width: 568px) {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    top: ${NAVBAR_HEIGHT};
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100vh;
+    background: white;
+    z-index: 1000;
+    margin: 0;
+    padding: ${props => props.isOpen ? '2rem' : '0'};
+  }
+`;
+
+const CloseFiltersButton = styled.button`
+  display: none;
+
+  @media (max-width: 568px) {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 8px 16px;
+    background-color: var(--app-yellow);
+    border: none;
+    cursor: pointer;
+    color: var(--dark-grey);
+    font-weight: bold;
+  }
+`;
+
+const Controls = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+`;
+
+const FiltersButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--dark-grey);
+  font-weight: bold;
+  font-size: 1rem;
+  margin-right: auto;
+`;
+
 const PaginationContainer = styled.div`
   margin-top: 2rem;
   width: 100%;
@@ -158,6 +228,7 @@ const CollectionGrid: React.FC = () => {
     const { games, loading, error, totalPages, fetchCollectionGames } = useCollectionGames();
     const [currentPage, setCurrentPage] = useState(1);
     const [sortType, setSortType] = useState<SortType>("YEAR_DESC");
+    const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
 
     useEffect(() => {
         fetchCollectionGames({
@@ -197,7 +268,9 @@ const CollectionGrid: React.FC = () => {
         <Container>
             <Content>
                 <Controls>
-                    <CollectionPlatformFilter onPlatformsChange={handlePlatformsChange} />
+                    <FiltersButton onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}>
+                        Filtros <IoFilter size={18} />
+                    </FiltersButton>
                     <CustomSelect
                         options={sortOptions}
                         value={sortType}
@@ -206,32 +279,41 @@ const CollectionGrid: React.FC = () => {
                     />
                 </Controls>
 
-                <GridContainer>
-                    {games.map((game) => (
-                        <StyledLink href={`/games/${game.id}`} key={game.id}>
-                            <GameCard>
-                                <ImageContainer>
-                                    <ImageWrapper>
-                                        <GameImage
-                                            src={getGameImageUrl(game)}
-                                            alt={game.title}
-                                        />
-                                    </ImageWrapper>
-                                    <ExpandedImageWrapper>
-                                        <GameImage
-                                            src={getGameImageUrl(game)}
-                                            alt={game.title}
-                                        />
-                                        <InfoLabel>Más información</InfoLabel>
-                                    </ExpandedImageWrapper>
-                                </ImageContainer>
-                                <GameContent>
-                                    <GameTitle>{game.title}</GameTitle>
-                                </GameContent>
-                            </GameCard>
-                        </StyledLink>
-                    ))}
-                </GridContainer>
+                <GridSection>
+                    <FiltersPanel isOpen={isFiltersPanelOpen}>
+                        <CloseFiltersButton onClick={() => setIsFiltersPanelOpen(false)}>
+                            <IoClose size={20} />
+                        </CloseFiltersButton>
+                        <CollectionPlatformFilter onPlatformsChange={handlePlatformsChange} />
+                    </FiltersPanel>
+
+                    <GridContainer>
+                        {games.map((game) => (
+                            <StyledLink href={`/games/${game.id}`} key={game.id}>
+                                <GameCard>
+                                    <ImageContainer>
+                                        <ImageWrapper>
+                                            <GameImage
+                                                src={getGameImageUrl(game)}
+                                                alt={game.title}
+                                            />
+                                        </ImageWrapper>
+                                        <ExpandedImageWrapper>
+                                            <GameImage
+                                                src={getGameImageUrl(game)}
+                                                alt={game.title}
+                                            />
+                                            <InfoLabel>Más información</InfoLabel>
+                                        </ExpandedImageWrapper>
+                                    </ImageContainer>
+                                    <GameContent>
+                                        <GameTitle>{game.title}</GameTitle>
+                                    </GameContent>
+                                </GameCard>
+                            </StyledLink>
+                        ))}
+                    </GridContainer>
+                </GridSection>
             </Content>
 
             <PaginationContainer>
