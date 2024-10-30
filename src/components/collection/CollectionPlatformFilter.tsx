@@ -77,12 +77,15 @@ interface Platform {
 
 interface CollectionPlatformFilterProps {
     onPlatformsChange: (platforms: Platform[]) => void;
+    selectedPlatforms: Platform[];
 }
 
-const CollectionPlatformFilter: React.FC<CollectionPlatformFilterProps> = ({ onPlatformsChange }) => {
+const CollectionPlatformFilter: React.FC<CollectionPlatformFilterProps> = ({
+    onPlatformsChange,
+    selectedPlatforms
+}) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [platforms, setPlatforms] = useState<Platform[]>([]);
-    const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
     const { searchPlatforms } = usePlatforms();
 
     useEffect(() => {
@@ -103,7 +106,6 @@ const CollectionPlatformFilter: React.FC<CollectionPlatformFilterProps> = ({ onP
             newSelected = [...selectedPlatforms, platform];
         }
 
-        setSelectedPlatforms(newSelected);
         onPlatformsChange(newSelected);
     };
 

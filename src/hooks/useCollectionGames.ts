@@ -10,6 +10,15 @@ interface CollectionParams {
   sortType: SortType;
 }
 
+interface FilterParams {
+  platformIds?: number[];
+}
+
+interface CollectionRequest {
+  collection: CollectionParams;
+  filter?: FilterParams;
+}
+
 export interface CollectionGame {
   id: number;
   title: string;
@@ -31,26 +40,32 @@ export const useCollectionGames = () => {
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(0);
 
-  const fetchCollectionGames = useCallback(async (params: CollectionParams) => {
-    setLoading(true);
-    try {
-      const response = await api.post<CollectionResponse>(
-        ENDPOINTS.GET_GAMES_COLLECTION,
-        {
+  const fetchCollectionGames = useCallback(
+    async (params: CollectionParams, filter?: FilterParams) => {
+      setLoading(true);
+      try {
+        const payload: CollectionRequest = {
           collection: params,
-        },
-        true
-      );
+          ...(filter && { filter }),
+        };
 
-      setGames(response.data);
-      setTotalPages(response.totalPages);
-    } catch (error) {
-      setError("Error al cargar la colección de juegos");
-      setGames([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+        const response = await api.post<CollectionResponse>(
+          ENDPOINTS.GET_GAMES_COLLECTION,
+          payload,
+          true
+        );
+
+        setGames(response.data);
+        setTotalPages(response.totalPages);
+      } catch (error) {
+        setError("Error al cargar la colección de juegos");
+        setGames([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   return {
     games,
