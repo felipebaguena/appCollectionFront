@@ -6,6 +6,8 @@ import { useCollectionGames, SortType, CollectionGame } from '@/hooks/useCollect
 import { API_BASE_URL } from '@/services/api';
 import Link from 'next/link';
 import CustomSelect from '@/components/ui/CustomSelect';
+import CollectionPlatformFilter from '@/components/collection/CollectionPlatformFilter';
+import { Platform } from '@/types/platform';
 
 const GridContainer = styled.div`
   display: grid;
@@ -183,6 +185,10 @@ const CollectionGrid: React.FC = () => {
             : `${API_BASE_URL}/uploads/resources/no-image.jpg`;
     };
 
+    const handlePlatformsChange = (platforms: Platform[]) => {
+        console.log('Plataformas seleccionadas:', platforms);
+    };
+
     if (loading) return <p>Cargando colección...</p>;
     if (error) return <p>Error: {error}</p>;
     if (!games || games.length === 0) return <p>No hay juegos disponibles</p>;
@@ -191,6 +197,7 @@ const CollectionGrid: React.FC = () => {
         <Container>
             <Content>
                 <Controls>
+                    <CollectionPlatformFilter onPlatformsChange={handlePlatformsChange} />
                     <CustomSelect
                         options={sortOptions}
                         value={sortType}

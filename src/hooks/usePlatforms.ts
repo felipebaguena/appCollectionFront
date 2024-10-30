@@ -22,6 +22,18 @@ export const usePlatforms = () => {
     }
   }, []);
 
+  const searchPlatforms = useCallback(async (search: string) => {
+    try {
+      const platformsData = await api.get<Platform[]>(
+        ENDPOINTS.GET_PLATFORMS_MULTISELECT(search)
+      );
+      return platformsData;
+    } catch (error) {
+      setError("Error al buscar plataformas");
+      return [];
+    }
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -52,5 +64,6 @@ export const usePlatforms = () => {
     error,
     createPlatform,
     fetchPlatforms,
+    searchPlatforms,
   };
 };

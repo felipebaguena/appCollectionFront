@@ -34,4 +34,6 @@ export const ENDPOINTS = {
   UPDATE_DEVELOPER: (id: string) => `/developers/${id}`,
   DELETE_DEVELOPER: (id: string) => `/developers/${id}`,
   GET_GAMES_COLLECTION: "/games/collection",
+  GET_PLATFORMS_MULTISELECT: (search: string) =>
+    `/platforms/multiselect?search=${search}`,
 };
