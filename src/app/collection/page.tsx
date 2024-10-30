@@ -1,26 +1,19 @@
 'use client';
 
-import React from 'react';
+import CollectionGrid from "@/components/games/CollectionGrid";
 import styled from 'styled-components';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-`;
-
-const MainTitle = styled.h1`
-  font-size: 2rem;
-  font-weight: bold;
-  color: #000;
-  margin-bottom: 20px;
+const Title = styled.h1`
+  color: var(--dark-grey);
+  text-align: center;
+  margin: 1rem 0 1rem 0;
 `;
 
 export default function CollectionPage() {
-    return (
-        <Container>
-            <MainTitle>Toda la colección</MainTitle>
-        </Container>
-    );
+  return (
+    <main>
+      <Title>Colección de Juegos</Title>
+      <CollectionGrid />
+    </main>
+  );
 }
