@@ -6,12 +6,17 @@ import FilterInput from '@/components/ui/FilterInput';
 import MultiSelect from '@/components/ui/Multiselect';
 import { useGames } from '@/hooks/useGames';
 import { FilterGroup, FilterLabel } from '@/components/management/DataTableElements';
+import YearRangeSelector from '@/components/ui/YearRangeSelector';
 
 interface GameFilter extends BaseFilter {
   search: string;
   platformIds: number[];
   genreIds: number[];
   developerIds: number[];
+  yearRange: {
+    start: number;
+    end: number;
+  } | null;
 }
 
 export const gameFilters: FilterPackage<Game, GameFilter> = {
@@ -19,21 +24,22 @@ export const gameFilters: FilterPackage<Game, GameFilter> = {
     search: "",
     platformIds: [],
     genreIds: [],
-    developerIds: []
+    developerIds: [],
+    yearRange: null
   },
   applyFilters: (params: DataTableParams<Game, GameFilter>) => {
-    const { search, platformIds, genreIds, developerIds } = params.filters;
+    const { search, platformIds, genreIds, developerIds, yearRange } = params.filters;
     return {
       filters: {
         search: search || "",
         platformIds: platformIds || [],
         genreIds: genreIds || [],
-        developerIds: developerIds || []
+        developerIds: developerIds || [],
+        yearRange: yearRange || null
       },
     };
   },
   renderFilter: (key: keyof GameFilter, value: any, onChange: (key: keyof GameFilter, value: any) => void) => {
-    // Obtener las opciones desde el hook useGames
     const { genres, platforms, developers } = useGames();
 
     const genresOptions = genres.map(g => ({ id: g.id, name: g.name, code: g.id.toString() }));
@@ -53,6 +59,18 @@ export const gameFilters: FilterPackage<Game, GameFilter> = {
               label="Buscar juego"
               value={value}
               onChange={(newValue) => onChange(key, newValue)}
+            />
+          </FilterGroup>
+        );
+      case 'yearRange':
+        return (
+          <FilterGroup key={key}>
+            <FilterLabel>Año de lanzamiento</FilterLabel>
+            <YearRangeSelector
+              value={value}
+              onChange={(range) => onChange(key, range)}
+              startYear={1970}
+              endYear={new Date().getFullYear()}
             />
           </FilterGroup>
         );

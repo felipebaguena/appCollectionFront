@@ -396,7 +396,7 @@ export const FilterGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  width: 13rem;
+  width: 12rem;
   flex: 0 0 auto;
 `;
 
