@@ -9,10 +9,20 @@ const ChipContainer = styled.div`
   margin: 0 4px;
   font-size: 0.875rem;
   color: var(--dark-grey);
+
+  @media (max-width: 568px) {
+    padding: 2px 6px;
+    font-size: 0.75rem;
+    margin: 0 2px;
+  }
 `;
 
 const ChipText = styled.span`
   margin-right: 4px;
+
+  @media (max-width: 568px) {
+    margin-right: 2px;
+  }
 `;
 
 const CloseButton = styled.button`
@@ -28,6 +38,10 @@ const CloseButton = styled.button`
   &:hover {
     opacity: 0.7;
   }
+
+  @media (max-width: 568px) {
+    padding: 1px;
+  }
 `;
 
 interface FilterChipProps {
@@ -39,7 +53,7 @@ const FilterChip: React.FC<FilterChipProps> = ({ label, onRemove }) => (
     <ChipContainer>
         <ChipText>{label}</ChipText>
         <CloseButton onClick={onRemove}>
-            <IoClose size={14} />
+            <IoClose size={12} />
         </CloseButton>
     </ChipContainer>
 );

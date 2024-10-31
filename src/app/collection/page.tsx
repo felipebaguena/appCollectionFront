@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import { Platform } from '@/types/platform';
 import { NAVBAR_HEIGHT } from '@/components/layout/NavbarElements';
-import { IoClose, IoFilter } from 'react-icons/io5';
+import { IoClose, IoFilter, IoCloseCircleOutline } from 'react-icons/io5';
 import { SortType } from '@/hooks/useCollectionGames';
 import CustomSelect from '@/components/ui/CustomSelect';
 import CollectionGenreFilter from "@/components/collection/CollectionGenreFilter";
@@ -37,9 +37,25 @@ const PageContainer = styled.main`
 
 const Controls = styled.div`
   display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 20px 20px 5px 20px;
+
+  @media (max-width: 568px) {
+    gap: 0.8rem;
+  }
+`;
+
+const ControlsTop = styled.div`
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+
+  @media (max-width: 568px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+  }
 `;
 
 const FiltersButton = styled.button`
@@ -125,20 +141,63 @@ const ControlsRight = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+
+  @media (max-width: 568px) {
+    flex-direction: row;
+    gap: 0.8rem;
+    width: 100%;
+    
+    > * {
+      flex: 1;
+      min-width: 0;
+    }
+  }
 `;
 
 const FiltersSection = styled.div`
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+
+  @media (max-width: 568px) {
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    width: 100%;
+  }
 `;
 
 const ChipsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 5px;
   align-items: center;
+  min-height: 34px;
+
+  @media (max-width: 768px) {
+    gap: 4px;
+    font-size: 0.875rem;
+  }
+`;
+
+const ClearFiltersButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--grey);
+  font-size: 0.875rem;
+
+  &:hover {
+    color: var(--dark-grey);
+  }
+
+  @media (max-width: 568px) {
+    font-size: 0.8rem;
+    margin-left: 0;
+  }
 `;
 
 export default function CollectionPage() {
@@ -197,6 +256,20 @@ export default function CollectionPage() {
     setYearRange(null);
   };
 
+  const hasActiveFilters = selectedPlatforms.length > 0 ||
+    selectedGenres.length > 0 ||
+    selectedDevelopers.length > 0 ||
+    (yearRange?.start && yearRange?.end) ||
+    searchTerm.length > 0;
+
+  const handleClearAllFilters = () => {
+    setSelectedPlatforms([]);
+    setSelectedGenres([]);
+    setSelectedDevelopers([]);
+    setYearRange(null);
+    setSearchTerm('');
+  };
+
   return (
     <PageContainer>
       <TitleBar>
@@ -204,53 +277,61 @@ export default function CollectionPage() {
       </TitleBar>
 
       <Controls>
-        <FiltersSection>
-          <FiltersButton onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}>
-            Filtros <IoFilter size={18} />
-          </FiltersButton>
-          <ChipsContainer>
-            {selectedPlatforms.map(platform => (
-              <FilterChip
-                key={`platform-${platform.id}`}
-                label={platform.name}
-                onRemove={() => handleRemovePlatform(platform.id)}
-              />
-            ))}
-            {selectedGenres.map(genre => (
-              <FilterChip
-                key={`genre-${genre.id}`}
-                label={genre.name}
-                onRemove={() => handleRemoveGenre(genre.id)}
-              />
-            ))}
-            {selectedDevelopers.map(developer => (
-              <FilterChip
-                key={`developer-${developer.id}`}
-                label={developer.name}
-                onRemove={() => handleRemoveDeveloper(developer.id)}
-              />
-            ))}
-            {yearRange?.start && yearRange?.end && (
-              <FilterChip
-                label={`${yearRange.start} - ${yearRange.end}`}
-                onRemove={handleRemoveYearRange}
-              />
+        <ControlsTop>
+          <FiltersSection>
+            <FiltersButton onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}>
+              Filtros <IoFilter size={18} />
+            </FiltersButton>
+            {hasActiveFilters && (
+              <ClearFiltersButton onClick={handleClearAllFilters}>
+                Limpiar todo <IoCloseCircleOutline size={16} />
+              </ClearFiltersButton>
             )}
-          </ChipsContainer>
-        </FiltersSection>
-        <ControlsRight>
-          <FilterInput
-            label="Buscar juego"
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-          <CustomSelect
-            options={sortOptions}
-            value={sortType}
-            onChange={handleSortChange}
-            placeholder="Ordenar por..."
-          />
-        </ControlsRight>
+          </FiltersSection>
+          <ControlsRight>
+            <FilterInput
+              label="Buscar juego"
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+            <CustomSelect
+              options={sortOptions}
+              value={sortType}
+              onChange={handleSortChange}
+              placeholder="Ordenar por..."
+            />
+          </ControlsRight>
+        </ControlsTop>
+
+        <ChipsContainer>
+          {selectedPlatforms.map(platform => (
+            <FilterChip
+              key={`platform-${platform.id}`}
+              label={platform.name}
+              onRemove={() => handleRemovePlatform(platform.id)}
+            />
+          ))}
+          {selectedGenres.map(genre => (
+            <FilterChip
+              key={`genre-${genre.id}`}
+              label={genre.name}
+              onRemove={() => handleRemoveGenre(genre.id)}
+            />
+          ))}
+          {selectedDevelopers.map(developer => (
+            <FilterChip
+              key={`developer-${developer.id}`}
+              label={developer.name}
+              onRemove={() => handleRemoveDeveloper(developer.id)}
+            />
+          ))}
+          {yearRange?.start && yearRange?.end && (
+            <FilterChip
+              label={`${yearRange.start} - ${yearRange.end}`}
+              onRemove={handleRemoveYearRange}
+            />
+          )}
+        </ChipsContainer>
       </Controls>
 
       <ContentWrapper>
