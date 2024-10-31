@@ -40,4 +40,5 @@ export const ENDPOINTS = {
     `/genres/multiselect?search=${search}`,
   GET_DEVELOPERS_MULTISELECT: (search: string) =>
     `/developers/multiselect?search=${search}`,
+  ADD_GAME_TO_COLLECTION: "/user-games/me",
 };

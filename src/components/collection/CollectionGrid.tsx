@@ -5,6 +5,9 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import { useCollectionGames, SortType, CollectionGame } from '@/hooks/useCollectionGames';
 import { API_BASE_URL } from '@/services/api';
+import { useUserGames } from '@/hooks/useUserGames';
+import Modal from '@/components/ui/Modal';
+import AddToCollectionForm from './AddToCollectionForm';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -42,7 +45,7 @@ const GameCardWrapper = styled(Link)`
       opacity: 1;
     }
 
-    .info-label {
+    .info-label, .add-collection-label {
       opacity: 1;
       transform: translateY(0);
     }
@@ -119,7 +122,28 @@ const InfoLabel = styled.div`
   text-align: center;
   opacity: 0;
   transform: translateY(100%);
-  transition: all 0.8s cubic-bezier(0.8, 0, 0.4, 1);
+  transition: all 0.6s cubic-bezier(0.8, 0, 0.4, 1);
+`;
+
+const AddToCollectionLabel = styled.div`
+  position: absolute;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  background-color: var(--grey);
+  color: white;
+  padding: 0.6rem 0.8rem;
+  font-weight: bold;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: all 0.6s cubic-bezier(0.8, 0, 0.4, 1);
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--dark-grey);
+    transition: background-color 0.4s ease;
+  }
 `;
 
 const Pagination = styled.div`
@@ -179,6 +203,10 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
 }) => {
   const { games, loading, error, totalPages, fetchCollectionGames } = useCollectionGames();
   const [currentPage, setCurrentPage] = useState(1);
+  const [showAddToCollectionModal, setShowAddToCollectionModal] = useState(false);
+  const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
+  const [selectedGame, setSelectedGame] = useState<CollectionGame | null>(null);
+  const { addGameToCollection, isLoading: isAddingGame, error: addGameError } = useUserGames();
 
   useEffect(() => {
     const filter = {
@@ -202,70 +230,116 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       : `${API_BASE_URL}/uploads/resources/no-image.jpg`;
   };
 
+  const handleAddToCollection = (e: React.MouseEvent, game: CollectionGame) => {
+    e.preventDefault();
+    setSelectedGameId(game.id);
+    setSelectedGame(game);
+    setShowAddToCollectionModal(true);
+  };
+
+  const handleSubmitAddToCollection = async (formData: {
+    rating?: number;
+    status?: number;
+    complete: boolean;
+    notes?: string;
+  }) => {
+    if (selectedGameId) {
+      const result = await addGameToCollection({
+        gameId: selectedGameId,
+        ...formData
+      });
+
+      if (result) {
+        setShowAddToCollectionModal(false);
+        // Aquí podrías mostrar una notificación de éxito
+      }
+    }
+  };
+
   if (loading) return <p>Cargando colección...</p>;
   if (error) return <p>Error: {error}</p>;
   if (!games || games.length === 0) return <p>No hay juegos disponibles</p>;
 
   return (
-    <Container>
-      <Content>
-        <GridContainer>
-          {games.map((game) => (
-            <GameCardWrapper key={game.id} href={`/games/${game.id}`}>
-              <GameCard className="game-card">
-                <ImageContainer>
-                  <ImageWrapper className="image-wrapper">
-                    <GameImage
-                      src={getGameImageUrl(game)}
-                      alt={game.title}
-                    />
-                  </ImageWrapper>
-                  <ExpandedImageWrapper className="expanded-wrapper">
-                    <GameImage
-                      src={getGameImageUrl(game)}
-                      alt={game.title}
-                    />
-                    <InfoLabel className="info-label">Más información</InfoLabel>
-                  </ExpandedImageWrapper>
-                </ImageContainer>
-                <GameContent>
-                  <GameTitle>{game.title}</GameTitle>
-                </GameContent>
-              </GameCard>
-            </GameCardWrapper>
-          ))}
-        </GridContainer>
-      </Content>
+    <>
+      <Container>
+        <Content>
+          <GridContainer>
+            {games.map((game) => (
+              <GameCardWrapper key={game.id} href={`/games/${game.id}`}>
+                <GameCard className="game-card">
+                  <ImageContainer>
+                    <ImageWrapper className="image-wrapper">
+                      <GameImage
+                        src={getGameImageUrl(game)}
+                        alt={game.title}
+                      />
+                    </ImageWrapper>
+                    <ExpandedImageWrapper className="expanded-wrapper">
+                      <GameImage
+                        src={getGameImageUrl(game)}
+                        alt={game.title}
+                      />
+                      <AddToCollectionLabel
+                        className="add-collection-label"
+                        onClick={(e) => handleAddToCollection(e, game)}
+                      >
+                        Añadir a la colección
+                      </AddToCollectionLabel>
+                      <InfoLabel className="info-label">Más información</InfoLabel>
+                    </ExpandedImageWrapper>
+                  </ImageContainer>
+                  <GameContent>
+                    <GameTitle>{game.title}</GameTitle>
+                  </GameContent>
+                </GameCard>
+              </GameCardWrapper>
+            ))}
+          </GridContainer>
+        </Content>
 
-      <PaginationContainer>
-        <Pagination>
-          <PageButton
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Anterior
-          </PageButton>
-
-          {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((page) => (
+        <PaginationContainer>
+          <Pagination>
             <PageButton
-              key={page}
-              active={page === currentPage}
-              onClick={() => setCurrentPage(page)}
-              disabled={totalPages <= 1}
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
             >
-              {page}
+              Anterior
             </PageButton>
-          ))}
 
-          <PageButton
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={currentPage === totalPages || totalPages <= 1}
-          >
-            Siguiente
-          </PageButton>
-        </Pagination>
-      </PaginationContainer>
-    </Container>
+            {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((page) => (
+              <PageButton
+                key={page}
+                active={page === currentPage}
+                onClick={() => setCurrentPage(page)}
+                disabled={totalPages <= 1}
+              >
+                {page}
+              </PageButton>
+            ))}
+
+            <PageButton
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages || totalPages <= 1}
+            >
+              Siguiente
+            </PageButton>
+          </Pagination>
+        </PaginationContainer>
+      </Container>
+
+      <Modal
+        isOpen={showAddToCollectionModal}
+        onClose={() => setShowAddToCollectionModal(false)}
+        title={selectedGame ? `Añadir ${selectedGame.title} a mi colección` : 'Añadir a mi colección'}
+      >
+        <AddToCollectionForm
+          onSubmit={handleSubmitAddToCollection}
+          onCancel={() => setShowAddToCollectionModal(false)}
+          isLoading={isAddingGame}
+        />
+      </Modal>
+    </>
   );
 };
 
