@@ -8,10 +8,10 @@ import { NAVBAR_HEIGHT } from '@/components/layout/NavbarElements';
 import { IoClose, IoFilter } from 'react-icons/io5';
 import { SortType } from '@/hooks/useCollectionGames';
 import CustomSelect from '@/components/ui/CustomSelect';
-import { FiltersContainer } from "@/components/management/DataTableElements";
 import CollectionGenreFilter from "@/components/collection/CollectionGenreFilter";
-import { Genre } from "@/types/game";
+import { Developer, Genre } from "@/types/game";
 import CollectionGrid from "@/components/collection/CollectionGrid";
+import CollectionDeveloperFilter from "@/components/collection/CollectionDeveloperFilter";
 
 const Title = styled.h1`
   color: var(--dark-grey);
@@ -116,6 +116,7 @@ const ControlsRight = styled.div`
 export default function CollectionPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<Genre[]>([]);
+  const [selectedDevelopers, setSelectedDevelopers] = useState<Developer[]>([]);
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
   const [sortType, setSortType] = useState<SortType>("YEAR_DESC");
 
@@ -132,6 +133,10 @@ export default function CollectionPage() {
 
   const handleGenresChange = (genres: Genre[]) => {
     setSelectedGenres(genres);
+  };
+
+  const handleDevelopersChange = (developers: Developer[]) => {
+    setSelectedDevelopers(developers);
   };
 
   const handleSortChange = (value: string) => {
@@ -170,12 +175,17 @@ export default function CollectionPage() {
               onGenresChange={handleGenresChange}
               selectedGenres={selectedGenres}
             />
+            <CollectionDeveloperFilter
+              onDevelopersChange={handleDevelopersChange}
+              selectedDevelopers={selectedDevelopers}
+            />
           </CollectionFiltersContainer>
         </FiltersPanel>
 
         <CollectionGrid
           selectedPlatformIds={selectedPlatforms.map(p => p.id)}
           selectedGenreIds={selectedGenres.map(g => g.id)}
+          selectedDeveloperIds={selectedDevelopers.map(d => d.id)}
           sortType={sortType}
         />
       </ContentWrapper>

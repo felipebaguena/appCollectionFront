@@ -19,6 +19,18 @@ export const useDevelopers = () => {
     }
   }, []);
 
+  const searchDevelopers = useCallback(async (search: string) => {
+    try {
+      const developersData = await api.get<Developer[]>(
+        ENDPOINTS.GET_DEVELOPERS_MULTISELECT(search)
+      );
+      return developersData;
+    } catch (error) {
+      setError("Error al buscar desarrolladores");
+      return [];
+    }
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -49,5 +61,6 @@ export const useDevelopers = () => {
     error,
     createDeveloper,
     fetchDevelopers,
+    searchDevelopers,
   };
 };

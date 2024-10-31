@@ -149,12 +149,14 @@ const PaginationContainer = styled.div`
 interface CollectionGridProps {
   selectedPlatformIds: number[];
   selectedGenreIds: number[];
+  selectedDeveloperIds: number[];
   sortType: SortType;
 }
 
 const CollectionGrid: React.FC<CollectionGridProps> = ({
   selectedPlatformIds,
   selectedGenreIds,
+  selectedDeveloperIds,
   sortType
 }) => {
   const { games, loading, error, totalPages, fetchCollectionGames } = useCollectionGames();
@@ -163,7 +165,8 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
   useEffect(() => {
     const filter = {
       ...(selectedPlatformIds.length > 0 && { platformIds: selectedPlatformIds }),
-      ...(selectedGenreIds.length > 0 && { genreIds: selectedGenreIds })
+      ...(selectedGenreIds.length > 0 && { genreIds: selectedGenreIds }),
+      ...(selectedDeveloperIds.length > 0 && { developerIds: selectedDeveloperIds })
     };
 
     fetchCollectionGames({
@@ -171,7 +174,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       limit: ITEMS_PER_PAGE,
       sortType
     }, Object.keys(filter).length > 0 ? filter : undefined);
-  }, [currentPage, sortType, selectedPlatformIds, selectedGenreIds, fetchCollectionGames]);
+  }, [currentPage, sortType, selectedPlatformIds, selectedGenreIds, selectedDeveloperIds, fetchCollectionGames]);
 
   const getGameImageUrl = (game: CollectionGame) => {
     return game.coverImage

@@ -38,4 +38,6 @@ export const ENDPOINTS = {
     `/platforms/multiselect?search=${search}`,
   GET_GENRES_MULTISELECT: (search: string) =>
     `/genres/multiselect?search=${search}`,
+  GET_DEVELOPERS_MULTISELECT: (search: string) =>
+    `/developers/multiselect?search=${search}`,
 };
