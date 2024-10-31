@@ -169,7 +169,7 @@ const FiltersSection = styled.div`
 const ChipsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 5px;
+  gap: 0.5rem;
   align-items: center;
   min-height: 34px;
 

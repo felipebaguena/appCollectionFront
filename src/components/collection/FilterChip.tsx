@@ -6,7 +6,6 @@ const ChipContainer = styled.div`
   align-items: center;
   background-color: var(--app-yellow);
   padding: 4px 8px;
-  margin: 0 4px;
   font-size: 0.875rem;
   color: var(--dark-grey);
 
