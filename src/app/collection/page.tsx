@@ -1,6 +1,5 @@
 'use client';
 
-import CollectionGrid from "@/components/games/CollectionGrid";
 import CollectionPlatformFilter from "@/components/collection/CollectionPlatformFilter";
 import styled from 'styled-components';
 import { useState } from 'react';
@@ -12,6 +11,7 @@ import CustomSelect from '@/components/ui/CustomSelect';
 import { FiltersContainer } from "@/components/management/DataTableElements";
 import CollectionGenreFilter from "@/components/collection/CollectionGenreFilter";
 import { Genre } from "@/types/game";
+import CollectionGrid from "@/components/collection/CollectionGrid";
 
 const Title = styled.h1`
   color: var(--dark-grey);
