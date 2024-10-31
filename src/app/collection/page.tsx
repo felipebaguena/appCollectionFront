@@ -14,6 +14,7 @@ import CollectionGrid from "@/components/collection/CollectionGrid";
 import CollectionDeveloperFilter from "@/components/collection/CollectionDeveloperFilter";
 import FilterInput from '@/components/ui/FilterInput';
 import CollectionYearFilter from "@/components/collection/CollectionYearFilter";
+import FilterChip from '@/components/collection/FilterChip';
 
 const TitleBar = styled.div`
   background-color: var(--app-yellow);
@@ -126,6 +127,20 @@ const ControlsRight = styled.div`
   gap: 1rem;
 `;
 
+const FiltersSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
+const ChipsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+`;
+
 export default function CollectionPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<Genre[]>([]);
@@ -166,6 +181,22 @@ export default function CollectionPage() {
     setYearRange(range);
   };
 
+  const handleRemovePlatform = (platformId: number) => {
+    setSelectedPlatforms(prev => prev.filter(p => p.id !== platformId));
+  };
+
+  const handleRemoveGenre = (genreId: number) => {
+    setSelectedGenres(prev => prev.filter(g => g.id !== genreId));
+  };
+
+  const handleRemoveDeveloper = (developerId: number) => {
+    setSelectedDevelopers(prev => prev.filter(d => d.id !== developerId));
+  };
+
+  const handleRemoveYearRange = () => {
+    setYearRange(null);
+  };
+
   return (
     <PageContainer>
       <TitleBar>
@@ -173,9 +204,40 @@ export default function CollectionPage() {
       </TitleBar>
 
       <Controls>
-        <FiltersButton onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}>
-          Filtros <IoFilter size={18} />
-        </FiltersButton>
+        <FiltersSection>
+          <FiltersButton onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}>
+            Filtros <IoFilter size={18} />
+          </FiltersButton>
+          <ChipsContainer>
+            {selectedPlatforms.map(platform => (
+              <FilterChip
+                key={`platform-${platform.id}`}
+                label={platform.name}
+                onRemove={() => handleRemovePlatform(platform.id)}
+              />
+            ))}
+            {selectedGenres.map(genre => (
+              <FilterChip
+                key={`genre-${genre.id}`}
+                label={genre.name}
+                onRemove={() => handleRemoveGenre(genre.id)}
+              />
+            ))}
+            {selectedDevelopers.map(developer => (
+              <FilterChip
+                key={`developer-${developer.id}`}
+                label={developer.name}
+                onRemove={() => handleRemoveDeveloper(developer.id)}
+              />
+            ))}
+            {yearRange?.start && yearRange?.end && (
+              <FilterChip
+                label={`${yearRange.start} - ${yearRange.end}`}
+                onRemove={handleRemoveYearRange}
+              />
+            )}
+          </ChipsContainer>
+        </FiltersSection>
         <ControlsRight>
           <FilterInput
             label="Buscar juego"

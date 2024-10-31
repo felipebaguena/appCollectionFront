@@ -22,6 +22,7 @@ const GameCardWrapper = styled(Link)`
   max-width: calc(33.333% - 14px);
   margin: 0;
   text-decoration: none;
+  position: relative;
 
   @media (max-width: 1200px) {
     max-width: calc(50% - 10px);
@@ -30,6 +31,25 @@ const GameCardWrapper = styled(Link)`
   @media (max-width: 768px) {
     max-width: 100%;
     min-width: 250px;
+  }
+
+  &:hover {
+    .image-wrapper {
+      opacity: 0;
+    }
+
+    .expanded-wrapper {
+      opacity: 1;
+    }
+
+    .info-label {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .game-card {
+      transform: translateY(-2px);
+    }
   }
 `;
 
@@ -41,10 +61,6 @@ const GameCard = styled.div`
   cursor: pointer;
   height: 100%;
   transition: transform 0.2s ease-in-out;
-
-  &:hover {
-    transform: translateY(-2px);
-  }
 `;
 
 const ImageContainer = styled.div`
@@ -62,10 +78,6 @@ const ImageWrapper = styled.div`
   height: 100%;
   padding: 2rem;
   transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-
-  ${GameCard}:hover & {
-    opacity: 0;
-  }
 `;
 
 const ExpandedImageWrapper = styled.div`
@@ -76,10 +88,6 @@ const ExpandedImageWrapper = styled.div`
   height: 100%;
   opacity: 0;
   transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-
-  ${GameCard}:hover & {
-    opacity: 1;
-  }
 `;
 
 const GameImage = styled.img`
@@ -112,11 +120,6 @@ const InfoLabel = styled.div`
   opacity: 0;
   transform: translateY(100%);
   transition: all 0.8s cubic-bezier(0.8, 0, 0.4, 1);
-
-  ${GameCard}:hover & {
-    opacity: 1;
-    transform: translateY(0);
-  }
 `;
 
 const Pagination = styled.div`
@@ -209,20 +212,20 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
         <GridContainer>
           {games.map((game) => (
             <GameCardWrapper key={game.id} href={`/games/${game.id}`}>
-              <GameCard>
+              <GameCard className="game-card">
                 <ImageContainer>
-                  <ImageWrapper>
+                  <ImageWrapper className="image-wrapper">
                     <GameImage
                       src={getGameImageUrl(game)}
                       alt={game.title}
                     />
                   </ImageWrapper>
-                  <ExpandedImageWrapper>
+                  <ExpandedImageWrapper className="expanded-wrapper">
                     <GameImage
                       src={getGameImageUrl(game)}
                       alt={game.title}
                     />
-                    <InfoLabel>Más información</InfoLabel>
+                    <InfoLabel className="info-label">Más información</InfoLabel>
                   </ExpandedImageWrapper>
                 </ImageContainer>
                 <GameContent>
