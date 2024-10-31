@@ -152,6 +152,7 @@ const Navbar = () => {
         </NavbarSection>
         <NavbarSection $position="right">
           <NavLink href="/">Inicio</NavLink>
+          <NavLink href="/collection">Colección</NavLink>
           {renderAuthButtons()}
         </NavbarSection>
         <Modal
