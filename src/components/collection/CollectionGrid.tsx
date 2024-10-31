@@ -6,49 +6,30 @@ import { useCollectionGames, SortType, CollectionGame } from '@/hooks/useCollect
 import { API_BASE_URL } from '@/services/api';
 import Link from 'next/link';
 
+const ITEMS_PER_PAGE = 9;
+
 const GridContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
   padding: 0 1rem;
-  min-width: 0;
   width: 100%;
-  transition: all 0.3s ease-in-out;
+`;
+
+const GameCardWrapper = styled.div`
+  flex: 1;
+  min-width: 300px;
+  max-width: calc(33.333% - 14px);
+  margin: 0;
 
   @media (max-width: 1200px) {
-    grid-template-columns: repeat(2, 1fr);
+    max-width: calc(50% - 10px);
   }
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr;
+    max-width: 100%;
+    min-width: 250px;
   }
-`;
-
-const Pagination = styled.div`
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-`;
-
-const PageButton = styled.button<{ active?: boolean; disabled?: boolean }>`
-  padding: 8px 12px;
-  border: none;
-  background-color: ${props => props.active ? 'var(--app-yellow)' : 'var(--background)'};
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  opacity: ${props => props.disabled ? 0.5 : 1};
-
-  &:hover {
-    background-color: ${props => props.disabled ? 'var(--background)' : 'var(--app-yellow)'};
-  }
-`;
-
-const ImageContainer = styled.div`
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
 `;
 
 const GameCard = styled.div`
@@ -57,6 +38,19 @@ const GameCard = styled.div`
   display: flex;
   flex-direction: column;
   cursor: pointer;
+  height: 100%;
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+`;
+
+const ImageContainer = styled.div`
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
 `;
 
 const ImageWrapper = styled.div`
@@ -128,17 +122,37 @@ const InfoLabel = styled.div`
   }
 `;
 
-const ITEMS_PER_PAGE = 10;
+const Pagination = styled.div`
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+`;
+
+const PageButton = styled.button<{ active?: boolean; disabled?: boolean }>`
+  padding: 8px 12px;
+  border: none;
+  background-color: ${props => props.active ? 'var(--app-yellow)' : 'var(--background)'};
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  opacity: ${props => props.disabled ? 0.5 : 1};
+
+  &:hover {
+    background-color: ${props => props.disabled ? 'var(--background)' : 'var(--app-yellow)'};
+  }
+`;
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100%;
   padding-bottom: 2rem;
+  width: 100%;
 `;
 
 const Content = styled.div`
   flex: 1;
+  width: 100%;
 `;
 
 const PaginationContainer = styled.div`
@@ -191,28 +205,30 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       <Content>
         <GridContainer>
           {games.map((game) => (
-            <StyledLink href={`/games/${game.id}`} key={game.id}>
-              <GameCard>
-                <ImageContainer>
-                  <ImageWrapper>
-                    <GameImage
-                      src={getGameImageUrl(game)}
-                      alt={game.title}
-                    />
-                  </ImageWrapper>
-                  <ExpandedImageWrapper>
-                    <GameImage
-                      src={getGameImageUrl(game)}
-                      alt={game.title}
-                    />
-                    <InfoLabel>Más información</InfoLabel>
-                  </ExpandedImageWrapper>
-                </ImageContainer>
-                <GameContent>
-                  <GameTitle>{game.title}</GameTitle>
-                </GameContent>
-              </GameCard>
-            </StyledLink>
+            <GameCardWrapper key={game.id}>
+              <StyledLink href={`/games/${game.id}`}>
+                <GameCard>
+                  <ImageContainer>
+                    <ImageWrapper>
+                      <GameImage
+                        src={getGameImageUrl(game)}
+                        alt={game.title}
+                      />
+                    </ImageWrapper>
+                    <ExpandedImageWrapper>
+                      <GameImage
+                        src={getGameImageUrl(game)}
+                        alt={game.title}
+                      />
+                      <InfoLabel>Más información</InfoLabel>
+                    </ExpandedImageWrapper>
+                  </ImageContainer>
+                  <GameContent>
+                    <GameTitle>{game.title}</GameTitle>
+                  </GameContent>
+                </GameCard>
+              </StyledLink>
+            </GameCardWrapper>
           ))}
         </GridContainer>
       </Content>

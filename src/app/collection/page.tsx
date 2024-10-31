@@ -59,17 +59,17 @@ const FiltersPanel = styled.div<{ isOpen: boolean }>`
   @media (max-width: 568px) {
     position: fixed;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     top: ${NAVBAR_HEIGHT};
     left: 0;
     right: 0;
     bottom: 0;
     width: 100%;
-    height: 100vh;
+    height: calc(100vh - ${NAVBAR_HEIGHT});
     background: white;
     z-index: 1000;
     margin: 0;
-    padding: ${props => props.isOpen ? '2rem' : '0'};
+    overflow-y: auto;
   }
 `;
 
@@ -82,6 +82,7 @@ const CollectionFiltersContainer = styled.div`
     width: 100%;
     max-width: 15rem;
     margin: 0 auto;
+    padding-bottom: 2rem;
   }
 `;
 
@@ -90,7 +91,7 @@ const CloseFiltersButton = styled.button`
 
   @media (max-width: 568px) {
     display: block;
-    position: absolute;
+    position: sticky;
     top: 0;
     right: 0;
     padding: 8px 16px;
@@ -99,6 +100,8 @@ const CloseFiltersButton = styled.button`
     cursor: pointer;
     color: var(--dark-grey);
     font-weight: bold;
+    margin-left: auto;
+    z-index: 1001;
   }
 `;
 
