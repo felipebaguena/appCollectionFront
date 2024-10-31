@@ -15,10 +15,18 @@ import CollectionDeveloperFilter from "@/components/collection/CollectionDevelop
 import FilterInput from '@/components/ui/FilterInput';
 import CollectionYearFilter from "@/components/collection/CollectionYearFilter";
 
+const TitleBar = styled.div`
+  background-color: var(--app-yellow);
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+`;
+
 const Title = styled.h1`
   color: var(--dark-grey);
   text-align: center;
-  margin: 1rem 0 1rem 0;
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
 `;
 
 const PageContainer = styled.main`
@@ -160,7 +168,9 @@ export default function CollectionPage() {
 
   return (
     <PageContainer>
-      <Title>Colección de Juegos</Title>
+      <TitleBar>
+        <Title>Nuestra colección de Juegos</Title>
+      </TitleBar>
 
       <Controls>
         <FiltersButton onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}>
