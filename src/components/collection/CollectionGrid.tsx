@@ -17,22 +17,28 @@ const GridContainer = styled.div`
   gap: 20px;
   padding: 0 1rem;
   width: 100%;
+  justify-content: flex-start;
+  max-width: 1600px;
+  margin: 0 auto;
 `;
 
 const GameCardWrapper = styled(Link)`
-  flex: 1;
+  flex: 0 0 auto;
+  width: calc(33.333% - 14px);
+  max-width: 400px;
   min-width: 300px;
-  max-width: calc(33.333% - 14px);
   margin: 0;
   text-decoration: none;
   position: relative;
 
   @media (max-width: 1200px) {
-    max-width: calc(50% - 10px);
+    width: calc(50% - 10px);
+    max-width: 400px;
   }
 
   @media (max-width: 768px) {
-    max-width: 100%;
+    width: 100%;
+    max-width: 400px;
     min-width: 250px;
   }
 
