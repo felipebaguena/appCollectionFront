@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import Link from 'next/link';
 import { useCollectionGames, SortType, CollectionGame } from '@/hooks/useCollectionGames';
 import { API_BASE_URL } from '@/services/api';
-import Link from 'next/link';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -16,11 +16,12 @@ const GridContainer = styled.div`
   width: 100%;
 `;
 
-const GameCardWrapper = styled.div`
+const GameCardWrapper = styled(Link)`
   flex: 1;
   min-width: 300px;
   max-width: calc(33.333% - 14px);
   margin: 0;
+  text-decoration: none;
 
   @media (max-width: 1200px) {
     max-width: calc(50% - 10px);
@@ -98,10 +99,6 @@ const GameTitle = styled.h3`
   font-weight: bold;
 `;
 
-const StyledLink = styled(Link)`
-  text-decoration: none;
-`;
-
 const InfoLabel = styled.div`
   position: absolute;
   bottom: 0;
@@ -164,6 +161,7 @@ interface CollectionGridProps {
   selectedPlatformIds: number[];
   selectedGenreIds: number[];
   selectedDeveloperIds: number[];
+  searchTerm: string;
   sortType: SortType;
 }
 
@@ -171,6 +169,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
   selectedPlatformIds,
   selectedGenreIds,
   selectedDeveloperIds,
+  searchTerm,
   sortType
 }) => {
   const { games, loading, error, totalPages, fetchCollectionGames } = useCollectionGames();
@@ -178,6 +177,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
 
   useEffect(() => {
     const filter = {
+      search: searchTerm,
       ...(selectedPlatformIds.length > 0 && { platformIds: selectedPlatformIds }),
       ...(selectedGenreIds.length > 0 && { genreIds: selectedGenreIds }),
       ...(selectedDeveloperIds.length > 0 && { developerIds: selectedDeveloperIds })
@@ -187,8 +187,8 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       page: currentPage,
       limit: ITEMS_PER_PAGE,
       sortType
-    }, Object.keys(filter).length > 0 ? filter : undefined);
-  }, [currentPage, sortType, selectedPlatformIds, selectedGenreIds, selectedDeveloperIds, fetchCollectionGames]);
+    }, filter);
+  }, [currentPage, sortType, selectedPlatformIds, selectedGenreIds, selectedDeveloperIds, searchTerm, fetchCollectionGames]);
 
   const getGameImageUrl = (game: CollectionGame) => {
     return game.coverImage
@@ -205,29 +205,27 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       <Content>
         <GridContainer>
           {games.map((game) => (
-            <GameCardWrapper key={game.id}>
-              <StyledLink href={`/games/${game.id}`}>
-                <GameCard>
-                  <ImageContainer>
-                    <ImageWrapper>
-                      <GameImage
-                        src={getGameImageUrl(game)}
-                        alt={game.title}
-                      />
-                    </ImageWrapper>
-                    <ExpandedImageWrapper>
-                      <GameImage
-                        src={getGameImageUrl(game)}
-                        alt={game.title}
-                      />
-                      <InfoLabel>Más información</InfoLabel>
-                    </ExpandedImageWrapper>
-                  </ImageContainer>
-                  <GameContent>
-                    <GameTitle>{game.title}</GameTitle>
-                  </GameContent>
-                </GameCard>
-              </StyledLink>
+            <GameCardWrapper key={game.id} href={`/games/${game.id}`}>
+              <GameCard>
+                <ImageContainer>
+                  <ImageWrapper>
+                    <GameImage
+                      src={getGameImageUrl(game)}
+                      alt={game.title}
+                    />
+                  </ImageWrapper>
+                  <ExpandedImageWrapper>
+                    <GameImage
+                      src={getGameImageUrl(game)}
+                      alt={game.title}
+                    />
+                    <InfoLabel>Más información</InfoLabel>
+                  </ExpandedImageWrapper>
+                </ImageContainer>
+                <GameContent>
+                  <GameTitle>{game.title}</GameTitle>
+                </GameContent>
+              </GameCard>
             </GameCardWrapper>
           ))}
         </GridContainer>

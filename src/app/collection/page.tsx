@@ -12,6 +12,7 @@ import CollectionGenreFilter from "@/components/collection/CollectionGenreFilter
 import { Developer, Genre } from "@/types/game";
 import CollectionGrid from "@/components/collection/CollectionGrid";
 import CollectionDeveloperFilter from "@/components/collection/CollectionDeveloperFilter";
+import FilterInput from '@/components/ui/FilterInput';
 
 const Title = styled.h1`
   color: var(--dark-grey);
@@ -120,6 +121,7 @@ export default function CollectionPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<Genre[]>([]);
   const [selectedDevelopers, setSelectedDevelopers] = useState<Developer[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
   const [sortType, setSortType] = useState<SortType>("YEAR_DESC");
 
@@ -146,6 +148,10 @@ export default function CollectionPage() {
     setSortType(value as SortType);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+  };
+
   return (
     <PageContainer>
       <Title>Colección de Juegos</Title>
@@ -155,6 +161,11 @@ export default function CollectionPage() {
           Filtros <IoFilter size={18} />
         </FiltersButton>
         <ControlsRight>
+          <FilterInput
+            label="Buscar juego"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
           <CustomSelect
             options={sortOptions}
             value={sortType}
@@ -189,6 +200,7 @@ export default function CollectionPage() {
           selectedPlatformIds={selectedPlatforms.map(p => p.id)}
           selectedGenreIds={selectedGenres.map(g => g.id)}
           selectedDeveloperIds={selectedDevelopers.map(d => d.id)}
+          searchTerm={searchTerm}
           sortType={sortType}
         />
       </ContentWrapper>

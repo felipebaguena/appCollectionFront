@@ -11,7 +11,10 @@ interface CollectionParams {
 }
 
 interface FilterParams {
+  search?: string;
   platformIds?: number[];
+  genreIds?: number[];
+  developerIds?: number[];
 }
 
 interface CollectionRequest {
@@ -46,7 +49,13 @@ export const useCollectionGames = () => {
       try {
         const payload: CollectionRequest = {
           collection: params,
-          ...(filter && { filter }),
+          filter: {
+            search: "",
+            platformIds: [],
+            genreIds: [],
+            developerIds: [],
+            ...filter,
+          },
         };
 
         const response = await api.post<CollectionResponse>(
