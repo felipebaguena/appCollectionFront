@@ -15,6 +15,10 @@ interface FilterParams {
   platformIds?: number[];
   genreIds?: number[];
   developerIds?: number[];
+  yearRange?: {
+    start: number | null;
+    end: number | null;
+  };
 }
 
 interface CollectionRequest {

@@ -13,6 +13,7 @@ import { Developer, Genre } from "@/types/game";
 import CollectionGrid from "@/components/collection/CollectionGrid";
 import CollectionDeveloperFilter from "@/components/collection/CollectionDeveloperFilter";
 import FilterInput from '@/components/ui/FilterInput';
+import CollectionYearFilter from "@/components/collection/CollectionYearFilter";
 
 const Title = styled.h1`
   color: var(--dark-grey);
@@ -124,6 +125,7 @@ export default function CollectionPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
   const [sortType, setSortType] = useState<SortType>("YEAR_DESC");
+  const [yearRange, setYearRange] = useState<{ start: number | null; end: number | null } | null>(null);
 
   const sortOptions = [
     { value: 'TITLE_ASC', label: 'Título (A-Z)' },
@@ -150,6 +152,10 @@ export default function CollectionPage() {
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
+  };
+
+  const handleYearRangeChange = (range: { start: number | null; end: number | null } | null) => {
+    setYearRange(range);
   };
 
   return (
@@ -181,6 +187,10 @@ export default function CollectionPage() {
             <IoClose size={20} />
           </CloseFiltersButton>
           <CollectionFiltersContainer>
+            <CollectionYearFilter
+              value={yearRange}
+              onChange={handleYearRangeChange}
+            />
             <CollectionPlatformFilter
               onPlatformsChange={handlePlatformsChange}
               selectedPlatforms={selectedPlatforms}
@@ -201,6 +211,7 @@ export default function CollectionPage() {
           selectedGenreIds={selectedGenres.map(g => g.id)}
           selectedDeveloperIds={selectedDevelopers.map(d => d.id)}
           searchTerm={searchTerm}
+          yearRange={yearRange}
           sortType={sortType}
         />
       </ContentWrapper>

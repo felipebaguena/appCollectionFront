@@ -162,6 +162,7 @@ interface CollectionGridProps {
   selectedGenreIds: number[];
   selectedDeveloperIds: number[];
   searchTerm: string;
+  yearRange: { start: number | null; end: number | null } | null;
   sortType: SortType;
 }
 
@@ -170,6 +171,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
   selectedGenreIds,
   selectedDeveloperIds,
   searchTerm,
+  yearRange,
   sortType
 }) => {
   const { games, loading, error, totalPages, fetchCollectionGames } = useCollectionGames();
@@ -180,7 +182,8 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       search: searchTerm,
       ...(selectedPlatformIds.length > 0 && { platformIds: selectedPlatformIds }),
       ...(selectedGenreIds.length > 0 && { genreIds: selectedGenreIds }),
-      ...(selectedDeveloperIds.length > 0 && { developerIds: selectedDeveloperIds })
+      ...(selectedDeveloperIds.length > 0 && { developerIds: selectedDeveloperIds }),
+      ...(yearRange && { yearRange })
     };
 
     fetchCollectionGames({
@@ -188,7 +191,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       limit: ITEMS_PER_PAGE,
       sortType
     }, filter);
-  }, [currentPage, sortType, selectedPlatformIds, selectedGenreIds, selectedDeveloperIds, searchTerm, fetchCollectionGames]);
+  }, [currentPage, sortType, selectedPlatformIds, selectedGenreIds, selectedDeveloperIds, searchTerm, yearRange, fetchCollectionGames]);
 
   const getGameImageUrl = (game: CollectionGame) => {
     return game.coverImage
