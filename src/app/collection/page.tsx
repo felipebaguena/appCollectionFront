@@ -157,7 +157,7 @@ const ControlsRight = styled.div`
 const FiltersSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 
   @media (max-width: 568px) {
     justify-content: space-between;
