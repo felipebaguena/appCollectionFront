@@ -36,4 +36,6 @@ export const ENDPOINTS = {
   GET_GAMES_COLLECTION: "/games/collection",
   GET_PLATFORMS_MULTISELECT: (search: string) =>
     `/platforms/multiselect?search=${search}`,
+  GET_GENRES_MULTISELECT: (search: string) =>
+    `/genres/multiselect?search=${search}`,
 };

@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { useCollectionGames, SortType, CollectionGame } from '@/hooks/useCollectionGames';
 import { API_BASE_URL } from '@/services/api';
 import Link from 'next/link';
-import CustomSelect from '@/components/ui/CustomSelect';
 
 const GridContainer = styled.div`
   display: grid;
@@ -142,20 +141,6 @@ const Content = styled.div`
   flex: 1;
 `;
 
-const GridSection = styled.div`
-  display: flex;
-  gap: 20px;
-  min-width: 0;
-  transition: gap 0.3s ease-in-out;
-`;
-
-const Controls = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-`;
-
 const PaginationContainer = styled.div`
   margin-top: 2rem;
   width: 100%;
@@ -163,27 +148,30 @@ const PaginationContainer = styled.div`
 
 interface CollectionGridProps {
   selectedPlatformIds: number[];
+  selectedGenreIds: number[];
   sortType: SortType;
 }
 
 const CollectionGrid: React.FC<CollectionGridProps> = ({
   selectedPlatformIds,
+  selectedGenreIds,
   sortType
 }) => {
   const { games, loading, error, totalPages, fetchCollectionGames } = useCollectionGames();
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    const filter = selectedPlatformIds.length > 0
-      ? { platformIds: selectedPlatformIds }
-      : undefined;
+    const filter = {
+      ...(selectedPlatformIds.length > 0 && { platformIds: selectedPlatformIds }),
+      ...(selectedGenreIds.length > 0 && { genreIds: selectedGenreIds })
+    };
 
     fetchCollectionGames({
       page: currentPage,
       limit: ITEMS_PER_PAGE,
       sortType
-    }, filter);
-  }, [currentPage, sortType, selectedPlatformIds, fetchCollectionGames]);
+    }, Object.keys(filter).length > 0 ? filter : undefined);
+  }, [currentPage, sortType, selectedPlatformIds, selectedGenreIds, fetchCollectionGames]);
 
   const getGameImageUrl = (game: CollectionGame) => {
     return game.coverImage

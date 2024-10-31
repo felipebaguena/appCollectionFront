@@ -17,6 +17,18 @@ export const useGenres = () => {
     }
   }, []);
 
+  const searchGenres = useCallback(async (search: string) => {
+    try {
+      const genresData = await api.get<Genre[]>(
+        ENDPOINTS.GET_GENRES_MULTISELECT(search)
+      );
+      return genresData;
+    } catch (error) {
+      setError("Error al buscar géneros");
+      return [];
+    }
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -47,5 +59,6 @@ export const useGenres = () => {
     error,
     createGenre,
     fetchGenres,
+    searchGenres,
   };
 };

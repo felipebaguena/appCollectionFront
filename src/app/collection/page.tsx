@@ -9,6 +9,9 @@ import { NAVBAR_HEIGHT } from '@/components/layout/NavbarElements';
 import { IoClose, IoFilter } from 'react-icons/io5';
 import { SortType } from '@/hooks/useCollectionGames';
 import CustomSelect from '@/components/ui/CustomSelect';
+import { FiltersContainer } from "@/components/management/DataTableElements";
+import CollectionGenreFilter from "@/components/collection/CollectionGenreFilter";
+import { Genre } from "@/types/game";
 
 const Title = styled.h1`
   color: var(--dark-grey);
@@ -70,6 +73,18 @@ const FiltersPanel = styled.div<{ isOpen: boolean }>`
   }
 `;
 
+const CollectionFiltersContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  
+  @media (max-width: 568px) {
+    width: 100%;
+    max-width: 15rem;
+    margin: 0 auto;
+  }
+`;
+
 const CloseFiltersButton = styled.button`
   display: none;
 
@@ -100,6 +115,7 @@ const ControlsRight = styled.div`
 
 export default function CollectionPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
+  const [selectedGenres, setSelectedGenres] = useState<Genre[]>([]);
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
   const [sortType, setSortType] = useState<SortType>("YEAR_DESC");
 
@@ -112,6 +128,10 @@ export default function CollectionPage() {
 
   const handlePlatformsChange = (platforms: Platform[]) => {
     setSelectedPlatforms(platforms);
+  };
+
+  const handleGenresChange = (genres: Genre[]) => {
+    setSelectedGenres(genres);
   };
 
   const handleSortChange = (value: string) => {
@@ -141,14 +161,21 @@ export default function CollectionPage() {
           <CloseFiltersButton onClick={() => setIsFiltersPanelOpen(false)}>
             <IoClose size={20} />
           </CloseFiltersButton>
-          <CollectionPlatformFilter
-            onPlatformsChange={handlePlatformsChange}
-            selectedPlatforms={selectedPlatforms}
-          />
+          <CollectionFiltersContainer>
+            <CollectionPlatformFilter
+              onPlatformsChange={handlePlatformsChange}
+              selectedPlatforms={selectedPlatforms}
+            />
+            <CollectionGenreFilter
+              onGenresChange={handleGenresChange}
+              selectedGenres={selectedGenres}
+            />
+          </CollectionFiltersContainer>
         </FiltersPanel>
 
         <CollectionGrid
           selectedPlatformIds={selectedPlatforms.map(p => p.id)}
+          selectedGenreIds={selectedGenres.map(g => g.id)}
           sortType={sortType}
         />
       </ContentWrapper>
