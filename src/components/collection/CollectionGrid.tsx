@@ -8,9 +8,10 @@ import { API_BASE_URL } from '@/services/api';
 
 import Modal from '@/components/ui/Modal';
 import AddToCollectionForm from './AddToCollectionForm';
-import { MdLibraryAddCheck } from 'react-icons/md';
+import { MdLibraryAddCheck, MdDelete } from 'react-icons/md';
 import { useUserGames } from '@/hooks/useUserGames';
 import { useUserGame } from '@/hooks/useUserGame';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -219,10 +220,21 @@ const CollectionIcon = styled.div`
   justify-content: center;
   z-index: 2;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: var(--app-red);
+    
+    svg {
+      color: white;
+    }
+  }
 
   svg {
     color: var(--dark-grey);
     font-size: 1.5rem;
+    transition: all 0.3s ease;
   }
 `;
 
@@ -243,14 +255,25 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
   yearRange,
   sortType
 }) => {
-  const { games, loading, error, totalPages, fetchCollectionGames } = useCollectionGames();
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddToCollectionModal, setShowAddToCollectionModal] = useState(false);
   const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
   const [selectedGame, setSelectedGame] = useState<CollectionGame | null>(null);
-  const { addGameToCollection, isLoading: isAddingGame, error: addGameError } = useUserGames();
-  const { userGame, loading: loadingUserGame, updateUserGame, fetchUserGame, clearUserGame } = useUserGame(selectedGameId || 0);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [gameToDelete, setGameToDelete] = useState<CollectionGame | null>(null);
+  const [isHoveringIcon, setIsHoveringIcon] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+
+  const { games, loading, error, totalPages, fetchCollectionGames } = useCollectionGames();
+  const { addGameToCollection, isLoading: isAddingGame, error: addGameError } = useUserGames();
+  const {
+    userGame,
+    loading: loadingUserGame,
+    updateUserGame,
+    fetchUserGame,
+    clearUserGame,
+    deleteUserGame
+  } = useUserGame(selectedGameId || 0);
 
   useEffect(() => {
     const filter = {
@@ -273,6 +296,12 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       fetchUserGame();
     }
   }, [isEditing, selectedGameId, showAddToCollectionModal, fetchUserGame]);
+
+  useEffect(() => {
+    if (gameToDelete) {
+      setSelectedGameId(gameToDelete.id);
+    }
+  }, [gameToDelete]);
 
   const getGameImageUrl = (game: CollectionGame) => {
     return game.coverImage
@@ -354,6 +383,31 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
     }
   };
 
+  const handleDeleteClick = (e: React.MouseEvent, game: CollectionGame) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setGameToDelete(game);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (gameToDelete) {
+      try {
+        await deleteUserGame();
+        await fetchCollectionGames({
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+          sortType
+        }, getCurrentFilter());
+        setShowDeleteModal(false);
+        setGameToDelete(null);
+        setSelectedGameId(null);
+      } catch (error) {
+        console.error('Error al eliminar el juego:', error);
+      }
+    }
+  };
+
   if (loading) return <p>Cargando colección...</p>;
   if (error) return <p>Error: {error}</p>;
   if (!games || games.length === 0) return <p>No hay juegos disponibles</p>;
@@ -368,8 +422,12 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                 <GameCard className="game-card">
                   <ImageContainer>
                     {game.inCollection && (
-                      <CollectionIcon>
-                        <MdLibraryAddCheck />
+                      <CollectionIcon
+                        onMouseEnter={() => setIsHoveringIcon(game.id)}
+                        onMouseLeave={() => setIsHoveringIcon(null)}
+                        onClick={(e) => handleDeleteClick(e, game)}
+                      >
+                        {isHoveringIcon === game.id ? <MdDelete /> : <MdLibraryAddCheck />}
                       </CollectionIcon>
                     )}
                     <ImageWrapper className="image-wrapper">
@@ -478,6 +536,19 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
           isEditing={isEditing}
         />
       </Modal>
+
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setGameToDelete(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Eliminar juego de la colección"
+        message={`¿Estás seguro de que quieres eliminar ${gameToDelete?.title} de tu colección?`}
+        confirmText="Eliminar"
+        confirmVariant="danger"
+      />
     </>
   );
 };
