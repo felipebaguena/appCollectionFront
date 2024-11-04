@@ -11,6 +11,7 @@ import {
 import Button from '@/components/ui/Button';
 import SliderBar from '@/components/ui/SliderBar';
 import CustomCheckbox from '@/components/ui/CustomCheckbox';
+import Spinner from '@/components/ui/Spinner';
 
 const RatingContainer = styled.div`
   display: flex;
@@ -29,6 +30,11 @@ const CheckboxLabel = styled(Label)`
   margin: 0;
   cursor: pointer;
   user-select: none;
+`;
+
+const FormWrapper = styled.div`
+  position: relative;
+  min-height: 300px;
 `;
 
 interface AddToCollectionFormProps {
@@ -56,90 +62,107 @@ const AddToCollectionForm: React.FC<AddToCollectionFormProps> = ({
     initialData,
     isEditing = false
 }) => {
-    const [rating, setRating] = useState<number>(0);
-    const [status, setStatus] = useState<number>(0);
-    const [complete, setComplete] = useState(false);
-    const [notes, setNotes] = useState('');
+    const [formData, setFormData] = useState<{
+        rating: number;
+        status: number;
+        complete: boolean;
+        notes: string;
+    } | null>(null);
+    const [isLoadingData, setIsLoadingData] = useState(isEditing);
 
     useEffect(() => {
         if (initialData) {
-            setRating(initialData.rating || 0);
-            setStatus(initialData.status || 0);
-            setComplete(initialData.complete || false);
-            setNotes(initialData.notes || '');
-        } else {
-            setRating(0);
-            setStatus(0);
-            setComplete(false);
-            setNotes('');
+            setFormData({
+                rating: initialData.rating || 0,
+                status: initialData.status || 0,
+                complete: initialData.complete || false,
+                notes: initialData.notes || ''
+            });
+            setIsLoadingData(false);
+        } else if (!isEditing) {
+            setFormData({
+                rating: 0,
+                status: 0,
+                complete: false,
+                notes: ''
+            });
+            setIsLoadingData(false);
         }
-    }, [initialData]);
+    }, [initialData, isEditing]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!formData) return;
+
         onSubmit({
-            rating: rating || undefined,
-            status: status ? parseFloat(status.toString()) : undefined,
-            complete,
-            notes: notes || undefined
+            rating: formData.rating || undefined,
+            status: formData.status ? parseFloat(formData.status.toString()) : undefined,
+            complete: formData.complete,
+            notes: formData.notes || undefined
         });
     };
 
+    if (isLoadingData || !formData) {
+        return <Spinner />;
+    }
+
     return (
-        <StyledForm onSubmit={handleSubmit}>
-            <RatingContainer>
-                <Label>Puntuación</Label>
-                <StarRating
-                    value={rating}
-                    onChange={setRating}
-                    size={28}
-                />
-            </RatingContainer>
+        <FormWrapper>
+            <StyledForm onSubmit={handleSubmit}>
+                <RatingContainer>
+                    <Label>Puntuación</Label>
+                    <StarRating
+                        value={formData.rating}
+                        onChange={(value) => setFormData(prev => prev ? { ...prev, rating: value } : null)}
+                        size={28}
+                    />
+                </RatingContainer>
 
-            <InputGroup>
-                <Label>Estado del juego</Label>
-                <SliderBar
-                    value={status}
-                    onChange={setStatus}
-                />
-            </InputGroup>
+                <InputGroup>
+                    <Label>Estado del juego</Label>
+                    <SliderBar
+                        value={formData.status}
+                        onChange={(value) => setFormData(prev => prev ? { ...prev, status: value } : null)}
+                    />
+                </InputGroup>
 
-            <CheckboxGroup>
-                <CustomCheckbox
-                    id="complete"
-                    checked={complete}
-                    onChange={setComplete}
-                />
-                <CheckboxLabel htmlFor="complete">Completo</CheckboxLabel>
-            </CheckboxGroup>
+                <CheckboxGroup>
+                    <CustomCheckbox
+                        id="complete"
+                        checked={formData.complete}
+                        onChange={(value) => setFormData(prev => prev ? { ...prev, complete: value } : null)}
+                    />
+                    <CheckboxLabel htmlFor="complete">Completo</CheckboxLabel>
+                </CheckboxGroup>
 
-            <InputGroup>
-                <Label>Notas</Label>
-                <TextArea
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Añade notas sobre tu copia del juego..."
-                />
-            </InputGroup>
+                <InputGroup>
+                    <Label>Notas</Label>
+                    <TextArea
+                        value={formData.notes}
+                        onChange={(e) => setFormData(prev => prev ? { ...prev, notes: e.target.value } : null)}
+                        placeholder="Añade notas sobre tu copia del juego..."
+                    />
+                </InputGroup>
 
-            <ButtonContainer>
-                <Button
-                    type="button"
-                    onClick={onCancel}
-                    $variant="cancel"
-                >
-                    Cancelar
-                </Button>
-                <Button
-                    type="submit"
-                    $variant="primary"
-                    disabled={isLoading}
-                >
-                    {isLoading ? (isEditing ? 'Actualizando...' : 'Añadiendo...')
-                        : (isEditing ? 'Actualizar juego' : 'Añadir a la colección')}
-                </Button>
-            </ButtonContainer>
-        </StyledForm>
+                <ButtonContainer>
+                    <Button
+                        type="button"
+                        onClick={onCancel}
+                        $variant="cancel"
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        type="submit"
+                        $variant="primary"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (isEditing ? 'Actualizando...' : 'Añadiendo...')
+                            : (isEditing ? 'Actualizar juego' : 'Añadir a la colección')}
+                    </Button>
+                </ButtonContainer>
+            </StyledForm>
+        </FormWrapper>
     );
 };
 
