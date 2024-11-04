@@ -8,6 +8,7 @@ import { API_BASE_URL } from '@/services/api';
 import { useUserGames } from '@/hooks/useUserGames';
 import Modal from '@/components/ui/Modal';
 import AddToCollectionForm from './AddToCollectionForm';
+import { MdLibraryAddCheck } from 'react-icons/md';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -107,6 +108,9 @@ const GameImage = styled.img`
 
 const GameContent = styled.div`
   padding: 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 `;
 
 const GameTitle = styled.h3`
@@ -115,6 +119,17 @@ const GameTitle = styled.h3`
   color: var(--dark-grey);
   font-weight: bold;
 `;
+
+const GameInfo = styled.div`
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--grey);
+`;
+
+const GameYear = styled.span``;
+
+const GamePlatforms = styled.span``;
 
 const InfoLabel = styled.div`
   position: absolute;
@@ -190,6 +205,25 @@ const PaginationContainer = styled.div`
   width: 100%;
 `;
 
+const CollectionIcon = styled.div`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: var(--app-yellow);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  svg {
+    color: var(--dark-grey);
+    font-size: 1.5rem;
+  }
+`;
+
 interface CollectionGridProps {
   selectedPlatformIds: number[];
   selectedGenreIds: number[];
@@ -257,7 +291,21 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
 
       if (result) {
         setShowAddToCollectionModal(false);
-        // Aquí podrías mostrar una notificación de éxito
+
+        // Recargar el grid con los filtros actuales
+        const filter = {
+          search: searchTerm,
+          ...(selectedPlatformIds.length > 0 && { platformIds: selectedPlatformIds }),
+          ...(selectedGenreIds.length > 0 && { genreIds: selectedGenreIds }),
+          ...(selectedDeveloperIds.length > 0 && { developerIds: selectedDeveloperIds }),
+          ...(yearRange && { yearRange })
+        };
+
+        await fetchCollectionGames({
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+          sortType
+        }, filter);
       }
     }
   };
@@ -275,6 +323,11 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
               <GameCardWrapper key={game.id} href={`/games/${game.id}`}>
                 <GameCard className="game-card">
                   <ImageContainer>
+                    {game.inCollection && (
+                      <CollectionIcon>
+                        <MdLibraryAddCheck />
+                      </CollectionIcon>
+                    )}
                     <ImageWrapper className="image-wrapper">
                       <GameImage
                         src={getGameImageUrl(game)}
@@ -286,17 +339,27 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                         src={getGameImageUrl(game)}
                         alt={game.title}
                       />
-                      <AddToCollectionLabel
-                        className="add-collection-label"
-                        onClick={(e) => handleAddToCollection(e, game)}
-                      >
-                        Añadir a la colección
-                      </AddToCollectionLabel>
+                      {!game.inCollection && (
+                        <AddToCollectionLabel
+                          className="add-collection-label"
+                          onClick={(e) => handleAddToCollection(e, game)}
+                        >
+                          Añadir a la colección
+                        </AddToCollectionLabel>
+                      )}
                       <InfoLabel className="info-label">Más información</InfoLabel>
                     </ExpandedImageWrapper>
                   </ImageContainer>
                   <GameContent>
                     <GameTitle>{game.title}</GameTitle>
+                    <GameInfo>
+                      <GameYear>{game.releaseYear}</GameYear>
+                      <GamePlatforms>
+                        {game.platforms.length > 2
+                          ? "Multiplataforma"
+                          : game.platforms.map(p => p.name).join(" / ")}
+                      </GamePlatforms>
+                    </GameInfo>
                   </GameContent>
                 </GameCard>
               </GameCardWrapper>

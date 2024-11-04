@@ -26,13 +26,21 @@ interface CollectionRequest {
   filter?: FilterParams;
 }
 
+interface Platform {
+  id: number;
+  name: string;
+}
+
 export interface CollectionGame {
   id: number;
   title: string;
+  releaseYear: number;
   coverImage: {
     id: number;
     path: string;
   } | null;
+  platforms: Platform[];
+  inCollection: boolean;
 }
 
 interface CollectionResponse {
