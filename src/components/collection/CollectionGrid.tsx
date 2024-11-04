@@ -5,10 +5,12 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import { useCollectionGames, SortType, CollectionGame } from '@/hooks/useCollectionGames';
 import { API_BASE_URL } from '@/services/api';
-import { useUserGames } from '@/hooks/useUserGames';
+
 import Modal from '@/components/ui/Modal';
 import AddToCollectionForm from './AddToCollectionForm';
 import { MdLibraryAddCheck } from 'react-icons/md';
+import { useUserGames } from '@/hooks/useUserGames';
+import { useUserGame } from '@/hooks/useUserGame';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -247,6 +249,8 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
   const [selectedGameId, setSelectedGameId] = useState<number | null>(null);
   const [selectedGame, setSelectedGame] = useState<CollectionGame | null>(null);
   const { addGameToCollection, isLoading: isAddingGame, error: addGameError } = useUserGames();
+  const { userGame, loading: loadingUserGame, updateUserGame, fetchUserGame, clearUserGame } = useUserGame(selectedGameId || 0);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const filter = {
@@ -264,6 +268,12 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
     }, filter);
   }, [currentPage, sortType, selectedPlatformIds, selectedGenreIds, selectedDeveloperIds, searchTerm, yearRange, fetchCollectionGames]);
 
+  useEffect(() => {
+    if (isEditing && selectedGameId && showAddToCollectionModal) {
+      fetchUserGame();
+    }
+  }, [isEditing, selectedGameId, showAddToCollectionModal, fetchUserGame]);
+
   const getGameImageUrl = (game: CollectionGame) => {
     return game.coverImage
       ? `${API_BASE_URL}/${game.coverImage.path}`
@@ -277,35 +287,69 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
     setShowAddToCollectionModal(true);
   };
 
-  const handleSubmitAddToCollection = async (formData: {
+  const handleEditCollection = async (e: React.MouseEvent, game: CollectionGame) => {
+    e.preventDefault();
+    setSelectedGameId(game.id);
+    setSelectedGame(game);
+    setIsEditing(true);
+    setShowAddToCollectionModal(true);
+  };
+
+  const getCurrentFilter = () => ({
+    search: searchTerm,
+    ...(selectedPlatformIds.length > 0 && { platformIds: selectedPlatformIds }),
+    ...(selectedGenreIds.length > 0 && { genreIds: selectedGenreIds }),
+    ...(selectedDeveloperIds.length > 0 && { developerIds: selectedDeveloperIds }),
+    ...(yearRange && { yearRange })
+  });
+
+  const handleSubmitForm = async (formData: {
     rating?: number;
     status?: number;
     complete: boolean;
     notes?: string;
   }) => {
     if (selectedGameId) {
-      const result = await addGameToCollection({
-        gameId: selectedGameId,
-        ...formData
-      });
+      if (isEditing) {
+        const result = await updateUserGame({
+          rating: formData.rating || null,
+          status: formData.status || null,
+          complete: formData.complete,
+          notes: formData.notes || null
+        });
 
-      if (result) {
-        setShowAddToCollectionModal(false);
+        if (result) {
+          setShowAddToCollectionModal(false);
+          await fetchCollectionGames({
+            page: currentPage,
+            limit: ITEMS_PER_PAGE,
+            sortType
+          }, getCurrentFilter());
+        }
+      } else {
+        const result = await addGameToCollection({
+          gameId: selectedGameId,
+          ...formData
+        });
 
-        // Recargar el grid con los filtros actuales
-        const filter = {
-          search: searchTerm,
-          ...(selectedPlatformIds.length > 0 && { platformIds: selectedPlatformIds }),
-          ...(selectedGenreIds.length > 0 && { genreIds: selectedGenreIds }),
-          ...(selectedDeveloperIds.length > 0 && { developerIds: selectedDeveloperIds }),
-          ...(yearRange && { yearRange })
-        };
+        if (result) {
+          setShowAddToCollectionModal(false);
 
-        await fetchCollectionGames({
-          page: currentPage,
-          limit: ITEMS_PER_PAGE,
-          sortType
-        }, filter);
+          // Recargar el grid con los filtros actuales
+          const filter = {
+            search: searchTerm,
+            ...(selectedPlatformIds.length > 0 && { platformIds: selectedPlatformIds }),
+            ...(selectedGenreIds.length > 0 && { genreIds: selectedGenreIds }),
+            ...(selectedDeveloperIds.length > 0 && { developerIds: selectedDeveloperIds }),
+            ...(yearRange && { yearRange })
+          };
+
+          await fetchCollectionGames({
+            page: currentPage,
+            limit: ITEMS_PER_PAGE,
+            sortType
+          }, filter);
+        }
       }
     }
   };
@@ -339,7 +383,14 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                         src={getGameImageUrl(game)}
                         alt={game.title}
                       />
-                      {!game.inCollection && (
+                      {game.inCollection ? (
+                        <AddToCollectionLabel
+                          className="add-collection-label"
+                          onClick={(e) => handleEditCollection(e, game)}
+                        >
+                          Editar juego de colección
+                        </AddToCollectionLabel>
+                      ) : (
                         <AddToCollectionLabel
                           className="add-collection-label"
                           onClick={(e) => handleAddToCollection(e, game)}
@@ -399,13 +450,32 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
 
       <Modal
         isOpen={showAddToCollectionModal}
-        onClose={() => setShowAddToCollectionModal(false)}
-        title={selectedGame ? `Añadir ${selectedGame.title} a mi colección` : 'Añadir a mi colección'}
+        onClose={() => {
+          setShowAddToCollectionModal(false);
+          setIsEditing(false);
+          clearUserGame();
+        }}
+        title={selectedGame
+          ? isEditing
+            ? `Editar ${selectedGame.title} en mi colección`
+            : `Añadir ${selectedGame.title} a mi colección`
+          : 'Añadir a mi colección'}
       >
         <AddToCollectionForm
-          onSubmit={handleSubmitAddToCollection}
-          onCancel={() => setShowAddToCollectionModal(false)}
-          isLoading={isAddingGame}
+          onSubmit={handleSubmitForm}
+          onCancel={() => {
+            setShowAddToCollectionModal(false);
+            setIsEditing(false);
+            clearUserGame();
+          }}
+          isLoading={isAddingGame || loadingUserGame}
+          initialData={isEditing && userGame ? {
+            rating: userGame.rating ? parseFloat(String(userGame.rating)) : 0,
+            status: userGame.status ? parseFloat(String(userGame.status)) : 0,
+            complete: userGame.complete,
+            notes: userGame.notes
+          } : undefined}
+          isEditing={isEditing}
         />
       </Modal>
     </>

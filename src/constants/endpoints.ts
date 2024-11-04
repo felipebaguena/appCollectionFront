@@ -41,4 +41,7 @@ export const ENDPOINTS = {
   GET_DEVELOPERS_MULTISELECT: (search: string) =>
     `/developers/multiselect?search=${search}`,
   ADD_GAME_TO_COLLECTION: "/user-games/me",
+  GET_USER_GAME_DETAILS: (id: string) => `/user-games/${id}/details`,
+  UPDATE_USER_GAME: (id: string) => `/user-games/${id}`,
+  DELETE_USER_GAME: (id: string) => `/user-games/${id}`,
 };

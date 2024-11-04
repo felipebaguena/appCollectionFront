@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import StarRating from '@/components/ui/StarRating';
 import {
@@ -40,17 +40,40 @@ interface AddToCollectionFormProps {
     }) => void;
     onCancel: () => void;
     isLoading?: boolean;
+    initialData?: {
+        rating: number | null;
+        status: number | null;
+        complete: boolean;
+        notes: string | null;
+    };
+    isEditing?: boolean;
 }
 
 const AddToCollectionForm: React.FC<AddToCollectionFormProps> = ({
     onSubmit,
     onCancel,
-    isLoading
+    isLoading,
+    initialData,
+    isEditing = false
 }) => {
     const [rating, setRating] = useState<number>(0);
     const [status, setStatus] = useState<number>(0);
     const [complete, setComplete] = useState(false);
     const [notes, setNotes] = useState('');
+
+    useEffect(() => {
+        if (initialData) {
+            setRating(initialData.rating || 0);
+            setStatus(initialData.status || 0);
+            setComplete(initialData.complete || false);
+            setNotes(initialData.notes || '');
+        } else {
+            setRating(0);
+            setStatus(0);
+            setComplete(false);
+            setNotes('');
+        }
+    }, [initialData]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -112,7 +135,8 @@ const AddToCollectionForm: React.FC<AddToCollectionFormProps> = ({
                     $variant="primary"
                     disabled={isLoading}
                 >
-                    {isLoading ? 'Añadiendo...' : 'Añadir a la colección'}
+                    {isLoading ? (isEditing ? 'Actualizando...' : 'Añadiendo...')
+                        : (isEditing ? 'Actualizar juego' : 'Añadir a la colección')}
                 </Button>
             </ButtonContainer>
         </StyledForm>
