@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FiLogOut, FiChevronDown, FiUser } from 'react-icons/fi';
-import { jwtDecode } from "jwt-decode";
 import CreateUserForm from '@/components/user/CreateUserForm';
 import LoginForm from '@/components/auth/LoginForm';
 import UserProfileModal from '@/components/user/UserProfileModal';
@@ -20,19 +19,11 @@ import {
   DropdownItem,
   DropdownTrigger,
   IconNavLink,
+  IconsContainer,
+  NavbarSpinner,
+  SpinnerContainer,
 } from '@/components/layout/NavbarElements';
 import { useAuth } from '@/contexts/AuthContext';
-import styled from 'styled-components';
-
-interface DecodedToken {
-  role: string;
-}
-
-const IconsContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-`;
 
 const Navbar = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -41,7 +32,7 @@ const Navbar = () => {
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [showManagementMenu, setShowManagementMenu] = useState(false);
 
-  const { isAuthenticated, userRole, logout, login } = useAuth();
+  const { isAuthenticated, userRole, logout, login, loading } = useAuth();
 
   const managementOptions = [
     { name: "Juegos", route: "/management/manage-games" },
@@ -143,12 +134,20 @@ const Navbar = () => {
           </LogoLink>
         </NavbarSection>
         <NavbarSection $position="right">
-          <NavLink href="/">Inicio</NavLink>
-          <NavLink href="/collection">Catálogo</NavLink>
-          {isAuthenticated && (
-            <NavLink href="/my-collection">Mi colección</NavLink>
+          {loading ? (
+            <SpinnerContainer>
+              <NavbarSpinner />
+            </SpinnerContainer>
+          ) : (
+            <>
+              <NavLink href="/">Inicio</NavLink>
+              <NavLink href="/collection">Catálogo</NavLink>
+              {isAuthenticated && (
+                <NavLink href="/my-collection">Mi colección</NavLink>
+              )}
+              {renderAuthButtons()}
+            </>
           )}
-          {renderAuthButtons()}
         </NavbarSection>
         <Modal
           isOpen={showLoginForm}
