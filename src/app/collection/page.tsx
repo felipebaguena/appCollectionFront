@@ -15,6 +15,8 @@ import CollectionDeveloperFilter from "@/components/collection/CollectionDevelop
 import FilterInput from '@/components/ui/FilterInput';
 import CollectionYearFilter from "@/components/collection/CollectionYearFilter";
 import FilterChip from '@/components/collection/FilterChip';
+import CollectionStatusFilter from '@/components/collection/CollectionStatusFilter';
+import { useAuth } from '@/contexts/AuthContext';
 
 const TitleBar = styled.div`
   background-color: var(--app-yellow);
@@ -208,6 +210,8 @@ export default function CollectionPage() {
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
   const [sortType, setSortType] = useState<SortType>("YEAR_DESC");
   const [yearRange, setYearRange] = useState<{ start: number | null; end: number | null } | null>(null);
+  const [collectionStatus, setCollectionStatus] = useState<'ALL' | 'IN_COLLECTION' | 'NOT_IN_COLLECTION'>('ALL');
+  const { isAuthenticated } = useAuth();
 
   const sortOptions = [
     { value: 'TITLE_ASC', label: 'Título (A-Z)' },
@@ -256,11 +260,20 @@ export default function CollectionPage() {
     setYearRange(null);
   };
 
+  const handleCollectionStatusChange = (status: 'ALL' | 'IN_COLLECTION' | 'NOT_IN_COLLECTION') => {
+    setCollectionStatus(status);
+  };
+
+  const handleRemoveCollectionStatus = () => {
+    setCollectionStatus('ALL');
+  };
+
   const hasActiveFilters = selectedPlatforms.length > 0 ||
     selectedGenres.length > 0 ||
     selectedDevelopers.length > 0 ||
     (yearRange?.start && yearRange?.end) ||
-    searchTerm.length > 0;
+    searchTerm.length > 0 ||
+    collectionStatus !== 'ALL';
 
   const handleClearAllFilters = () => {
     setSelectedPlatforms([]);
@@ -268,6 +281,7 @@ export default function CollectionPage() {
     setSelectedDevelopers([]);
     setYearRange(null);
     setSearchTerm('');
+    setCollectionStatus('ALL');
   };
 
   return (
@@ -331,6 +345,12 @@ export default function CollectionPage() {
               onRemove={handleRemoveYearRange}
             />
           )}
+          {isAuthenticated && collectionStatus !== 'ALL' && (
+            <FilterChip
+              label={collectionStatus === 'IN_COLLECTION' ? 'En colección' : 'Fuera de colección'}
+              onRemove={handleRemoveCollectionStatus}
+            />
+          )}
         </ChipsContainer>
       </Controls>
 
@@ -340,6 +360,12 @@ export default function CollectionPage() {
             <IoClose size={20} />
           </CloseFiltersButton>
           <CollectionFiltersContainer>
+            {isAuthenticated && (
+              <CollectionStatusFilter
+                value={collectionStatus}
+                onChange={handleCollectionStatusChange}
+              />
+            )}
             <CollectionYearFilter
               value={yearRange}
               onChange={handleYearRangeChange}
@@ -366,6 +392,7 @@ export default function CollectionPage() {
           searchTerm={searchTerm}
           yearRange={yearRange}
           sortType={sortType}
+          collectionStatus={isAuthenticated ? collectionStatus : 'ALL'}
         />
       </ContentWrapper>
     </PageContainer>

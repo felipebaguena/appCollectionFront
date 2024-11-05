@@ -252,6 +252,7 @@ interface CollectionGridProps {
   searchTerm: string;
   yearRange: { start: number | null; end: number | null } | null;
   sortType: SortType;
+  collectionStatus: 'ALL' | 'IN_COLLECTION' | 'NOT_IN_COLLECTION';
 }
 
 const CollectionGrid: React.FC<CollectionGridProps> = ({
@@ -260,7 +261,8 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
   selectedDeveloperIds,
   searchTerm,
   yearRange,
-  sortType
+  sortType,
+  collectionStatus
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddToCollectionModal, setShowAddToCollectionModal] = useState(false);
@@ -293,7 +295,8 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       ...(selectedPlatformIds.length > 0 && { platformIds: selectedPlatformIds }),
       ...(selectedGenreIds.length > 0 && { genreIds: selectedGenreIds }),
       ...(selectedDeveloperIds.length > 0 && { developerIds: selectedDeveloperIds }),
-      ...(yearRange && { yearRange })
+      ...(yearRange && { yearRange }),
+      collectionStatus
     };
 
     fetchCollectionGames({
@@ -301,7 +304,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       limit: ITEMS_PER_PAGE,
       sortType
     }, filter);
-  }, [currentPage, sortType, selectedPlatformIds, selectedGenreIds, selectedDeveloperIds, searchTerm, yearRange, fetchCollectionGames]);
+  }, [currentPage, sortType, selectedPlatformIds, selectedGenreIds, selectedDeveloperIds, searchTerm, yearRange, collectionStatus, fetchCollectionGames]);
 
   useEffect(() => {
     if (isEditing && selectedGameId && showAddToCollectionModal) {
@@ -351,7 +354,8 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
     ...(selectedPlatformIds.length > 0 && { platformIds: selectedPlatformIds }),
     ...(selectedGenreIds.length > 0 && { genreIds: selectedGenreIds }),
     ...(selectedDeveloperIds.length > 0 && { developerIds: selectedDeveloperIds }),
-    ...(yearRange && { yearRange })
+    ...(yearRange && { yearRange }),
+    collectionStatus
   });
 
   const handleSubmitForm = async (formData: {
