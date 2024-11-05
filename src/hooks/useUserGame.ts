@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
+import { Platform } from "@/types/platform";
 
 interface UserGame {
   id: number;
@@ -8,6 +9,7 @@ interface UserGame {
   status: number | null;
   complete: boolean;
   notes: string | null;
+  platforms: Platform[];
   createdAt: string;
   updatedAt: string;
   gameId: number;
@@ -18,6 +20,7 @@ interface UpdateUserGameBody {
   status: number | null;
   complete: boolean;
   notes: string | null;
+  platformIds: number[];
 }
 
 export const useUserGame = (gameId: number) => {

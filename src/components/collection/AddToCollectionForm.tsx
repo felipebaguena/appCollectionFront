@@ -1,58 +1,92 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useGame } from '@/hooks/useGame';
+
+import { Platform } from '@/types/platform';
 import StarRating from '@/components/ui/StarRating';
-import {
-    StyledForm,
-    InputGroup,
-    Label,
-    TextArea,
-    ButtonContainer
-} from '@/components/ui/FormElements';
-import Button from '@/components/ui/Button';
 import SliderBar from '@/components/ui/SliderBar';
-import CustomCheckbox from '@/components/ui/CustomCheckbox';
+import MultiSelect from '../ui/Multiselect';
 import Spinner from '@/components/ui/Spinner';
 
-const RatingContainer = styled.div`
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 `;
 
-const CheckboxGroup = styled.div`
+const Label = styled.label`
+  font-weight: bold;
+  color: var(--dark-grey);
+`;
+
+const TextArea = styled.textarea`
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-height: 100px;
+  resize: vertical;
+`;
+
+const ButtonGroup = styled.div`
   display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  margin-top: 0.5rem;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
 `;
 
-const CheckboxLabel = styled(Label)`
-  margin: 0;
+const Button = styled.button`
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  user-select: none;
+  font-weight: bold;
 `;
 
-const FormWrapper = styled.div`
-  position: relative;
-  min-height: 300px;
+const SubmitButton = styled(Button)`
+  background-color: var(--app-yellow);
+  color: var(--dark-grey);
+
+  &:hover {
+    background-color: var(--app-yellow-hover);
+  }
 `;
+
+const CancelButton = styled(Button)`
+  background-color: var(--grey);
+  color: white;
+
+  &:hover {
+    background-color: var(--dark-grey);
+  }
+`;
+
+interface FormData {
+    rating: number;
+    status: number;
+    complete: boolean;
+    notes: string;
+    platformIds: number[];
+}
 
 interface AddToCollectionFormProps {
-    onSubmit: (data: {
-        rating?: number;
-        status?: number;
-        complete: boolean;
-        notes?: string;
-    }) => void;
+    onSubmit: (data: FormData) => void;
     onCancel: () => void;
     isLoading?: boolean;
     initialData?: {
-        rating: number | null;
-        status: number | null;
+        rating: number | string | null;
+        status: number | string | null;
         complete: boolean;
         notes: string | null;
+        platforms: Platform[];
     };
     isEditing?: boolean;
+    gameId: number;
 }
 
 const AddToCollectionForm: React.FC<AddToCollectionFormProps> = ({
@@ -60,109 +94,135 @@ const AddToCollectionForm: React.FC<AddToCollectionFormProps> = ({
     onCancel,
     isLoading,
     initialData,
-    isEditing = false
+    isEditing,
+    gameId
 }) => {
-    const [formData, setFormData] = useState<{
-        rating: number;
-        status: number;
-        complete: boolean;
-        notes: string;
-    } | null>(null);
-    const [isLoadingData, setIsLoadingData] = useState(isEditing);
+    const [formData, setFormData] = useState<FormData>({
+        rating: 0,
+        status: 0,
+        complete: false,
+        notes: '',
+        platformIds: []
+    });
+
+    const { game, loading: loadingGame, fetchGame } = useGame(gameId.toString());
+    const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
+    const [isFormReady, setIsFormReady] = useState(false);
+
+    useEffect(() => {
+        fetchGame();
+    }, [gameId, fetchGame]);
+
+    useEffect(() => {
+        if (isEditing) {
+            // Para edición, necesitamos tanto las plataformas como los datos iniciales
+            if (!loadingGame && initialData && game) {
+                setIsFormReady(true);
+            }
+        } else {
+            // Para añadir, solo necesitamos las plataformas
+            if (!loadingGame && game) {
+                setIsFormReady(true);
+            }
+        }
+    }, [loadingGame, initialData, game, isEditing]);
 
     useEffect(() => {
         if (initialData) {
             setFormData({
-                rating: initialData.rating || 0,
-                status: initialData.status || 0,
-                complete: initialData.complete || false,
-                notes: initialData.notes || ''
+                rating: typeof initialData.rating === 'string'
+                    ? parseFloat(initialData.rating)
+                    : initialData.rating ?? 0,
+                status: typeof initialData.status === 'string'
+                    ? parseFloat(initialData.status)
+                    : initialData.status ?? 0,
+                complete: initialData.complete,
+                notes: initialData.notes ?? '',
+                platformIds: initialData.platforms?.map(p => p.id) ?? []
             });
-            setIsLoadingData(false);
-        } else if (!isEditing) {
-            setFormData({
-                rating: 0,
-                status: 0,
-                complete: false,
-                notes: ''
-            });
-            setIsLoadingData(false);
+            setSelectedPlatforms(initialData.platforms ?? []);
         }
-    }, [initialData, isEditing]);
+    }, [initialData]);
+
+    const handleRatingChange = (value: number) => {
+        setFormData(prev => ({ ...prev, rating: value }));
+    };
+
+    const handleStatusChange = (value: number) => {
+        setFormData(prev => ({ ...prev, status: value }));
+    };
+
+    const handleCompleteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData(prev => ({ ...prev, complete: e.target.checked }));
+    };
+
+    const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setFormData(prev => ({ ...prev, notes: e.target.value }));
+    };
+
+    const handlePlatformsChange = (selected: Platform[]) => {
+        setSelectedPlatforms(selected);
+        setFormData(prev => ({ ...prev, platformIds: selected.map(p => p.id) }));
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData) return;
-
-        onSubmit({
-            rating: formData.rating || undefined,
-            status: formData.status ? parseFloat(formData.status.toString()) : undefined,
-            complete: formData.complete,
-            notes: formData.notes || undefined
-        });
+        onSubmit(formData);
     };
 
-    if (isLoadingData || !formData) {
-        return <Spinner />;
-    }
+    if (!isFormReady) return <Spinner />;
 
     return (
-        <FormWrapper>
-            <StyledForm onSubmit={handleSubmit}>
-                <RatingContainer>
-                    <Label>Puntuación</Label>
-                    <StarRating
-                        value={formData.rating}
-                        onChange={(value) => setFormData(prev => prev ? { ...prev, rating: value } : null)}
-                        size={28}
-                    />
-                </RatingContainer>
+        <Form onSubmit={handleSubmit}>
+            <FormGroup>
+                <Label>Valoración</Label>
+                <StarRating value={formData.rating} onChange={handleRatingChange} />
+            </FormGroup>
 
-                <InputGroup>
-                    <Label>Estado del juego</Label>
-                    <SliderBar
-                        value={formData.status}
-                        onChange={(value) => setFormData(prev => prev ? { ...prev, status: value } : null)}
-                    />
-                </InputGroup>
+            <FormGroup>
+                <Label>Estado</Label>
+                <SliderBar value={formData.status} onChange={handleStatusChange} />
+            </FormGroup>
 
-                <CheckboxGroup>
-                    <CustomCheckbox
-                        id="complete"
+            <FormGroup>
+                <Label>
+                    <input
+                        type="checkbox"
                         checked={formData.complete}
-                        onChange={(value) => setFormData(prev => prev ? { ...prev, complete: value } : null)}
+                        onChange={handleCompleteChange}
                     />
-                    <CheckboxLabel htmlFor="complete">Completo</CheckboxLabel>
-                </CheckboxGroup>
+                    Completado
+                </Label>
+            </FormGroup>
 
-                <InputGroup>
-                    <Label>Notas</Label>
-                    <TextArea
-                        value={formData.notes}
-                        onChange={(e) => setFormData(prev => prev ? { ...prev, notes: e.target.value } : null)}
-                        placeholder="Añade notas sobre tu copia del juego..."
-                    />
-                </InputGroup>
+            <FormGroup>
+                <Label>Plataformas en las que tienes el juego</Label>
+                <MultiSelect
+                    options={game?.platforms || []}
+                    selectedOptions={selectedPlatforms}
+                    onChange={handlePlatformsChange}
+                    placeholder="Selecciona las plataformas"
+                />
+            </FormGroup>
 
-                <ButtonContainer>
-                    <Button
-                        type="button"
-                        onClick={onCancel}
-                        $variant="cancel"
-                    >
-                        Cancelar
-                    </Button>
-                    <Button
-                        type="submit"
-                        $variant="primary"
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (isEditing ? 'Actualizando...' : 'Añadiendo...')
-                            : (isEditing ? 'Actualizar juego' : 'Añadir a la colección')}
-                    </Button>
-                </ButtonContainer>
-            </StyledForm>
-        </FormWrapper>
+            <FormGroup>
+                <Label>Notas</Label>
+                <TextArea
+                    value={formData.notes}
+                    onChange={handleNotesChange}
+                    placeholder="Añade notas sobre el juego..."
+                />
+            </FormGroup>
+
+            <ButtonGroup>
+                <CancelButton type="button" onClick={onCancel}>
+                    Cancelar
+                </CancelButton>
+                <SubmitButton type="submit" disabled={isLoading}>
+                    {isLoading ? 'Guardando...' : isEditing ? 'Actualizar' : 'Añadir'}
+                </SubmitButton>
+            </ButtonGroup>
+        </Form>
     );
 };
 

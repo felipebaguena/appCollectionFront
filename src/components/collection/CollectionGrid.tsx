@@ -14,7 +14,6 @@ import { useUserGames } from '@/hooks/useUserGames';
 import { useUserGame } from '@/hooks/useUserGame';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
-import { useUserActions } from '@/hooks/useUserActions';
 import LoginForm from '../auth/LoginForm';
 
 import { useAuth } from '@/contexts/AuthContext';
@@ -363,6 +362,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
     status?: number;
     complete: boolean;
     notes?: string;
+    platformIds: number[];
   }) => {
     if (selectedGameId) {
       if (isEditing) {
@@ -370,7 +370,8 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
           rating: formData.rating || null,
           status: formData.status || null,
           complete: formData.complete,
-          notes: formData.notes || null
+          notes: formData.notes || null,
+          platformIds: formData.platformIds
         });
 
         if (result) {
@@ -574,6 +575,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
           : 'Añadir a mi colección'}
       >
         <AddToCollectionForm
+          gameId={selectedGameId || 0}
           onSubmit={handleSubmitForm}
           onCancel={() => {
             setShowAddToCollectionModal(false);
@@ -582,10 +584,15 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
           }}
           isLoading={isAddingGame || loadingUserGame}
           initialData={isEditing && userGame ? {
-            rating: userGame.rating ? parseFloat(String(userGame.rating)) : 0,
-            status: userGame.status ? parseFloat(String(userGame.status)) : 0,
+            rating: typeof userGame.rating === 'string'
+              ? parseFloat(userGame.rating)
+              : userGame.rating,
+            status: typeof userGame.status === 'string'
+              ? parseFloat(userGame.status)
+              : userGame.status,
             complete: userGame.complete,
-            notes: userGame.notes
+            notes: userGame.notes,
+            platforms: userGame.platforms || []
           } : undefined}
           isEditing={isEditing}
         />
