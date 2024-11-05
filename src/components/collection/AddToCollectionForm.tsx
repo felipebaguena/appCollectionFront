@@ -7,6 +7,7 @@ import StarRating from '@/components/ui/StarRating';
 import SliderBar from '@/components/ui/SliderBar';
 import MultiSelect from '../ui/Multiselect';
 import Spinner from '@/components/ui/Spinner';
+import CustomCheckbox from '@/components/ui/CustomCheckbox';
 
 const Form = styled.form`
   display: flex;
@@ -22,7 +23,7 @@ const FormGroup = styled.div`
 
 const Label = styled.label`
   font-weight: bold;
-  color: var(--dark-grey);
+  color: var(--clear-grey);
 `;
 
 const TextArea = styled.textarea`
@@ -64,6 +65,16 @@ const CancelButton = styled(Button)`
   &:hover {
     background-color: var(--dark-grey);
   }
+`;
+
+const CheckboxLabel = styled(Label)`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const CheckboxText = styled.span`
+  color: var(--clear-grey);
 `;
 
 interface FormData {
@@ -185,18 +196,17 @@ const AddToCollectionForm: React.FC<AddToCollectionFormProps> = ({
             </FormGroup>
 
             <FormGroup>
-                <Label>
-                    <input
-                        type="checkbox"
+                <CheckboxLabel>
+                    <CustomCheckbox
                         checked={formData.complete}
-                        onChange={handleCompleteChange}
+                        onChange={(checked) => setFormData(prev => ({ ...prev, complete: checked }))}
                     />
-                    Completado
-                </Label>
+                    <CheckboxText>Completo</CheckboxText>
+                </CheckboxLabel>
             </FormGroup>
 
             <FormGroup>
-                <Label>Plataformas en las que tienes el juego</Label>
+                <Label>Plataformas en las que poseo el juego</Label>
                 <MultiSelect
                     options={game?.platforms || []}
                     selectedOptions={selectedPlatforms}
