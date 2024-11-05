@@ -8,7 +8,7 @@ import { PageWrapper } from '@/components/layout/LayoutElements';
 import StyledComponentsRegistry from "@/components/StyledComponentsRegistry";
 import StyledComponentsProvider from '@/components/StyledComponentsProvider';
 import AuthRedirectHandler from "@/components/auth/AuthRedirectHandler";
-
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,12 +31,14 @@ export default function RootLayout({
       <body className={geistSans.variable}>
         <StyledComponentsRegistry>
           <StyledComponentsProvider>
-            <PageWrapper>
-              <Navbar />
-              <ClientLayout showLogs={false}>{children}</ClientLayout>
-              <Footer />
-              <AuthRedirectHandler />
-            </PageWrapper>
+            <AuthProvider>
+              <PageWrapper>
+                <Navbar />
+                <ClientLayout showLogs={false}>{children}</ClientLayout>
+                <Footer />
+                <AuthRedirectHandler />
+              </PageWrapper>
+            </AuthProvider>
           </StyledComponentsProvider>
         </StyledComponentsRegistry>
       </body>

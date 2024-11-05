@@ -20,6 +20,7 @@ import {
   DropdownItem,
   DropdownTrigger
 } from '@/components/layout/NavbarElements';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DecodedToken {
   role: string;
@@ -30,55 +31,9 @@ const Navbar = () => {
   const [showRegisterForm, setShowRegisterForm] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
-  const [authState, setAuthState] = useState<'loading' | 'authenticated' | 'unauthenticated'>('loading');
-  const [userRole, setUserRole] = useState<string | null>(null);
   const [showManagementMenu, setShowManagementMenu] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      setAuthState('authenticated');
-      try {
-        const decodedToken = jwtDecode<DecodedToken>(token);
-        setUserRole(decodedToken.role);
-      } catch (error) {
-        console.error('Error al decodificar el token:', error);
-        setUserRole(null);
-      }
-    } else {
-      setAuthState('unauthenticated');
-      setUserRole(null);
-    }
-  }, []);
-
-  const handleLoginSuccess = (access_token: string) => {
-    localStorage.setItem('access_token', access_token);
-    setAuthState('authenticated');
-    try {
-      const decodedToken = jwtDecode<DecodedToken>(access_token);
-      setUserRole(decodedToken.role);
-    } catch (error) {
-      console.error('Error al decodificar el token:', error);
-      setUserRole(null);
-    }
-    setShowLoginForm(false);
-  };
-
-  const handleLogoutClick = () => {
-    setShowLogoutConfirmation(true);
-  };
-
-  const handleLogoutConfirm = () => {
-    localStorage.removeItem('access_token');
-    setAuthState('unauthenticated');
-    setUserRole(null);
-    setShowLogoutConfirmation(false);
-  };
-
-  const handleRegisterClick = () => {
-    setShowLoginForm(false);
-    setShowRegisterForm(true);
-  };
+  const { isAuthenticated, userRole, logout, login } = useAuth();
 
   const managementOptions = [
     { name: "Juegos", route: "/management/manage-games" },
@@ -88,58 +43,84 @@ const Navbar = () => {
   ];
 
   const renderAuthButtons = () => {
-    switch (authState) {
-      case 'loading':
-        return null;
-      case 'authenticated':
-        return (
-          <>
-            {userRole === 'SUPERUSER' && (
-              <DropdownContainer
-                data-open={showManagementMenu}
-                onMouseEnter={() => setShowManagementMenu(true)}
-                onMouseLeave={() => setShowManagementMenu(false)}
-              >
-                <DropdownTrigger href="#">
-                  Gestión <FiChevronDown />
-                </DropdownTrigger>
-                <DropdownMenu $isOpen={showManagementMenu}>
-                  {managementOptions.map((option) => (
-                    <DropdownItem
-                      key={option.name}
-                      href={option.route}
-                      onClick={() => setShowManagementMenu(false)}
-                    >
-                      {option.name}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </DropdownContainer>
-            )}
-            <NavLink
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setShowProfileModal(true);
-              }}
+    if (isAuthenticated) {
+      return (
+        <>
+          {userRole === 'SUPERUSER' && (
+            <DropdownContainer
+              data-open={showManagementMenu}
+              onMouseEnter={() => setShowManagementMenu(true)}
+              onMouseLeave={() => setShowManagementMenu(false)}
             >
-              Mi Perfil
-            </NavLink>
-            <NavLink
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                handleLogoutClick();
-              }}
-              title="Cerrar Sesión"
-            >
-              <FiLogOut size={15} />
-            </NavLink>
-          </>
-        );
-      case 'unauthenticated':
-        return <NavLink href="#" onClick={(e) => { e.preventDefault(); setShowLoginForm(true); }}>Iniciar Sesión</NavLink>;
+              <DropdownTrigger href="#">
+                Gestión <FiChevronDown />
+              </DropdownTrigger>
+              <DropdownMenu $isOpen={showManagementMenu}>
+                {managementOptions.map((option) => (
+                  <DropdownItem
+                    key={option.name}
+                    href={option.route}
+                    onClick={() => setShowManagementMenu(false)}
+                  >
+                    {option.name}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </DropdownContainer>
+          )}
+          <NavLink
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              setShowProfileModal(true);
+            }}
+          >
+            Mi Perfil
+          </NavLink>
+          <NavLink
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              handleLogoutClick();
+            }}
+            title="Cerrar Sesión"
+          >
+            <FiLogOut size={15} />
+          </NavLink>
+        </>
+      );
     }
+
+    return (
+      <NavLink
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          setShowLoginForm(true);
+        }}
+      >
+        Iniciar Sesión
+      </NavLink>
+    );
+  };
+
+  const handleLoginSuccess = (access_token: string) => {
+    login(access_token);
+    setShowLoginForm(false);
+  };
+
+  const handleLogoutClick = () => {
+    setShowLogoutConfirmation(true);
+  };
+
+  const handleLogoutConfirm = () => {
+    logout();
+    setShowLogoutConfirmation(false);
+  };
+
+  const handleRegisterClick = () => {
+    setShowLoginForm(false);
+    setShowRegisterForm(true);
   };
 
   return (

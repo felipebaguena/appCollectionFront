@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import { useCollectionGames, SortType, CollectionGame } from '@/hooks/useCollectionGames';
 import { API_BASE_URL } from '@/services/api';
+import { useRouter } from 'next/navigation';
 
 import Modal from '@/components/ui/Modal';
 import AddToCollectionForm from './AddToCollectionForm';
@@ -12,6 +13,12 @@ import { MdLibraryAddCheck, MdDelete } from 'react-icons/md';
 import { useUserGames } from '@/hooks/useUserGames';
 import { useUserGame } from '@/hooks/useUserGame';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
+
+import { useUserActions } from '@/hooks/useUserActions';
+import LoginForm from '../auth/LoginForm';
+
+import { useAuth } from '@/contexts/AuthContext';
+import CreateUserForm from '@/components/user/CreateUserForm';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -263,6 +270,11 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
   const [gameToDelete, setGameToDelete] = useState<CollectionGame | null>(null);
   const [isHoveringIcon, setIsHoveringIcon] = useState<number | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [pendingGame, setPendingGame] = useState<CollectionGame | null>(null);
+  const { login, isAuthenticated } = useAuth();
+  const router = useRouter();
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
 
   const { games, loading, error, totalPages, fetchCollectionGames } = useCollectionGames();
   const { addGameToCollection, isLoading: isAddingGame, error: addGameError } = useUserGames();
@@ -302,6 +314,16 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       setSelectedGameId(gameToDelete.id);
     }
   }, [gameToDelete]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      fetchCollectionGames({
+        page: currentPage,
+        limit: ITEMS_PER_PAGE,
+        sortType
+      }, getCurrentFilter());
+    }
+  }, [isAuthenticated]);
 
   const getGameImageUrl = (game: CollectionGame) => {
     return game.coverImage
@@ -408,6 +430,22 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
     }
   };
 
+  const handleLoginSuccess = async (access_token: string) => {
+    login(access_token);
+    setShowLoginModal(false);
+    router.refresh();
+  };
+
+  const handleRegisterClick = () => {
+    setShowLoginModal(false);
+    setShowRegisterModal(true);
+  };
+
+  const handleRegisterSuccess = () => {
+    setShowRegisterModal(false);
+    setShowLoginModal(true);
+  };
+
   if (loading) return <p>Cargando colección...</p>;
   if (error) return <p>Error: {error}</p>;
   if (!games || games.length === 0) return <p>No hay juegos disponibles</p>;
@@ -441,20 +479,32 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                         src={getGameImageUrl(game)}
                         alt={game.title}
                       />
-                      {game.inCollection ? (
+                      {!localStorage.getItem('access_token') ? (
                         <AddToCollectionLabel
                           className="add-collection-label"
-                          onClick={(e) => handleEditCollection(e, game)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setShowLoginModal(true);
+                          }}
                         >
-                          Editar juego de colección
+                          Inicia sesión para gestionar tu colección
                         </AddToCollectionLabel>
                       ) : (
-                        <AddToCollectionLabel
-                          className="add-collection-label"
-                          onClick={(e) => handleAddToCollection(e, game)}
-                        >
-                          Añadir a la colección
-                        </AddToCollectionLabel>
+                        game.inCollection ? (
+                          <AddToCollectionLabel
+                            className="add-collection-label"
+                            onClick={(e) => handleEditCollection(e, game)}
+                          >
+                            Editar juego de colección
+                          </AddToCollectionLabel>
+                        ) : (
+                          <AddToCollectionLabel
+                            className="add-collection-label"
+                            onClick={(e) => handleAddToCollection(e, game)}
+                          >
+                            Añadir a la colección
+                          </AddToCollectionLabel>
+                        )
                       )}
                       <InfoLabel className="info-label">Más información</InfoLabel>
                     </ExpandedImageWrapper>
@@ -549,6 +599,37 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
         confirmText="Eliminar"
         confirmVariant="danger"
       />
+
+      <Modal
+        isOpen={showLoginModal}
+        onClose={() => {
+          setShowLoginModal(false);
+          setPendingGame(null);
+        }}
+        title="Iniciar Sesión"
+      >
+        <LoginForm
+          onClose={() => {
+            setShowLoginModal(false);
+            setPendingGame(null);
+          }}
+          onLoginSuccess={handleLoginSuccess}
+          onRegisterClick={handleRegisterClick}
+        />
+      </Modal>
+
+      <Modal
+        isOpen={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
+        title="Crear Usuario"
+      >
+        <CreateUserForm
+          onClose={() => {
+            setShowRegisterModal(false);
+            setShowLoginModal(true);
+          }}
+        />
+      </Modal>
     </>
   );
 };
