@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FiLogOut, FiChevronDown } from 'react-icons/fi';
+import { FiLogOut, FiChevronDown, FiUser } from 'react-icons/fi';
 import { jwtDecode } from "jwt-decode";
 import CreateUserForm from '@/components/user/CreateUserForm';
 import LoginForm from '@/components/auth/LoginForm';
@@ -18,13 +18,21 @@ import {
   DropdownContainer,
   DropdownMenu,
   DropdownItem,
-  DropdownTrigger
+  DropdownTrigger,
+  IconNavLink,
 } from '@/components/layout/NavbarElements';
 import { useAuth } from '@/contexts/AuthContext';
+import styled from 'styled-components';
 
 interface DecodedToken {
   role: string;
 }
+
+const IconsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
 
 const Navbar = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -68,25 +76,28 @@ const Navbar = () => {
               </DropdownMenu>
             </DropdownContainer>
           )}
-          <NavLink
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              setShowProfileModal(true);
-            }}
-          >
-            Mi Perfil
-          </NavLink>
-          <NavLink
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              handleLogoutClick();
-            }}
-            title="Cerrar Sesión"
-          >
-            <FiLogOut size={15} />
-          </NavLink>
+          <IconsContainer>
+            <IconNavLink
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setShowProfileModal(true);
+              }}
+              title="Mi Perfil"
+            >
+              <FiUser size={15} />
+            </IconNavLink>
+            <IconNavLink
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handleLogoutClick();
+              }}
+              title="Cerrar Sesión"
+            >
+              <FiLogOut size={15} />
+            </IconNavLink>
+          </IconsContainer>
         </>
       );
     }
@@ -133,7 +144,10 @@ const Navbar = () => {
         </NavbarSection>
         <NavbarSection $position="right">
           <NavLink href="/">Inicio</NavLink>
-          <NavLink href="/collection">Colección</NavLink>
+          <NavLink href="/collection">Catálogo</NavLink>
+          {isAuthenticated && (
+            <NavLink href="/my-collection">Mi colección</NavLink>
+          )}
           {renderAuthButtons()}
         </NavbarSection>
         <Modal

@@ -93,6 +93,10 @@ export const NavLink = styled(Link)`
 
 `;
 
+export const IconNavLink = styled(NavLink)`
+  padding: 0.5rem 0.5rem;
+`;
+
 export const DropdownTrigger = styled(NavLink)`
   display: flex;
   align-items: center;
