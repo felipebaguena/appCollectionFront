@@ -8,6 +8,7 @@ import SliderBar from '@/components/ui/SliderBar';
 import MultiSelect from '../ui/Multiselect';
 import Spinner from '@/components/ui/Spinner';
 import CustomCheckbox from '@/components/ui/CustomCheckbox';
+import Button from '@/components/ui/Button';
 
 const Form = styled.form`
   display: flex;
@@ -39,32 +40,6 @@ const ButtonGroup = styled.div`
   gap: 1rem;
   justify-content: flex-end;
   margin-top: 1rem;
-`;
-
-const Button = styled.button`
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-`;
-
-const SubmitButton = styled(Button)`
-  background-color: var(--app-yellow);
-  color: var(--dark-grey);
-
-  &:hover {
-    background-color: var(--app-yellow-hover);
-  }
-`;
-
-const CancelButton = styled(Button)`
-  background-color: var(--grey);
-  color: white;
-
-  &:hover {
-    background-color: var(--dark-grey);
-  }
 `;
 
 const CheckboxLabel = styled(Label)`
@@ -225,12 +200,20 @@ const AddToCollectionForm: React.FC<AddToCollectionFormProps> = ({
             </FormGroup>
 
             <ButtonGroup>
-                <CancelButton type="button" onClick={onCancel}>
+                <Button
+                    type="button"
+                    onClick={onCancel}
+                    $variant="cancel"
+                >
                     Cancelar
-                </CancelButton>
-                <SubmitButton type="submit" disabled={isLoading}>
+                </Button>
+                <Button
+                    type="submit"
+                    disabled={isLoading}
+                    $variant="primary"
+                >
                     {isLoading ? 'Guardando...' : isEditing ? 'Actualizar' : 'Añadir'}
-                </SubmitButton>
+                </Button>
             </ButtonGroup>
         </Form>
     );
