@@ -7,18 +7,14 @@ import { MdDelete, MdEdit } from 'react-icons/md';
 
 const Card = styled.div`
   background: var(--dark-grey);
-  overflow: visible;
-  transition: transform 0.2s;
-  cursor: pointer;
   width: 100%;
   height: 30rem;
   display: flex;
   flex-direction: column;
   position: relative;
+  cursor: pointer;
 
   &:hover {
-    transform: translateY(-5px);
-
     .icons-container {
       opacity: 1;
     }
@@ -33,19 +29,19 @@ const IconsContainer = styled.div`
   gap: 0.5rem;
   z-index: 2;
   opacity: 0;
-  transition: opacity 0.3s ease;
-  transform: translateY(5px);
 `;
 
-const ActionIcon = styled.div<{ $variant?: 'edit' | 'delete' }>`
+const ActionButton = styled.button<{ $variant?: 'edit' | 'delete' }>`
   background-color: ${props => props.$variant === 'edit' ? 'var(--app-yellow)' : 'var(--app-red)'};
   width: 2.5rem;
   height: 2.5rem;
+  border: none;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  color: inherit;
 `;
 
 const ImageContainer = styled.div`
@@ -138,26 +134,28 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
         <Card>
             <ImageContainer>
                 <IconsContainer className="icons-container">
-                    <ActionIcon
-                        $variant="edit"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onEdit?.(e);
-                        }}
-                    >
-                        <MdEdit />
-                    </ActionIcon>
-                    <ActionIcon
-                        $variant="delete"
-                        onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onDelete?.(e);
-                        }}
-                    >
-                        <MdDelete />
-                    </ActionIcon>
+                    {onEdit && (
+                        <ActionButton
+                            $variant="edit"
+                            onClick={e => {
+                                e.stopPropagation();
+                                onEdit(e);
+                            }}
+                        >
+                            <MdEdit />
+                        </ActionButton>
+                    )}
+                    {onDelete && (
+                        <ActionButton
+                            $variant="delete"
+                            onClick={e => {
+                                e.stopPropagation();
+                                onDelete(e);
+                            }}
+                        >
+                            <MdDelete />
+                        </ActionButton>
+                    )}
                 </IconsContainer>
                 <GameImage
                     src={getGameImageUrl(game)}
