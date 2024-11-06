@@ -84,35 +84,35 @@ export default function MyCollectionPage() {
     return range.start !== null && range.end !== null;
   };
 
+  const fetchCollection = async () => {
+    try {
+      const params = {
+        collection: {
+          page: currentPage,
+          limit: itemsPerPage,
+          sortType: sortType
+        },
+        filter: {
+          search: searchTerm || undefined,
+          platformIds: selectedPlatforms.length > 0 ? selectedPlatforms.map(p => p.id) : undefined,
+          genreIds: selectedGenres.length > 0 ? selectedGenres.map(g => g.id) : undefined,
+          developerIds: selectedDevelopers.length > 0 ? selectedDevelopers.map(d => d.id) : undefined,
+          yearRange: yearRange || undefined,
+          complete: completeStatus !== CompleteStatus.ALL ? completeStatus : undefined,
+          ratingRange: (ratingRange.start > 0 || ratingRange.end < 5) ? ratingRange : undefined,
+          statusRange: (statusRange.start > 0 || statusRange.end < 10) ? statusRange : undefined,
+          addedAtRange: hasValidDateRange(addedAtRange) ? addedAtRange : undefined
+        }
+      };
+
+      const response = await getUserCollection(params);
+      setCollectionData(response);
+    } catch (error) {
+      console.error('Error al obtener la colección:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchCollection = async () => {
-      try {
-        const params = {
-          collection: {
-            page: currentPage,
-            limit: itemsPerPage,
-            sortType: sortType
-          },
-          filter: {
-            search: searchTerm || undefined,
-            platformIds: selectedPlatforms.length > 0 ? selectedPlatforms.map(p => p.id) : undefined,
-            genreIds: selectedGenres.length > 0 ? selectedGenres.map(g => g.id) : undefined,
-            developerIds: selectedDevelopers.length > 0 ? selectedDevelopers.map(d => d.id) : undefined,
-            yearRange: yearRange || undefined,
-            complete: completeStatus !== CompleteStatus.ALL ? completeStatus : undefined,
-            ratingRange: (ratingRange.start > 0 || ratingRange.end < 5) ? ratingRange : undefined,
-            statusRange: (statusRange.start > 0 || statusRange.end < 10) ? statusRange : undefined,
-            addedAtRange: hasValidDateRange(addedAtRange) ? addedAtRange : undefined
-          }
-        };
-
-        const response = await getUserCollection(params);
-        setCollectionData(response);
-      } catch (error) {
-        console.error('Error al obtener la colección:', error);
-      }
-    };
-
     if (isAuthenticated) {
       fetchCollection();
     }
@@ -374,6 +374,7 @@ export default function MyCollectionPage() {
               currentPage={currentPage}
               onPageChange={setCurrentPage}
               itemsPerPage={itemsPerPage}
+              onGameDeleted={fetchCollection}
             />
           )}
         </MyCollectionCentralContent>

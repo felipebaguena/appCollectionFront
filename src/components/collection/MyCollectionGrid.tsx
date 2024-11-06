@@ -1,8 +1,14 @@
+'use client'
+
+import { useState } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { UserGameInCollection } from '@/types/collection';
 import CollectionCard from './CollectionCard';
 import Pagination from '../ui/Pagination';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import { useUserGame } from '@/hooks/useUserGame';
+import { MdDelete } from 'react-icons/md';
 
 const Container = styled.div`
   display: flex;
@@ -22,11 +28,38 @@ const FlexContainer = styled.div`
   margin: 0 auto;
 `;
 
+const DeleteIcon = styled.div`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: var(--app-red);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+
+  svg {
+    color: white;
+    font-size: 1.5rem;
+  }
+`;
+
 const CardWrapper = styled(Link)`
+  position: relative;
   flex: 0 0 auto;
   width: calc(20% - 1.6rem);
   min-width: 250px;
   text-decoration: none;
+
+  &:hover ${DeleteIcon} {
+    opacity: 1;
+  }
 
   @media (max-width: 1800px) {
     width: calc(25% - 1.5rem);
@@ -64,6 +97,7 @@ interface MyCollectionGridProps {
     currentPage: number;
     onPageChange: (page: number) => void;
     itemsPerPage: number;
+    onGameDeleted?: () => void; // Callback para recargar los datos
 }
 
 const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
@@ -71,33 +105,79 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
     totalItems,
     currentPage,
     onPageChange,
-    itemsPerPage
+    itemsPerPage,
+    onGameDeleted
 }) => {
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [gameToDelete, setGameToDelete] = useState<UserGameInCollection | null>(null);
+
+    const { deleteUserGame } = useUserGame(gameToDelete?.game.id || 0);
+
+    const handleDeleteClick = (e: React.MouseEvent, game: UserGameInCollection) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setGameToDelete(game);
+        setShowDeleteModal(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (gameToDelete) {
+            try {
+                await deleteUserGame();
+                setShowDeleteModal(false);
+                setGameToDelete(null);
+                if (onGameDeleted) {
+                    onGameDeleted();
+                }
+            } catch (error) {
+                console.error('Error al eliminar el juego:', error);
+            }
+        }
+    };
+
     if (games.length === 0) {
         return <NoGamesMessage>No hay juegos en tu colección</NoGamesMessage>;
     }
 
     return (
-        <Container>
-            <FlexContainer>
-                {games.map(game => (
-                    <CardWrapper
-                        key={game.id}
-                        href={`/games/${game.game.id}`}
-                    >
-                        <CollectionCard game={game} />
-                    </CardWrapper>
-                ))}
-            </FlexContainer>
-            <PaginationWrapper>
-                <Pagination
-                    currentPage={currentPage}
-                    totalItems={totalItems}
-                    itemsPerPage={itemsPerPage}
-                    onPageChange={onPageChange}
-                />
-            </PaginationWrapper>
-        </Container>
+        <>
+            <Container>
+                <FlexContainer>
+                    {games.map(game => (
+                        <CardWrapper
+                            key={game.id}
+                            href={`/games/${game.game.id}`}
+                        >
+                            <DeleteIcon onClick={(e) => handleDeleteClick(e, game)}>
+                                <MdDelete />
+                            </DeleteIcon>
+                            <CollectionCard game={game} />
+                        </CardWrapper>
+                    ))}
+                </FlexContainer>
+                <PaginationWrapper>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalItems={totalItems}
+                        itemsPerPage={itemsPerPage}
+                        onPageChange={onPageChange}
+                    />
+                </PaginationWrapper>
+            </Container>
+
+            <ConfirmationModal
+                isOpen={showDeleteModal}
+                onClose={() => {
+                    setShowDeleteModal(false);
+                    setGameToDelete(null);
+                }}
+                onConfirm={handleConfirmDelete}
+                title="Eliminar juego de la colección"
+                message={`¿Estás seguro de que quieres eliminar ${gameToDelete?.game.title} de tu colección?`}
+                confirmText="Eliminar"
+                confirmVariant="danger"
+            />
+        </>
     );
 };
 
