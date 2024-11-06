@@ -1,41 +1,47 @@
 'use client';
 
 import styled from 'styled-components';
-import CustomCheckbox from '@/components/ui/CustomCheckbox';
 import { FilterContainer, FilterCard, FilterTitle } from './CollectionFilterElements';
+import { CompleteStatus } from '@/types/collection';
+import CustomSelect from '@/components/ui/CustomSelect';
 
 interface CollectionCompleteFilterProps {
-    value: boolean;
-    onChange: (value: boolean) => void;
+    value: CompleteStatus;
+    onChange: (value: CompleteStatus) => void;
 }
 
-const CheckboxContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
+const SelectContainer = styled.div`
   padding-top: 0.5rem;
   padding-bottom: 0.2rem;
+  width: 100%;
 `;
 
-const Label = styled.label`
-  color: var(--dark-grey);
-  cursor: pointer;
-`;
+const options = [
+    { value: CompleteStatus.ALL, label: 'Todos los juegos' },
+    { value: CompleteStatus.COMPLETE, label: 'Juegos completos' },
+    { value: CompleteStatus.INCOMPLETE, label: 'Juegos incompletos' }
+];
 
-const CollectionCompleteFilter: React.FC<CollectionCompleteFilterProps> = ({ value, onChange }) => {
+const CollectionCompleteFilter: React.FC<CollectionCompleteFilterProps> = ({
+    value,
+    onChange
+}) => {
+    const handleChange = (newValue: string) => {
+        onChange(newValue as CompleteStatus);
+    };
+
     return (
         <FilterContainer>
             <FilterCard>
-                <FilterTitle>Elementos del juego</FilterTitle>
-                <CheckboxContainer>
-                    <CustomCheckbox
-                        checked={value}
-                        onChange={onChange}
-                        id="complete-filter"
+                <FilterTitle>Estado de completitud</FilterTitle>
+                <SelectContainer>
+                    <CustomSelect
+                        options={options}
+                        value={value}
+                        onChange={handleChange}
+                        placeholder="Seleccionar estado..."
                     />
-                    <Label htmlFor="complete-filter">Juegos completos</Label>
-                </CheckboxContainer>
+                </SelectContainer>
             </FilterCard>
         </FilterContainer>
     );

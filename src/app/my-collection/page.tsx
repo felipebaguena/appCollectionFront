@@ -7,6 +7,7 @@ import { Developer, Genre } from "@/types/game";
 import { MyCollectionSortType } from '@/types/collection';
 import { useAuth } from '@/contexts/AuthContext';
 import { DateFormat } from '@/types/date';
+import { CompleteStatus } from '@/types/collection';
 
 import CollectionPlatformFilter from "@/components/collection/CollectionPlatformFilter";
 import CollectionGenreFilter from "@/components/collection/CollectionGenreFilter";
@@ -48,7 +49,7 @@ export default function MyCollectionPage() {
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
   const [sortType, setSortType] = useState<MyCollectionSortType>(MyCollectionSortType.YEAR_DESC);
   const [yearRange, setYearRange] = useState<{ start: number | null; end: number | null } | null>(null);
-  const [isComplete, setIsComplete] = useState(false);
+  const [completeStatus, setCompleteStatus] = useState<CompleteStatus>(CompleteStatus.ALL);
   const [ratingRange, setRatingRange] = useState<{ start: number; end: number }>({ start: 0, end: 5 });
   const [statusRange, setStatusRange] = useState<{ start: number; end: number }>({ start: 0, end: 10 });
   const [addedAtRange, setAddedAtRange] = useState<{ start: string | null; end: string | null }>({
@@ -83,7 +84,7 @@ export default function MyCollectionPage() {
       search: searchTerm,
       yearRange,
       sortType,
-      isComplete,
+      complete: completeStatus,
       ratingRange,
       statusRange,
       ...(hasValidDateRange(addedAtRange) && { addedAtRange })
@@ -91,7 +92,7 @@ export default function MyCollectionPage() {
 
     console.log('Filtros actuales:', filters);
   }, [selectedPlatforms, selectedGenres, selectedDevelopers, searchTerm, yearRange,
-    sortType, isComplete, ratingRange, statusRange, addedAtRange]);
+    sortType, completeStatus, ratingRange, statusRange, addedAtRange]);
 
   const handlePlatformsChange = (platforms: Platform[]) => {
     setSelectedPlatforms(platforms);
@@ -133,8 +134,8 @@ export default function MyCollectionPage() {
     setYearRange(null);
   };
 
-  const handleCompleteChange = (complete: boolean) => {
-    setIsComplete(complete);
+  const handleCompleteChange = (value: CompleteStatus) => {
+    setCompleteStatus(value);
   };
 
   const handleRatingRangeChange = (range: { start: number; end: number }) => {
@@ -146,7 +147,7 @@ export default function MyCollectionPage() {
   };
 
   const handleRemoveComplete = () => {
-    setIsComplete(false);
+    setCompleteStatus(CompleteStatus.ALL);
   };
 
   const handleRemoveRatingRange = () => {
@@ -174,7 +175,7 @@ export default function MyCollectionPage() {
     setSelectedDevelopers([]);
     setYearRange(null);
     setSearchTerm('');
-    setIsComplete(false);
+    setCompleteStatus(CompleteStatus.ALL);
     setRatingRange({ start: 0, end: 5 });
     setStatusRange({ start: 0, end: 10 });
     setAddedAtRange({
@@ -188,7 +189,7 @@ export default function MyCollectionPage() {
     selectedDevelopers.length > 0 ||
     (yearRange?.start && yearRange?.end) ||
     searchTerm.length > 0 ||
-    isComplete ||
+    completeStatus !== CompleteStatus.ALL ||
     (ratingRange.start > 0 || ratingRange.end < 5) ||
     (statusRange.start > 0 || statusRange.end < 10) ||
     hasValidDateRange(addedAtRange);
@@ -254,9 +255,12 @@ export default function MyCollectionPage() {
               onRemove={handleRemoveYearRange}
             />
           )}
-          {isComplete && (
+          {completeStatus !== CompleteStatus.ALL && (
             <FilterChip
-              label="Juegos completos"
+              label={completeStatus === CompleteStatus.COMPLETE ?
+                "Juegos completos" :
+                "Juegos incompletos"
+              }
               onRemove={handleRemoveComplete}
             />
           )}
@@ -288,7 +292,7 @@ export default function MyCollectionPage() {
           </CloseFiltersButton>
           <CollectionFiltersContainer>
             <CollectionCompleteFilter
-              value={isComplete}
+              value={completeStatus}
               onChange={handleCompleteChange}
             />
             <CollectionRatingFilter
