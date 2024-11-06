@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { IoFilter, IoClose, IoCloseCircleOutline } from 'react-icons/io5';
 import { Platform } from '@/types/platform';
 import { Developer, Genre } from "@/types/game";
-import { SortType } from '@/hooks/useCollectionGames';
+import { MyCollectionSortType } from '@/types/collection';
 import { useAuth } from '@/contexts/AuthContext';
 
 import CollectionPlatformFilter from "@/components/collection/CollectionPlatformFilter";
@@ -17,6 +17,7 @@ import FilterInput from '@/components/ui/FilterInput';
 import CollectionCompleteFilter from "@/components/collection/CollectionCompleteFilter";
 import CollectionRatingFilter from "@/components/collection/CollectionRatingFilter";
 import CollectionStatusGameFilter from "@/components/collection/CollectionStatusGameFilter";
+import CollectionAddedAtRangeFilter from "@/components/collection/CollectionAddedAtRangeFilter";
 
 import {
   TitleBar,
@@ -42,22 +43,36 @@ export default function MyCollectionPage() {
   const [selectedDevelopers, setSelectedDevelopers] = useState<Developer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
-  const [sortType, setSortType] = useState<SortType>("YEAR_DESC");
+  const [sortType, setSortType] = useState<MyCollectionSortType>(MyCollectionSortType.YEAR_DESC);
   const [yearRange, setYearRange] = useState<{ start: number | null; end: number | null } | null>(null);
   const [isComplete, setIsComplete] = useState(false);
   const [ratingRange, setRatingRange] = useState<{ start: number; end: number }>({ start: 0, end: 5 });
   const [statusRange, setStatusRange] = useState<{ start: number; end: number }>({ start: 0, end: 10 });
+  const [addedAtRange, setAddedAtRange] = useState<{ start: string | null; end: string | null }>({
+    start: null,
+    end: null
+  });
   const { isAuthenticated } = useAuth();
 
   const sortOptions = [
-    { value: 'TITLE_ASC', label: 'Título (A-Z)' },
-    { value: 'TITLE_DESC', label: 'Título (Z-A)' },
-    { value: 'YEAR_ASC', label: 'Año (Ascendente)' },
-    { value: 'YEAR_DESC', label: 'Año (Descendente)' }
+    { value: MyCollectionSortType.TITLE_ASC, label: 'Título (A-Z)' },
+    { value: MyCollectionSortType.TITLE_DESC, label: 'Título (Z-A)' },
+    { value: MyCollectionSortType.YEAR_ASC, label: 'Año (Ascendente)' },
+    { value: MyCollectionSortType.YEAR_DESC, label: 'Año (Descendente)' },
+    { value: MyCollectionSortType.RATING_ASC, label: 'Valoración (Menor a Mayor)' },
+    { value: MyCollectionSortType.RATING_DESC, label: 'Valoración (Mayor a Menor)' },
+    { value: MyCollectionSortType.STATUS_ASC, label: 'Estado (Menor a Mayor)' },
+    { value: MyCollectionSortType.STATUS_DESC, label: 'Estado (Mayor a Menor)' },
+    { value: MyCollectionSortType.ADDED_ASC, label: 'Fecha añadido (Más antiguo)' },
+    { value: MyCollectionSortType.ADDED_DESC, label: 'Fecha añadido (Más reciente)' }
   ];
 
+  const hasValidDateRange = (range: { start: string | null; end: string | null }) => {
+    return range.start !== null && range.end !== null;
+  };
+
   useEffect(() => {
-    console.log('Filtros actuales:', {
+    const filters = {
       platforms: selectedPlatforms,
       genres: selectedGenres,
       developers: selectedDevelopers,
@@ -66,9 +81,13 @@ export default function MyCollectionPage() {
       sortType,
       isComplete,
       ratingRange,
-      statusRange
-    });
-  }, [selectedPlatforms, selectedGenres, selectedDevelopers, searchTerm, yearRange, sortType, isComplete, ratingRange, statusRange]);
+      statusRange,
+      ...(hasValidDateRange(addedAtRange) && { addedAtRange })
+    };
+
+    console.log('Filtros actuales:', filters);
+  }, [selectedPlatforms, selectedGenres, selectedDevelopers, searchTerm, yearRange,
+    sortType, isComplete, ratingRange, statusRange, addedAtRange]);
 
   const handlePlatformsChange = (platforms: Platform[]) => {
     setSelectedPlatforms(platforms);
@@ -83,7 +102,7 @@ export default function MyCollectionPage() {
   };
 
   const handleSortChange = (value: string) => {
-    setSortType(value as SortType);
+    setSortType(value as MyCollectionSortType);
   };
 
   const handleSearchChange = (value: string) => {
@@ -134,14 +153,16 @@ export default function MyCollectionPage() {
     setStatusRange({ start: 0, end: 10 });
   };
 
-  const hasActiveFilters = selectedPlatforms.length > 0 ||
-    selectedGenres.length > 0 ||
-    selectedDevelopers.length > 0 ||
-    (yearRange?.start && yearRange?.end) ||
-    searchTerm.length > 0 ||
-    isComplete ||
-    (ratingRange.start > 0 || ratingRange.end < 5) ||
-    (statusRange.start > 0 || statusRange.end < 10);
+  const handleAddedAtRangeChange = (range: { start: string | null; end: string | null }) => {
+    setAddedAtRange(range);
+  };
+
+  const handleRemoveAddedAtRange = () => {
+    setAddedAtRange({
+      start: null,
+      end: null
+    });
+  };
 
   const handleClearAllFilters = () => {
     setSelectedPlatforms([]);
@@ -152,7 +173,21 @@ export default function MyCollectionPage() {
     setIsComplete(false);
     setRatingRange({ start: 0, end: 5 });
     setStatusRange({ start: 0, end: 10 });
+    setAddedAtRange({
+      start: null,
+      end: null
+    });
   };
+
+  const hasActiveFilters = selectedPlatforms.length > 0 ||
+    selectedGenres.length > 0 ||
+    selectedDevelopers.length > 0 ||
+    (yearRange?.start && yearRange?.end) ||
+    searchTerm.length > 0 ||
+    isComplete ||
+    (ratingRange.start > 0 || ratingRange.end < 5) ||
+    (statusRange.start > 0 || statusRange.end < 10) ||
+    hasValidDateRange(addedAtRange);
 
   return (
     <PageContainer>
@@ -233,6 +268,20 @@ export default function MyCollectionPage() {
               onRemove={handleRemoveStatusRange}
             />
           )}
+          {hasValidDateRange(addedAtRange) && (
+            <FilterChip
+              label={`Añadido: ${new Date(addedAtRange.start!).toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+              })} - ${new Date(addedAtRange.end!).toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+              })}`}
+              onRemove={() => setAddedAtRange({ start: null, end: null })}
+            />
+          )}
         </ChipsContainer>
       </Controls>
 
@@ -253,6 +302,10 @@ export default function MyCollectionPage() {
             <CollectionStatusGameFilter
               value={statusRange}
               onChange={handleStatusRangeChange}
+            />
+            <CollectionAddedAtRangeFilter
+              value={addedAtRange}
+              onChange={handleAddedAtRangeChange}
             />
             <CollectionYearFilter
               value={yearRange}
