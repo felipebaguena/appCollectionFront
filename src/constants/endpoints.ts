@@ -44,4 +44,5 @@ export const ENDPOINTS = {
   GET_USER_GAME_DETAILS: (id: string) => `/user-games/${id}/details`,
   UPDATE_USER_GAME: (id: string) => `/user-games/${id}`,
   DELETE_USER_GAME: (id: string) => `/user-games/${id}`,
+  GET_USER_GAMES_COLLECTION: "/user-games/collection",
 };

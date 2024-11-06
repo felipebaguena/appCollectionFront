@@ -40,6 +40,7 @@ import {
 } from '@/components/collection/CollectionElements';
 
 import { formatDate } from '@/helpers/dateFormatter';
+import { useUserCollection } from '@/hooks/useUserCollection';
 
 export default function MyCollectionPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
@@ -58,6 +59,9 @@ export default function MyCollectionPage() {
   });
   const [dateFormat, setDateFormat] = useState<DateFormat>(DateFormat.SHORT);
   const { isAuthenticated } = useAuth();
+  const { getUserCollection, isLoading, error } = useUserCollection();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12; // Podemos ajustar esto según necesidades
 
   const sortOptions = [
     { value: MyCollectionSortType.TITLE_ASC, label: 'Título (A-Z)' },
@@ -77,22 +81,51 @@ export default function MyCollectionPage() {
   };
 
   useEffect(() => {
-    const filters = {
-      platforms: selectedPlatforms,
-      genres: selectedGenres,
-      developers: selectedDevelopers,
-      search: searchTerm,
-      yearRange,
-      sortType,
-      complete: completeStatus,
-      ratingRange,
-      statusRange,
-      ...(hasValidDateRange(addedAtRange) && { addedAtRange })
+    const fetchCollection = async () => {
+      try {
+        const params = {
+          collection: {
+            page: currentPage,
+            limit: itemsPerPage,
+            sortType: sortType
+          },
+          filter: {
+            search: searchTerm || undefined,
+            platformIds: selectedPlatforms.length > 0 ? selectedPlatforms.map(p => p.id) : undefined,
+            genreIds: selectedGenres.length > 0 ? selectedGenres.map(g => g.id) : undefined,
+            developerIds: selectedDevelopers.length > 0 ? selectedDevelopers.map(d => d.id) : undefined,
+            yearRange: yearRange || undefined,
+            complete: completeStatus !== CompleteStatus.ALL ? completeStatus : undefined,
+            ratingRange: (ratingRange.start > 0 || ratingRange.end < 5) ? ratingRange : undefined,
+            statusRange: (statusRange.start > 0 || statusRange.end < 10) ? statusRange : undefined,
+            addedAtRange: hasValidDateRange(addedAtRange) ? addedAtRange : undefined
+          }
+        };
+
+        const response = await getUserCollection(params);
+        console.log('Respuesta de la colección:', response);
+      } catch (error) {
+        console.error('Error al obtener la colección:', error);
+      }
     };
 
-    console.log('Filtros actuales:', filters);
-  }, [selectedPlatforms, selectedGenres, selectedDevelopers, searchTerm, yearRange,
-    sortType, completeStatus, ratingRange, statusRange, addedAtRange]);
+    if (isAuthenticated) {
+      fetchCollection();
+    }
+  }, [
+    currentPage,
+    sortType,
+    searchTerm,
+    selectedPlatforms,
+    selectedGenres,
+    selectedDevelopers,
+    yearRange,
+    completeStatus,
+    ratingRange,
+    statusRange,
+    addedAtRange,
+    isAuthenticated
+  ]);
 
   const handlePlatformsChange = (platforms: Platform[]) => {
     setSelectedPlatforms(platforms);
@@ -328,7 +361,9 @@ export default function MyCollectionPage() {
         </FiltersPanel>
 
         <CentralContent>
-          Colección
+          {isLoading && <div>Cargando...</div>}
+          {error && <div>Error: {error}</div>}
+          {!isLoading && !error && <div>Colección</div>}
         </CentralContent>
       </ContentWrapper>
     </PageContainer>

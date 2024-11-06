@@ -171,8 +171,9 @@ const AddToCollectionForm: React.FC<AddToCollectionFormProps> = ({
             </FormGroup>
 
             <FormGroup>
-                <CheckboxLabel>
+                <CheckboxLabel htmlFor="complete-checkbox">
                     <CustomCheckbox
+                        id="complete-checkbox"
                         checked={formData.complete}
                         onChange={(checked) => setFormData(prev => ({ ...prev, complete: checked }))}
                     />

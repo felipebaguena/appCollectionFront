@@ -1,9 +1,10 @@
 import styled from 'styled-components';
 import { FaCheck } from 'react-icons/fa';
 
-const CheckboxContainer = styled.div`
+const CheckboxContainer = styled.label`
   display: inline-block;
   vertical-align: middle;
+  cursor: pointer;
 `;
 
 const HiddenCheckbox = styled.input.attrs({ type: 'checkbox' })`
@@ -24,12 +25,11 @@ const StyledCheckbox = styled.div<{ checked: boolean }>`
   height: 24px;
   background: ${props => props.checked ? 'white' : 'white'};
   border: 2px solid var(--dark-grey);
-  cursor: pointer;
   position: relative;
 
   svg {
     visibility: ${props => props.checked ? 'visible' : 'hidden'};
-    background-color:var(--dark-grey);
+    background-color: var(--dark-grey);
     color: var(--app-yellow);
   }
 
@@ -45,15 +45,11 @@ interface CustomCheckboxProps {
 }
 
 const CustomCheckbox: React.FC<CustomCheckboxProps> = ({ checked, onChange, id }) => {
-    const handleClick = () => {
-        onChange(!checked);
-    };
-
     return (
-        <CheckboxContainer onClick={handleClick}>
+        <CheckboxContainer>
             <HiddenCheckbox
                 checked={checked}
-                onChange={() => { }} // Mantenemos esto para evitar warnings
+                onChange={(e) => onChange(e.target.checked)}
                 id={id}
             />
             <StyledCheckbox checked={checked}>
