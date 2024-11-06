@@ -194,6 +194,5 @@ export const MyCollectionCentralContent = styled.div`
   display: flex;
   min-height: 100%;
   justify-content: center;
-  font-size: 2rem;
   color: var(--dark-grey);
 `; 

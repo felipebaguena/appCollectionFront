@@ -22,7 +22,7 @@ const Card = styled.div`
 const ImageContainer = styled.div`
   position: relative;
   width: 100%;
-  height: 23rem;
+  height: 50%;
   overflow: hidden;
 `;
 
@@ -34,7 +34,7 @@ const GameImage = styled.img`
 `;
 
 const GameInfo = styled.div`
-  height: 100%;
+  height: 50%;
   padding: 1rem;
 `;
 

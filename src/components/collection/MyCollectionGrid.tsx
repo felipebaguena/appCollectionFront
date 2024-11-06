@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Link from 'next/link';
 import { UserGameInCollection } from '@/types/collection';
 import CollectionCard from './CollectionCard';
 import Pagination from '../ui/Pagination';
@@ -17,14 +18,25 @@ const FlexContainer = styled.div`
   gap: 2rem;
   padding: 1.5rem;
   justify-content: flex-start;
+  max-width: 2000px;
+  margin: 0 auto;
 `;
 
-const CardWrapper = styled.div`
+const CardWrapper = styled(Link)`
   flex: 0 0 auto;
-  width: calc(33.333% - 1.334rem);
-  min-width: 280px;
+  width: calc(20% - 1.6rem);
+  min-width: 250px;
+  text-decoration: none;
 
-  @media (max-width: 1200px) {
+  @media (max-width: 1800px) {
+    width: calc(25% - 1.5rem);
+  }
+
+  @media (max-width: 1400px) {
+    width: calc(33.333% - 1.334rem);
+  }
+
+  @media (max-width: 1100px) {
     width: calc(50% - 1rem);
   }
 
@@ -69,7 +81,10 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
         <Container>
             <FlexContainer>
                 {games.map(game => (
-                    <CardWrapper key={game.id}>
+                    <CardWrapper
+                        key={game.id}
+                        href={`/games/${game.game.id}`}
+                    >
                         <CollectionCard game={game} />
                     </CardWrapper>
                 ))}
