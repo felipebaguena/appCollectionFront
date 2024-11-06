@@ -6,6 +6,7 @@ import { Platform } from '@/types/platform';
 import { Developer, Genre } from "@/types/game";
 import { MyCollectionSortType } from '@/types/collection';
 import { useAuth } from '@/contexts/AuthContext';
+import { DateFormat } from '@/types/date';
 
 import CollectionPlatformFilter from "@/components/collection/CollectionPlatformFilter";
 import CollectionGenreFilter from "@/components/collection/CollectionGenreFilter";
@@ -37,6 +38,8 @@ import {
   CentralContent
 } from '@/components/collection/CollectionElements';
 
+import { formatDate } from '@/helpers/dateFormatter';
+
 export default function MyCollectionPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<Genre[]>([]);
@@ -52,6 +55,7 @@ export default function MyCollectionPage() {
     start: null,
     end: null
   });
+  const [dateFormat, setDateFormat] = useState<DateFormat>(DateFormat.SHORT);
   const { isAuthenticated } = useAuth();
 
   const sortOptions = [
@@ -270,15 +274,7 @@ export default function MyCollectionPage() {
           )}
           {hasValidDateRange(addedAtRange) && (
             <FilterChip
-              label={`Añadido: ${new Date(addedAtRange.start!).toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-              })} - ${new Date(addedAtRange.end!).toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric'
-              })}`}
+              label={`Añadido: ${formatDate(addedAtRange.start, { format: dateFormat })} - ${formatDate(addedAtRange.end, { format: dateFormat })}`}
               onRemove={() => setAddedAtRange({ start: null, end: null })}
             />
           )}
@@ -306,6 +302,7 @@ export default function MyCollectionPage() {
             <CollectionAddedAtRangeFilter
               value={addedAtRange}
               onChange={handleAddedAtRangeChange}
+              dateFormat={dateFormat}
             />
             <CollectionYearFilter
               value={yearRange}

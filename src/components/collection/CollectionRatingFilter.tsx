@@ -12,19 +12,20 @@ interface CollectionRatingFilterProps {
 const RatingContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
 `;
 
 const RangeContainer = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  justify-content: flex-start;
 `;
 
 const RangeLabel = styled.span`
   color: var(--dark-grey);
   font-size: 0.9rem;
+  min-width: 50px;
 `;
 
 const CollectionRatingFilter: React.FC<CollectionRatingFilterProps> = ({ value, onChange }) => {

@@ -12,8 +12,10 @@ interface CollectionCompleteFilterProps {
 const CheckboxContainer = styled.div`
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
-  padding: 16px;
+  padding-top: 0.5rem;
+  padding-bottom: 0.2rem;
 `;
 
 const Label = styled.label`

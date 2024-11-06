@@ -2,6 +2,7 @@
 
 import styled from 'styled-components';
 import { useState, useEffect, useRef } from 'react';
+import { DateFormat } from '../../types/date';
 
 const CalendarContainer = styled.div`
   background: white;
@@ -72,8 +73,8 @@ const DayCell = styled.button<{ $isToday?: boolean; $isSelected?: boolean; $isCu
   background: ${props => props.$isSelected ? 'var(--app-yellow)' : 'none'};
   color: ${props => {
         if (props.$isSelected) return 'var(--dark-grey)';
-        if (!props.$isCurrentMonth) return 'var(--mid-grey)';
-        return 'var(--dark-grey)';
+        if (!props.$isCurrentMonth) return 'var(--clear-grey)';
+        return 'var(--cancel-grey)';
     }};
   font-weight: ${props => props.$isCurrentMonth ? '500' : '400'};
   cursor: pointer;
@@ -121,9 +122,10 @@ interface CalendarProps {
     selectedDate: Date | null;
     onChange: (date: Date) => void;
     onClose?: () => void;
+    dateFormat?: DateFormat;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose }) => {
+const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, dateFormat }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [showMonthDropdown, setShowMonthDropdown] = useState(false);
     const [showYearDropdown, setShowYearDropdown] = useState(false);

@@ -10,7 +10,7 @@ interface CollectionStatusGameFilterProps {
 }
 
 const StatusContainer = styled.div`
-  padding: 0 16px 16px;
+  padding: 0 0.5rem 0.1rem;
 `;
 
 const CollectionStatusGameFilter: React.FC<CollectionStatusGameFilterProps> = ({ value, onChange }) => {

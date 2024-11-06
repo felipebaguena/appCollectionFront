@@ -63,7 +63,7 @@ export const FiltersPanel = styled.div<{ isOpen: boolean }>`
   width: ${props => props.isOpen ? 'auto' : '0'};
   min-width: ${props => props.isOpen ? 'auto' : '0'};
   flex-shrink: 0;
-  overflow: hidden;
+  overflow: visible;
   transition: all 0.3s ease-in-out;
   padding: ${props => props.isOpen ? '20px' : '0'};
   margin-top: 20px;
@@ -90,14 +90,8 @@ export const FiltersPanel = styled.div<{ isOpen: boolean }>`
 export const CollectionFiltersContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  
-  @media (max-width: 568px) {
-    width: 100%;
-    max-width: 15rem;
-    margin: 0 auto;
-    padding-bottom: 2rem;
-  }
+  gap: 16px;
+  overflow: visible;
 `;
 
 export const CloseFiltersButton = styled.button`
