@@ -1,206 +1,38 @@
 'use client';
 
-import CollectionPlatformFilter from "@/components/collection/CollectionPlatformFilter";
-import styled from 'styled-components';
 import { useState } from 'react';
+import { IoFilter, IoClose, IoCloseCircleOutline } from 'react-icons/io5';
 import { Platform } from '@/types/platform';
-import { NAVBAR_HEIGHT } from '@/components/layout/NavbarElements';
-import { IoClose, IoFilter, IoCloseCircleOutline } from 'react-icons/io5';
-import { SortType } from '@/hooks/useCollectionGames';
-import CustomSelect from '@/components/ui/CustomSelect';
-import CollectionGenreFilter from "@/components/collection/CollectionGenreFilter";
 import { Developer, Genre } from "@/types/game";
-import CollectionGrid from "@/components/collection/CollectionGrid";
-import CollectionDeveloperFilter from "@/components/collection/CollectionDeveloperFilter";
-import FilterInput from '@/components/ui/FilterInput';
-import CollectionYearFilter from "@/components/collection/CollectionYearFilter";
-import FilterChip from '@/components/collection/FilterChip';
-import CollectionStatusFilter from '@/components/collection/CollectionStatusFilter';
+import { SortType } from '@/hooks/useCollectionGames';
 import { useAuth } from '@/contexts/AuthContext';
 
-const TitleBar = styled.div`
-  background-color: var(--app-yellow);
-  padding: 0.8rem;
-  margin-bottom: 1rem;
-`;
+import CollectionPlatformFilter from "@/components/collection/CollectionPlatformFilter";
+import CollectionGenreFilter from "@/components/collection/CollectionGenreFilter";
+import CollectionDeveloperFilter from "@/components/collection/CollectionDeveloperFilter";
+import CollectionYearFilter from "@/components/collection/CollectionYearFilter";
+import CollectionStatusFilter from '@/components/collection/CollectionStatusFilter';
+import CollectionGrid from "@/components/collection/CollectionGrid";
+import FilterChip from '@/components/collection/FilterChip';
+import CustomSelect from '@/components/ui/CustomSelect';
+import FilterInput from '@/components/ui/FilterInput';
 
-const Title = styled.h1`
-  color: var(--dark-grey);
-  text-align: center;
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: bold;
-`;
-
-const PageContainer = styled.main`
-  display: flex;
-  flex-direction: column;
-`;
-
-const Controls = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 20px 20px 5px 20px;
-
-  @media (max-width: 568px) {
-    gap: 0.8rem;
-  }
-`;
-
-const ControlsTop = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  @media (max-width: 568px) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.8rem;
-  }
-`;
-
-const FiltersButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--dark-grey);
-  font-weight: bold;
-  font-size: 1rem;
-  margin-right: auto;
-`;
-
-const FiltersPanel = styled.div<{ isOpen: boolean }>`
-  width: ${props => props.isOpen ? 'auto' : '0'};
-  min-width: ${props => props.isOpen ? 'auto' : '0'};
-  flex-shrink: 0;
-  overflow: hidden;
-  transition: all 0.3s ease-in-out;
-  padding: ${props => props.isOpen ? '20px' : '0'};
-  margin-top: 20px;
-  opacity: ${props => props.isOpen ? '1' : '0'};
-  visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
-
-  @media (max-width: 568px) {
-    position: fixed;
-    display: flex;
-    flex-direction: column;
-    top: ${NAVBAR_HEIGHT};
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: calc(100vh - ${NAVBAR_HEIGHT});
-    background: white;
-    z-index: 1000;
-    margin: 0;
-    overflow-y: auto;
-  }
-`;
-
-const CollectionFiltersContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  
-  @media (max-width: 568px) {
-    width: 100%;
-    max-width: 15rem;
-    margin: 0 auto;
-    padding-bottom: 2rem;
-  }
-`;
-
-const CloseFiltersButton = styled.button`
-  display: none;
-
-  @media (max-width: 568px) {
-    display: block;
-    position: sticky;
-    top: 0;
-    right: 0;
-    padding: 8px 16px;
-    background-color: var(--app-yellow);
-    border: none;
-    cursor: pointer;
-    color: var(--dark-grey);
-    font-weight: bold;
-    margin-left: auto;
-    z-index: 1001;
-  }
-`;
-
-const ContentWrapper = styled.div`
-  display: flex;
-  gap: 20px;
-`;
-
-const ControlsRight = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-
-  @media (max-width: 568px) {
-    flex-direction: row;
-    gap: 0.8rem;
-    width: 100%;
-    
-    > * {
-      flex: 1;
-      min-width: 0;
-    }
-  }
-`;
-
-const FiltersSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  @media (max-width: 568px) {
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-    width: 100%;
-  }
-`;
-
-const ChipsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-  min-height: 34px;
-
-  @media (max-width: 768px) {
-    gap: 4px;
-    font-size: 0.875rem;
-  }
-`;
-
-const ClearFiltersButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--grey);
-  font-size: 0.875rem;
-
-  &:hover {
-    color: var(--dark-grey);
-  }
-
-  @media (max-width: 568px) {
-    font-size: 0.8rem;
-    margin-left: 0;
-  }
-`;
+import {
+  TitleBar,
+  Title,
+  PageContainer,
+  Controls,
+  ControlsTop,
+  FiltersButton,
+  FiltersPanel,
+  CollectionFiltersContainer,
+  CloseFiltersButton,
+  ContentWrapper,
+  ControlsRight,
+  FiltersSection,
+  ChipsContainer,
+  ClearFiltersButton,
+} from '@/components/collection/CollectionElements';
 
 export default function CollectionPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
