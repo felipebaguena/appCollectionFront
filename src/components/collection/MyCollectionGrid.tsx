@@ -8,7 +8,10 @@ import CollectionCard from './CollectionCard';
 import Pagination from '../ui/Pagination';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import { useUserGame } from '@/hooks/useUserGame';
-import { MdDelete } from 'react-icons/md';
+import { MdDelete, MdEdit } from 'react-icons/md';
+import Modal from '@/components/ui/Modal';
+import AddToCollectionForm from './AddToCollectionForm';
+import { Platform } from '@/types/game';
 
 const Container = styled.div`
   display: flex;
@@ -28,24 +31,29 @@ const FlexContainer = styled.div`
   margin: 0 auto;
 `;
 
-const DeleteIcon = styled.div`
+const IconsContainer = styled.div`
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background-color: var(--app-red);
+  display: flex;
+  gap: 0.5rem;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+`;
+
+const ActionIcon = styled.div<{ $variant?: 'edit' | 'delete' }>`
+  background-color: ${props => props.$variant === 'edit' ? 'var(--app-yellow)' : 'var(--app-red)'};
   width: 2.5rem;
   height: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.3s ease;
 
   svg {
-    color: white;
+    color: ${props => props.$variant === 'edit' ? 'var(--dark-grey)' : 'white'};
     font-size: 1.5rem;
   }
 `;
@@ -57,7 +65,7 @@ const CardWrapper = styled(Link)`
   min-width: 250px;
   text-decoration: none;
 
-  &:hover ${DeleteIcon} {
+  &:hover ${IconsContainer} {
     opacity: 1;
   }
 
@@ -109,9 +117,11 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
     onGameDeleted
 }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [gameToDelete, setGameToDelete] = useState<UserGameInCollection | null>(null);
+    const [gameToEdit, setGameToEdit] = useState<UserGameInCollection | null>(null);
 
-    const { deleteUserGame } = useUserGame(gameToDelete?.game.id || 0);
+    const { deleteUserGame, updateUserGame } = useUserGame(gameToEdit?.game.id || 0);
 
     const handleDeleteClick = (e: React.MouseEvent, game: UserGameInCollection) => {
         e.preventDefault();
@@ -135,6 +145,43 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
         }
     };
 
+    const handleEditClick = (e: React.MouseEvent, game: UserGameInCollection) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setGameToEdit(game);
+        setShowEditModal(true);
+    };
+
+    const handleSubmitForm = async (formData: {
+        rating?: number;
+        status?: number;
+        complete: boolean;
+        notes?: string;
+        platformIds: number[];
+    }) => {
+        if (gameToEdit) {
+            try {
+                const result = await updateUserGame({
+                    rating: formData.rating || null,
+                    status: formData.status || null,
+                    complete: formData.complete,
+                    notes: formData.notes || null,
+                    platformIds: formData.platformIds
+                });
+
+                if (result) {
+                    setShowEditModal(false);
+                    setGameToEdit(null);
+                    if (onGameDeleted) {
+                        onGameDeleted(); // Recargar los datos
+                    }
+                }
+            } catch (error) {
+                console.error('Error al actualizar el juego:', error);
+            }
+        }
+    };
+
     if (games.length === 0) {
         return <NoGamesMessage>No hay juegos en tu colección</NoGamesMessage>;
     }
@@ -148,9 +195,20 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
                             key={game.id}
                             href={`/games/${game.game.id}`}
                         >
-                            <DeleteIcon onClick={(e) => handleDeleteClick(e, game)}>
-                                <MdDelete />
-                            </DeleteIcon>
+                            <IconsContainer>
+                                <ActionIcon
+                                    $variant="edit"
+                                    onClick={(e) => handleEditClick(e, game)}
+                                >
+                                    <MdEdit />
+                                </ActionIcon>
+                                <ActionIcon
+                                    $variant="delete"
+                                    onClick={(e) => handleDeleteClick(e, game)}
+                                >
+                                    <MdDelete />
+                                </ActionIcon>
+                            </IconsContainer>
                             <CollectionCard game={game} />
                         </CardWrapper>
                     ))}
@@ -177,6 +235,32 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
                 confirmText="Eliminar"
                 confirmVariant="danger"
             />
+
+            <Modal
+                isOpen={showEditModal}
+                onClose={() => {
+                    setShowEditModal(false);
+                    setGameToEdit(null);
+                }}
+                title={`Editar ${gameToEdit?.game.title} en mi colección`}
+            >
+                <AddToCollectionForm
+                    gameId={gameToEdit?.game.id || 0}
+                    onSubmit={handleSubmitForm}
+                    onCancel={() => {
+                        setShowEditModal(false);
+                        setGameToEdit(null);
+                    }}
+                    isEditing={true}
+                    initialData={{
+                        rating: gameToEdit?.rating || null,
+                        status: gameToEdit?.status || null,
+                        complete: gameToEdit?.complete || false,
+                        notes: gameToEdit?.notes || null,
+                        platforms: (gameToEdit?.platforms || []) as Platform[]
+                    }}
+                />
+            </Modal>
         </>
     );
 };

@@ -3,20 +3,49 @@ import { UserGameInCollection } from '@/types/collection';
 import { API_BASE_URL } from '@/services/api';
 import StarRating from '../ui/StarRating';
 import { formatDate } from '@/helpers/dateFormatter';
+import { MdDelete, MdEdit } from 'react-icons/md';
 
 const Card = styled.div`
   background: var(--dark-grey);
-  overflow: hidden;
+  overflow: visible;
   transition: transform 0.2s;
   cursor: pointer;
   width: 100%;
   height: 30rem;
   display: flex;
   flex-direction: column;
+  position: relative;
 
   &:hover {
     transform: translateY(-5px);
+
+    .icons-container {
+      opacity: 1;
+    }
   }
+`;
+
+const IconsContainer = styled.div`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  transform: translateY(5px);
+`;
+
+const ActionIcon = styled.div<{ $variant?: 'edit' | 'delete' }>`
+  background-color: ${props => props.$variant === 'edit' ? 'var(--app-yellow)' : 'var(--app-red)'};
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 `;
 
 const ImageContainer = styled.div`
@@ -86,18 +115,50 @@ const PlatformTag = styled.span`
 
 interface CollectionCardProps {
     game: UserGameInCollection;
+    onEdit?: (e: React.MouseEvent) => void;
+    onDelete?: (e: React.MouseEvent) => void;
 }
 
-const CollectionCard: React.FC<CollectionCardProps> = ({ game }) => {
+const CollectionCard: React.FC<CollectionCardProps> = ({
+    game,
+    onEdit,
+    onDelete
+}) => {
     const getGameImageUrl = (game: UserGameInCollection) => {
         return game.game.coverImage
             ? `${API_BASE_URL}/${game.game.coverImage.path}`
             : `${API_BASE_URL}/uploads/resources/no-image.jpg`;
     };
 
+    const rating = typeof game.rating === 'string'
+        ? parseFloat(game.rating)
+        : game.rating || 0;
+
     return (
         <Card>
             <ImageContainer>
+                <IconsContainer className="icons-container">
+                    <ActionIcon
+                        $variant="edit"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onEdit?.(e);
+                        }}
+                    >
+                        <MdEdit />
+                    </ActionIcon>
+                    <ActionIcon
+                        $variant="delete"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            onDelete?.(e);
+                        }}
+                    >
+                        <MdDelete />
+                    </ActionIcon>
+                </IconsContainer>
                 <GameImage
                     src={getGameImageUrl(game)}
                     alt={game.game.title}
@@ -107,7 +168,11 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ game }) => {
                 <InfoContent>
                     <TopContent>
                         <Title>{game.game.title}</Title>
-                        <StarRating value={game.rating} readOnly size={16} />
+                        <StarRating
+                            value={rating}
+                            readOnly
+                            size={16}
+                        />
                     </TopContent>
                     <BottomContent>
                         <Details>
@@ -127,4 +192,4 @@ const CollectionCard: React.FC<CollectionCardProps> = ({ game }) => {
     );
 };
 
-export default CollectionCard;
+export default CollectionCard; 
