@@ -47,7 +47,7 @@ export default function MyCollectionPage() {
   const [selectedDevelopers, setSelectedDevelopers] = useState<Developer[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
-  const [sortType, setSortType] = useState<MyCollectionSortType>(MyCollectionSortType.YEAR_DESC);
+  const [sortType, setSortType] = useState<MyCollectionSortType>(MyCollectionSortType.RATING_DESC);
   const [yearRange, setYearRange] = useState<{ start: number | null; end: number | null } | null>(null);
   const [completeStatus, setCompleteStatus] = useState<CompleteStatus>(CompleteStatus.ALL);
   const [ratingRange, setRatingRange] = useState<{ start: number; end: number }>({ start: 0, end: 5 });

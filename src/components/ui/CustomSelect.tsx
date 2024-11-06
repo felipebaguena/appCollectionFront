@@ -15,7 +15,7 @@ interface SelectProps {
 
 const SelectContainer = styled.div`
   position: relative;
-  width: 12rem;
+  min-width: 12rem;
 `;
 
 const SelectButton = styled.button`
