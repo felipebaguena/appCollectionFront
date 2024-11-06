@@ -36,11 +36,14 @@ import {
   FiltersSection,
   ChipsContainer,
   ClearFiltersButton,
-  CentralContent
+  MyCollectionCentralContent
 } from '@/components/collection/CollectionElements';
 
 import { formatDate } from '@/helpers/dateFormatter';
 import { useUserCollection } from '@/hooks/useUserCollection';
+
+import { CollectionResponse } from '@/types/collection';
+import MyCollectionGrid from '@/components/collection/MyCollectionGrid';
 
 export default function MyCollectionPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
@@ -62,6 +65,7 @@ export default function MyCollectionPage() {
   const { getUserCollection, isLoading, error } = useUserCollection();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12; // Podemos ajustar esto según necesidades
+  const [collectionData, setCollectionData] = useState<CollectionResponse | null>(null);
 
   const sortOptions = [
     { value: MyCollectionSortType.TITLE_ASC, label: 'Título (A-Z)' },
@@ -103,7 +107,7 @@ export default function MyCollectionPage() {
         };
 
         const response = await getUserCollection(params);
-        console.log('Respuesta de la colección:', response);
+        setCollectionData(response);
       } catch (error) {
         console.error('Error al obtener la colección:', error);
       }
@@ -360,11 +364,19 @@ export default function MyCollectionPage() {
           </CollectionFiltersContainer>
         </FiltersPanel>
 
-        <CentralContent>
+        <MyCollectionCentralContent>
           {isLoading && <div>Cargando...</div>}
           {error && <div>Error: {error}</div>}
-          {!isLoading && !error && <div>Colección</div>}
-        </CentralContent>
+          {!isLoading && !error && collectionData && (
+            <MyCollectionGrid
+              games={collectionData.data}
+              totalItems={collectionData.totalItems}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              itemsPerPage={itemsPerPage}
+            />
+          )}
+        </MyCollectionCentralContent>
       </ContentWrapper>
     </PageContainer>
   );

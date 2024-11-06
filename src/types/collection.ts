@@ -16,3 +16,36 @@ export enum CompleteStatus {
   INCOMPLETE = "INCOMPLETE",
   ALL = "ALL",
 }
+
+export interface CoverImage {
+  id: number;
+  path: string;
+}
+
+export interface Platform {
+  id: number;
+  name: string;
+}
+
+export interface GameInCollection {
+  id: number;
+  title: string;
+  coverImage?: CoverImage;
+}
+
+export interface UserGameInCollection {
+  id: number;
+  game: GameInCollection;
+  platforms: Platform[];
+  rating: number;
+  status: number;
+  complete: boolean;
+  notes: string;
+  addedAt: string;
+}
+
+export interface CollectionResponse {
+  data: UserGameInCollection[];
+  totalItems: number;
+  totalPages: number;
+}

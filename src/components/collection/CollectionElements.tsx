@@ -65,8 +65,7 @@ export const FiltersPanel = styled.div<{ isOpen: boolean }>`
   flex-shrink: 0;
   overflow: visible;
   transition: all 0.3s ease-in-out;
-  padding: ${props => props.isOpen ? '20px' : '0'};
-  margin-top: 20px;
+  padding: ${props => props.isOpen ? '1.5rem' : '0'};
   opacity: ${props => props.isOpen ? '1' : '0'};
   visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
 
@@ -186,6 +185,15 @@ export const CentralContent = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 2rem;
+  color: var(--dark-grey);
+`;
+
+export const MyCollectionCentralContent = styled.div`
+  flex: 1;
+  display: flex;
+  min-height: 100%;
+  justify-content: center;
   font-size: 2rem;
   color: var(--dark-grey);
 `; 
