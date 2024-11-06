@@ -14,6 +14,9 @@ import CollectionYearFilter from "@/components/collection/CollectionYearFilter";
 import FilterChip from '@/components/collection/FilterChip';
 import CustomSelect from '@/components/ui/CustomSelect';
 import FilterInput from '@/components/ui/FilterInput';
+import CollectionCompleteFilter from "@/components/collection/CollectionCompleteFilter";
+import CollectionRatingFilter from "@/components/collection/CollectionRatingFilter";
+import CollectionStatusGameFilter from "@/components/collection/CollectionStatusGameFilter";
 
 import {
   TitleBar,
@@ -41,6 +44,9 @@ export default function MyCollectionPage() {
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
   const [sortType, setSortType] = useState<SortType>("YEAR_DESC");
   const [yearRange, setYearRange] = useState<{ start: number | null; end: number | null } | null>(null);
+  const [isComplete, setIsComplete] = useState(false);
+  const [ratingRange, setRatingRange] = useState<{ start: number; end: number }>({ start: 0, end: 5 });
+  const [statusRange, setStatusRange] = useState<{ start: number; end: number }>({ start: 0, end: 10 });
   const { isAuthenticated } = useAuth();
 
   const sortOptions = [
@@ -57,9 +63,12 @@ export default function MyCollectionPage() {
       developers: selectedDevelopers,
       search: searchTerm,
       yearRange,
-      sortType
+      sortType,
+      isComplete,
+      ratingRange,
+      statusRange
     });
-  }, [selectedPlatforms, selectedGenres, selectedDevelopers, searchTerm, yearRange, sortType]);
+  }, [selectedPlatforms, selectedGenres, selectedDevelopers, searchTerm, yearRange, sortType, isComplete, ratingRange, statusRange]);
 
   const handlePlatformsChange = (platforms: Platform[]) => {
     setSelectedPlatforms(platforms);
@@ -101,11 +110,38 @@ export default function MyCollectionPage() {
     setYearRange(null);
   };
 
+  const handleCompleteChange = (complete: boolean) => {
+    setIsComplete(complete);
+  };
+
+  const handleRatingRangeChange = (range: { start: number; end: number }) => {
+    setRatingRange(range);
+  };
+
+  const handleStatusRangeChange = (range: { start: number; end: number }) => {
+    setStatusRange(range);
+  };
+
+  const handleRemoveComplete = () => {
+    setIsComplete(false);
+  };
+
+  const handleRemoveRatingRange = () => {
+    setRatingRange({ start: 0, end: 5 });
+  };
+
+  const handleRemoveStatusRange = () => {
+    setStatusRange({ start: 0, end: 10 });
+  };
+
   const hasActiveFilters = selectedPlatforms.length > 0 ||
     selectedGenres.length > 0 ||
     selectedDevelopers.length > 0 ||
     (yearRange?.start && yearRange?.end) ||
-    searchTerm.length > 0;
+    searchTerm.length > 0 ||
+    isComplete ||
+    (ratingRange.start > 0 || ratingRange.end < 5) ||
+    (statusRange.start > 0 || statusRange.end < 10);
 
   const handleClearAllFilters = () => {
     setSelectedPlatforms([]);
@@ -113,6 +149,9 @@ export default function MyCollectionPage() {
     setSelectedDevelopers([]);
     setYearRange(null);
     setSearchTerm('');
+    setIsComplete(false);
+    setRatingRange({ start: 0, end: 5 });
+    setStatusRange({ start: 0, end: 10 });
   };
 
   return (
@@ -176,6 +215,24 @@ export default function MyCollectionPage() {
               onRemove={handleRemoveYearRange}
             />
           )}
+          {isComplete && (
+            <FilterChip
+              label="Juegos completos"
+              onRemove={handleRemoveComplete}
+            />
+          )}
+          {(ratingRange.start > 0 || ratingRange.end < 5) && (
+            <FilterChip
+              label={`${ratingRange.start} - ${ratingRange.end} estrellas`}
+              onRemove={handleRemoveRatingRange}
+            />
+          )}
+          {(statusRange.start > 0 || statusRange.end < 10) && (
+            <FilterChip
+              label={`Estado: ${statusRange.start} - ${statusRange.end}`}
+              onRemove={handleRemoveStatusRange}
+            />
+          )}
         </ChipsContainer>
       </Controls>
 
@@ -185,6 +242,18 @@ export default function MyCollectionPage() {
             <IoClose size={20} />
           </CloseFiltersButton>
           <CollectionFiltersContainer>
+            <CollectionCompleteFilter
+              value={isComplete}
+              onChange={handleCompleteChange}
+            />
+            <CollectionRatingFilter
+              value={ratingRange}
+              onChange={handleRatingRangeChange}
+            />
+            <CollectionStatusGameFilter
+              value={statusRange}
+              onChange={handleStatusRangeChange}
+            />
             <CollectionYearFilter
               value={yearRange}
               onChange={handleYearRangeChange}

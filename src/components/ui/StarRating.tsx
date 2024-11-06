@@ -6,6 +6,17 @@ const RatingContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 4px;
+  position: relative;
+  padding-left: 16px;
+`;
+
+const ZeroStarArea = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 16px;
+  height: 100%;
+  cursor: pointer;
 `;
 
 const StarContainer = styled.div`
@@ -64,6 +75,10 @@ const StarRating: React.FC<StarRatingProps> = ({ value, onChange, size = 24 }) =
         }
     };
 
+    const handleZeroClick = () => {
+        onChange(0);
+    };
+
     const renderStar = (index: number) => {
         const isHalf = value === index + 0.5;
         const isFilled = value >= index + 1;
@@ -97,6 +112,7 @@ const StarRating: React.FC<StarRatingProps> = ({ value, onChange, size = 24 }) =
 
     return (
         <RatingContainer>
+            <ZeroStarArea onClick={handleZeroClick} />
             {[0, 1, 2, 3, 4].map(index => renderStar(index))}
         </RatingContainer>
     );
