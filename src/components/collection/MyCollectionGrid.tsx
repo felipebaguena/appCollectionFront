@@ -37,43 +37,12 @@ const FlexContainer = styled.div`
   margin: 0 auto;
 `;
 
-const IconsContainer = styled.div`
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  display: flex;
-  gap: 0.5rem;
-  z-index: 2;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-`;
-
-const ActionIcon = styled.div<{ $variant?: 'edit' | 'delete' }>`
-  background-color: ${props => props.$variant === 'edit' ? 'var(--app-yellow)' : 'var(--app-red)'};
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-
-  svg {
-    color: ${props => props.$variant === 'edit' ? 'var(--dark-grey)' : 'white'};
-    font-size: 1.5rem;
-  }
-`;
-
 const CardWrapper = styled(Link)`
   position: relative;
   flex: 0 0 auto;
   width: calc(20% - 1.6rem);
   min-width: 250px;
   text-decoration: none;
-
-  &:hover ${IconsContainer} {
-    opacity: 1;
-  }
 
   @media (max-width: 1800px) {
     width: calc(25% - 1.5rem);
@@ -239,21 +208,11 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
                                 key={game.id}
                                 href={`/games/${game.game.id}`}
                             >
-                                <IconsContainer>
-                                    <ActionIcon
-                                        $variant="edit"
-                                        onClick={(e) => handleEditClick(e, game)}
-                                    >
-                                        <MdEdit />
-                                    </ActionIcon>
-                                    <ActionIcon
-                                        $variant="delete"
-                                        onClick={(e) => handleDeleteClick(e, game)}
-                                    >
-                                        <MdDelete />
-                                    </ActionIcon>
-                                </IconsContainer>
-                                <CollectionCard game={game} />
+                                <CollectionCard
+                                    game={game}
+                                    onEdit={(e) => handleEditClick(e, game)}
+                                    onDelete={(e) => handleDeleteClick(e, game)}
+                                />
                             </CardWrapper>
                         ))}
                     </FlexContainer>

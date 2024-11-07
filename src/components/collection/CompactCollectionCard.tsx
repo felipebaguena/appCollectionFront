@@ -34,6 +34,10 @@ const IconsContainer = styled.div`
   z-index: 2;
   opacity: 0;
   transition: opacity 0.3s ease;
+
+  @media (max-width: 768px) {
+    opacity: 1; // Siempre visible en móvil
+  }
 `;
 
 const ActionButton = styled.button<{ $variant?: 'edit' | 'delete' }>`

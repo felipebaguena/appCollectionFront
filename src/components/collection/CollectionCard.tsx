@@ -5,6 +5,7 @@ import StarRating from '../ui/StarRating';
 import { formatDate } from '@/helpers/dateFormatter';
 import { MdDelete, MdEdit } from 'react-icons/md';
 
+
 const Card = styled.div`
   background: var(--dark-grey);
   width: 100%;
@@ -13,6 +14,7 @@ const Card = styled.div`
   flex-direction: column;
   position: relative;
   cursor: pointer;
+  overflow: hidden;
 
   &:hover {
     .icons-container {
@@ -23,25 +25,43 @@ const Card = styled.div`
 
 const IconsContainer = styled.div`
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 0.5rem;
+  right: 0.5rem;
   display: flex;
   gap: 0.5rem;
   z-index: 2;
   opacity: 0;
+  transition: opacity 0.3s ease;
+
+  @media (max-width: 768px) {
+    opacity: 1;
+  }
 `;
 
 const ActionButton = styled.button<{ $variant?: 'edit' | 'delete' }>`
   background-color: ${props => props.$variant === 'edit' ? 'var(--app-yellow)' : 'var(--app-red)'};
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
   border: none;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: inherit;
+  color: ${props => props.$variant === 'edit' ? 'var(--dark-grey)' : 'white'};
+
+  @media (max-width: 464px) {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  svg {
+    font-size: 1.2rem;
+
+    @media (max-width: 464px) {
+      font-size: 1rem;
+    }
+  }
 `;
 
 const ImageContainer = styled.div`
@@ -132,31 +152,31 @@ const CollectionCard: React.FC<CollectionCardProps> = ({
 
     return (
         <Card>
+            <IconsContainer className="icons-container">
+                {onEdit && (
+                    <ActionButton
+                        $variant="edit"
+                        onClick={e => {
+                            e.stopPropagation();
+                            onEdit(e);
+                        }}
+                    >
+                        <MdEdit />
+                    </ActionButton>
+                )}
+                {onDelete && (
+                    <ActionButton
+                        $variant="delete"
+                        onClick={e => {
+                            e.stopPropagation();
+                            onDelete(e);
+                        }}
+                    >
+                        <MdDelete />
+                    </ActionButton>
+                )}
+            </IconsContainer>
             <ImageContainer>
-                <IconsContainer className="icons-container">
-                    {onEdit && (
-                        <ActionButton
-                            $variant="edit"
-                            onClick={e => {
-                                e.stopPropagation();
-                                onEdit(e);
-                            }}
-                        >
-                            <MdEdit />
-                        </ActionButton>
-                    )}
-                    {onDelete && (
-                        <ActionButton
-                            $variant="delete"
-                            onClick={e => {
-                                e.stopPropagation();
-                                onDelete(e);
-                            }}
-                        >
-                            <MdDelete />
-                        </ActionButton>
-                    )}
-                </IconsContainer>
                 <GameImage
                     src={getGameImageUrl(game)}
                     alt={game.game.title}
