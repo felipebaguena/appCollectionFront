@@ -5,14 +5,13 @@ import styled from 'styled-components';
 import Link from 'next/link';
 import { UserGameInCollection } from '@/types/collection';
 import CollectionCard from './CollectionCard';
-import Pagination from '../ui/Pagination';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import { useUserGame } from '@/hooks/useUserGame';
-import { MdDelete, MdEdit } from 'react-icons/md';
 import Modal from '@/components/ui/Modal';
 import AddToCollectionForm from './AddToCollectionForm';
 import { Platform } from '@/types/game';
 import CompactCollectionCard from './CompactCollectionCard';
+import PaginationGrid from '../ui/PaginationGrid';
 
 const Container = styled.div<{ $isCompact?: boolean }>`
   display: flex;
@@ -218,10 +217,9 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
                     </FlexContainer>
                 )}
                 <PaginationWrapper>
-                    <Pagination
+                    <PaginationGrid
                         currentPage={currentPage}
-                        totalItems={totalItems}
-                        itemsPerPage={itemsPerPage}
+                        totalPages={Math.ceil(totalItems / itemsPerPage)}
                         onPageChange={onPageChange}
                     />
                 </PaginationWrapper>

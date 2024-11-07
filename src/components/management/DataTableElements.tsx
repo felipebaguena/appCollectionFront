@@ -130,7 +130,7 @@ export const CoverThumbnail = styled.div`
 
 export const PaginationContainer = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   font-size: 14px;
   color: #333;

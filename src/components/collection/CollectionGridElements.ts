@@ -216,6 +216,7 @@ export const Content = styled.div`
 `;
 
 export const PaginationContainer = styled.div`
+  display: flex;
   margin-top: 2rem;
   width: 100%;
 `;

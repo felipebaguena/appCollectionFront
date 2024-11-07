@@ -30,11 +30,8 @@ import {
   GamePlatforms,
   InfoLabel,
   AddToCollectionLabel,
-  Pagination,
-  PageButton,
   Container,
   Content,
-  PaginationContainer,
   DeleteIcon,
   EditIcon,
   CollectionIcon,
@@ -44,6 +41,7 @@ import {
   CompactIcon
 } from './CollectionGridElements';
 import { CollectionGridProps } from '@/types/collection';
+import PaginationGrid from '../ui/PaginationGrid';
 
 const ITEMS_PER_PAGE = 9;
 
@@ -399,34 +397,11 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
           </GridContainer>
         </Content>
 
-        <PaginationContainer>
-          <Pagination>
-            <PageButton
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              Anterior
-            </PageButton>
-
-            {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((page) => (
-              <PageButton
-                key={page}
-                active={page === currentPage}
-                onClick={() => setCurrentPage(page)}
-                disabled={totalPages <= 1}
-              >
-                {page}
-              </PageButton>
-            ))}
-
-            <PageButton
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages || totalPages <= 1}
-            >
-              Siguiente
-            </PageButton>
-          </Pagination>
-        </PaginationContainer>
+        <PaginationGrid
+          currentPage={currentPage}
+          totalPages={totalPages || 1}
+          onPageChange={setCurrentPage}
+        />
       </Container>
 
       <Modal
