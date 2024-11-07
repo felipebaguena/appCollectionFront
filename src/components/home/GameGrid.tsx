@@ -26,7 +26,8 @@ const GridContainer = styled.div`
   }
 
   @media (max-width: 600px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
 `;
 
@@ -39,7 +40,6 @@ const ImageContainer = styled.div`
 
 const GameCard = styled.div`
   background-color: var(--background);
-  padding: 15px;
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -57,6 +57,15 @@ const ImageWrapper = styled.div`
   ${GameCard}:hover & {
     opacity: 0;
   }
+
+  @media (max-width: 600px) {
+    padding: 0;
+    transition: none;
+    opacity: 1;
+    ${GameCard}:hover & {
+      opacity: 1;
+    }
+  }
 `;
 
 const ExpandedImageWrapper = styled.div`
@@ -70,6 +79,10 @@ const ExpandedImageWrapper = styled.div`
 
   ${GameCard}:hover & {
     opacity: 1;
+  }
+
+  @media (max-width: 600px) {
+    display: none;
   }
 `;
 
@@ -127,6 +140,10 @@ const InfoLabel = styled.div`
   ${GameCard}:hover & {
     opacity: 1;
     transform: translateY(0);
+  }
+
+  @media (max-width: 600px) {
+    display: none;
   }
 `;
 
