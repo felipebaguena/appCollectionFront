@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { useCollectionGames, SortType, CollectionGame } from '@/hooks/useCollectionGames';
+import { useCollectionGames, CollectionGame } from '@/hooks/useCollectionGames';
 import { API_BASE_URL } from '@/services/api';
 import { useRouter } from 'next/navigation';
 import { MdLibraryAddCheck, MdDelete, MdEdit, MdAdd } from 'react-icons/md';
@@ -43,19 +43,9 @@ import {
   CompactIconsContainer,
   CompactIcon
 } from './CollectionGridElements';
+import { CollectionGridProps } from '@/types/collection';
 
 const ITEMS_PER_PAGE = 9;
-
-interface CollectionGridProps {
-  selectedPlatformIds: number[];
-  selectedGenreIds: number[];
-  selectedDeveloperIds: number[];
-  searchTerm: string;
-  yearRange: { start: number | null; end: number | null } | null;
-  sortType: SortType;
-  collectionStatus: 'ALL' | 'IN_COLLECTION' | 'NOT_IN_COLLECTION';
-  isCompactView?: boolean;
-}
 
 const CollectionGrid: React.FC<CollectionGridProps> = ({
   selectedPlatformIds,
@@ -137,15 +127,12 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       setIsMobile(window.innerWidth <= 768);
     };
 
-    // Comprobar inicialmente
     checkMobile();
 
-    // Actualizar cuando cambie el tamaño de la ventana
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Solo aplicar isCompactView si estamos en móvil
   const effectiveCompactView = isMobile && isCompactView;
 
   const getGameImageUrl = (game: CollectionGame) => {

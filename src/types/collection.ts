@@ -1,3 +1,5 @@
+import { SortType } from "@/hooks/useCollectionGames";
+
 export enum MyCollectionSortType {
   TITLE_ASC = "TITLE_ASC",
   TITLE_DESC = "TITLE_DESC",
@@ -48,4 +50,15 @@ export interface CollectionResponse {
   data: UserGameInCollection[];
   totalItems: number;
   totalPages: number;
+}
+
+export interface CollectionGridProps {
+  selectedPlatformIds: number[];
+  selectedGenreIds: number[];
+  selectedDeveloperIds: number[];
+  searchTerm: string;
+  yearRange: { start: number | null; end: number | null } | null;
+  sortType: SortType;
+  collectionStatus: "ALL" | "IN_COLLECTION" | "NOT_IN_COLLECTION";
+  isCompactView?: boolean;
 }
