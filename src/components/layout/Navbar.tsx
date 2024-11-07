@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FiLogOut, FiChevronDown, FiUser } from 'react-icons/fi';
+import { FiLogOut, FiChevronDown, FiUser, FiBook, FiBookmark, FiSettings } from 'react-icons/fi';
 import CreateUserForm from '@/components/user/CreateUserForm';
 import LoginForm from '@/components/auth/LoginForm';
 import UserProfileModal from '@/components/user/UserProfileModal';
@@ -44,52 +44,28 @@ const Navbar = () => {
   const renderAuthButtons = () => {
     if (isAuthenticated) {
       return (
-        <>
-          {userRole === 'SUPERUSER' && (
-            <DropdownContainer
-              data-open={showManagementMenu}
-              onMouseEnter={() => setShowManagementMenu(true)}
-              onMouseLeave={() => setShowManagementMenu(false)}
-            >
-              <DropdownTrigger href="#">
-                Gestión <FiChevronDown />
-              </DropdownTrigger>
-              <DropdownMenu $isOpen={showManagementMenu}>
-                {managementOptions.map((option) => (
-                  <DropdownItem
-                    key={option.name}
-                    href={option.route}
-                    onClick={() => setShowManagementMenu(false)}
-                  >
-                    {option.name}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </DropdownContainer>
-          )}
-          <IconsContainer>
-            <IconNavLink
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                setShowProfileModal(true);
-              }}
-              title="Mi Perfil"
-            >
-              <FiUser size={15} />
-            </IconNavLink>
-            <IconNavLink
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                handleLogoutClick();
-              }}
-              title="Cerrar Sesión"
-            >
-              <FiLogOut size={15} />
-            </IconNavLink>
-          </IconsContainer>
-        </>
+        <IconsContainer>
+          <IconNavLink
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              setShowProfileModal(true);
+            }}
+            title="Mi Perfil"
+          >
+            <FiUser size={20} />
+          </IconNavLink>
+          <IconNavLink
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              handleLogoutClick();
+            }}
+            title="Cerrar Sesión"
+          >
+            <FiLogOut size={20} />
+          </IconNavLink>
+        </IconsContainer>
       );
     }
 
@@ -101,7 +77,8 @@ const Navbar = () => {
           setShowLoginForm(true);
         }}
       >
-        Iniciar Sesión
+        <span className="nav-text">Iniciar Sesión</span>
+        <FiUser className="nav-icon" size={20} />
       </NavLink>
     );
   };
@@ -140,10 +117,39 @@ const Navbar = () => {
             </SpinnerContainer>
           ) : (
             <>
-              <NavLink href="/">Inicio</NavLink>
-              <NavLink href="/collection">Catálogo</NavLink>
+              <NavLink href="/collection">
+                <span className="nav-text">Catálogo</span>
+                <FiBook className="nav-icon" size={20} />
+              </NavLink>
               {isAuthenticated && (
-                <NavLink href="/my-collection">Mi colección</NavLink>
+                <NavLink href="/my-collection">
+                  <span className="nav-text">Mi colección</span>
+                  <FiBookmark className="nav-icon" size={20} />
+                </NavLink>
+              )}
+              {userRole === 'SUPERUSER' && (
+                <DropdownContainer
+                  data-open={showManagementMenu}
+                  onMouseEnter={() => setShowManagementMenu(true)}
+                  onMouseLeave={() => setShowManagementMenu(false)}
+                >
+                  <DropdownTrigger href="#">
+                    <span className="nav-text">Gestión</span>
+                    <FiSettings className="nav-icon" size={20} />
+                    <FiChevronDown />
+                  </DropdownTrigger>
+                  <DropdownMenu $isOpen={showManagementMenu}>
+                    {managementOptions.map((option) => (
+                      <DropdownItem
+                        key={option.name}
+                        href={option.route}
+                        onClick={() => setShowManagementMenu(false)}
+                      >
+                        {option.name}
+                      </DropdownItem>
+                    ))}
+                  </DropdownMenu>
+                </DropdownContainer>
               )}
               {renderAuthButtons()}
             </>

@@ -91,6 +91,24 @@ export const NavLink = styled(Link)`
     color: var(--app-yellow);
   }
 
+  .nav-text {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
+
+  .nav-icon {
+    display: none;
+    @media (max-width: 768px) {
+      display: block;
+    }
+  }
+
+  &.home-link {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
 `;
 
 export const IconNavLink = styled(NavLink)`
@@ -103,6 +121,12 @@ export const DropdownTrigger = styled(NavLink)`
   gap: 0.5rem;
   cursor: pointer;
   transition: color 0.3s ease;
+
+  .chevron-icon {
+    @media (max-width: 768px) {
+      display: none;
+    }
+  }
 
   &:hover {
     opacity: 1;
@@ -148,9 +172,14 @@ export const DropdownMenu = styled.div<{ $isOpen: boolean }>`
   min-width: 200px;
   display: ${props => props.$isOpen ? 'block' : 'none'};
   z-index: 1000;
-
   margin-top: -20px;
   padding-top: 20px;
+
+  @media (max-width: 768px) {
+    min-width: 150px;
+    right: -50%;
+    transform: translateX(50%);
+  }
 `;
 
 export const DropdownContent = styled.div`
