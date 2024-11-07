@@ -10,7 +10,9 @@ import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import {
   NavbarContainer,
   NavbarContent,
-  Logo,
+  LogoContainer,
+  LogoText,
+  LogoHighlight,
   LogoLink,
   NavLink,
   NavbarSection,
@@ -22,6 +24,7 @@ import {
   IconsContainer,
   NavbarSpinner,
   SpinnerContainer,
+  MobileLogoText,
 } from '@/components/layout/NavbarElements';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -107,7 +110,16 @@ const Navbar = () => {
       <NavbarContent>
         <NavbarSection $position='left'>
           <LogoLink href="/">
-            <Logo>LOGO</Logo>
+            <LogoContainer>
+              <div className="full-text">
+                <LogoText>MY </LogoText>
+                <LogoHighlight>VIDEOGAME </LogoHighlight>
+                <LogoText>COLLECTION</LogoText>
+              </div>
+              <MobileLogoText className="mobile-text">
+                MVC
+              </MobileLogoText>
+            </LogoContainer>
           </LogoLink>
         </NavbarSection>
         <NavbarSection $position="right">

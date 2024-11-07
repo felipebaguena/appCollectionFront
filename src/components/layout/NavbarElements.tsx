@@ -45,20 +45,47 @@ export const NavbarSection = styled.div<{ $position: 'left' | 'center' | 'right'
   }};
 `;
 
-export const Logo = styled.div`
-  font-size: 1.3rem;
+export const LogoHighlight = styled.span`
+  color: var(--grey);
+  transition: color 0.3s ease;
   font-weight: bold;
+`;
+
+export const LogoText = styled.span`
+  color: var(--grey);
+  transition: color 0.3s ease;
+`;
+
+export const LogoContainer = styled.div`
+  display: flex;
+  gap: 0.3rem;
+  font-size: 1rem;
+  cursor: pointer;
+
+  &:hover ${LogoHighlight} {
+    color: var(--app-yellow);
+    font-weight: bold;
+  }
+
+  &:hover ${LogoText} {
+    color: var(--clear-grey);
+  }
+
+  @media (max-width: 768px) {
+    .full-text {
+      display: none;
+    }
+    .mobile-text {
+      display: block;
+      color: var(--app-yellow);
+    }
+  }
 `;
 
 export const LogoLink = styled(Link)`
   text-decoration: none;
   color: inherit;
   cursor: pointer;
-  transition: opacity 0.3s ease;
-
-  &:hover {
-    opacity: 0.8;
-  }
 `;
 
 export const NavButton = styled(Button) <ButtonProps>`
@@ -299,4 +326,15 @@ export const SpinnerContainer = styled.div`
   display: flex;
   align-items: center;
   padding: 0 1rem;
+`;
+
+export const MobileLogoText = styled.span`
+  display: none;
+  color: var(--app-yellow);
+  font-size: 1.2rem;
+  font-weight: bold;
+
+  @media (max-width: 768px) {
+    display: block;
+  }
 `;
