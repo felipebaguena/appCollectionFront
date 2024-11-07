@@ -466,6 +466,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
   const router = useRouter();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [hoveredGameId, setHoveredGameId] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
 
   const { games, loading, error, totalPages, fetchCollectionGames } = useCollectionGames();
   const { addGameToCollection, isLoading: isAddingGame, error: addGameError } = useUserGames();
@@ -516,6 +517,22 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       }, getCurrentFilter());
     }
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    // Comprobar inicialmente
+    checkMobile();
+
+    // Actualizar cuando cambie el tamaño de la ventana
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Solo aplicar isCompactView si estamos en móvil
+  const effectiveCompactView = isMobile && isCompactView;
 
   const getGameImageUrl = (game: CollectionGame) => {
     return game.coverImage
@@ -656,12 +673,19 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
           </MobileLoginBanner>
           <GridContainer>
             {games.map((game) => (
-              <GameCardWrapper key={game.id} href={`/games/${game.id}`} $isCompact={isCompactView}>
-                <GameCard className="game-card" $isCompact={isCompactView}>
+              <GameCardWrapper
+                key={game.id}
+                href={`/games/${game.id}`}
+                $isCompact={effectiveCompactView}
+              >
+                <GameCard
+                  className="game-card"
+                  $isCompact={effectiveCompactView}
+                >
                   <ImageContainer>
                     {localStorage.getItem('access_token') && (
                       <>
-                        {isCompactView ? (
+                        {effectiveCompactView ? (
                           <CompactIconsContainer>
                             {game.inCollection ? (
                               <>
@@ -689,7 +713,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                           </CompactIconsContainer>
                         ) : (
                           <>
-                            {!isCompactView && game.inCollection && (
+                            {!effectiveCompactView && game.inCollection && (
                               <>
                                 <EditIcon onClick={(e) => handleEditCollection(e, game)}>
                                   <MdEdit />
@@ -757,9 +781,9 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                       <InfoLabel className="info-label">Más información</InfoLabel>
                     </ExpandedImageWrapper>
                   </ImageContainer>
-                  <GameContent $isCompact={isCompactView}>
-                    <GameTitle $isCompact={isCompactView}>{game.title}</GameTitle>
-                    <GameInfo $isCompact={isCompactView}>
+                  <GameContent $isCompact={effectiveCompactView}>
+                    <GameTitle $isCompact={effectiveCompactView}>{game.title}</GameTitle>
+                    <GameInfo $isCompact={effectiveCompactView}>
                       <GameYear>{game.releaseYear}</GameYear>
                       <GamePlatforms>
                         {game.platforms.length > 2
