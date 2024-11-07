@@ -90,6 +90,7 @@ export const FiltersPanel = styled.div<{ isOpen: boolean }>`
 export const CollectionFiltersContainer = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 16px;
   overflow: visible;
 `;
