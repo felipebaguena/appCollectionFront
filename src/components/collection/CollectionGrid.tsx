@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 
 import Modal from '@/components/ui/Modal';
 import AddToCollectionForm from './AddToCollectionForm';
-import { MdLibraryAddCheck, MdDelete } from 'react-icons/md';
+import { MdLibraryAddCheck, MdDelete, MdEdit, MdAdd } from 'react-icons/md';
 import { useUserGames } from '@/hooks/useUserGames';
 import { useUserGame } from '@/hooks/useUserGame';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
@@ -30,6 +30,10 @@ const GridContainer = styled.div`
   justify-content: flex-start;
   max-width: 1600px;
   margin: 0 auto;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
 `;
 
 const GameCardWrapper = styled(Link)`
@@ -97,6 +101,10 @@ const ImageWrapper = styled.div`
   height: 100%;
   padding: 2rem;
   transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  @media (max-width: 768px) {
+    opacity: 0;
+  }
 `;
 
 const ExpandedImageWrapper = styled.div`
@@ -107,6 +115,10 @@ const ExpandedImageWrapper = styled.div`
   height: 100%;
   opacity: 0;
   transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+  @media (max-width: 768px) {
+    opacity: 1;
+  }
 `;
 
 const GameImage = styled.img`
@@ -153,6 +165,10 @@ const InfoLabel = styled.div`
   opacity: 0;
   transform: translateY(100%);
   transition: all 0.6s cubic-bezier(0.8, 0, 0.4, 1);
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const AddToCollectionLabel = styled.div`
@@ -169,6 +185,10 @@ const AddToCollectionLabel = styled.div`
   transform: translateY(100%);
   transition: all 0.6s cubic-bezier(0.8, 0, 0.4, 1);
   cursor: pointer;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 
   &:hover {
     background-color: var(--dark-grey);
@@ -214,6 +234,64 @@ const PaginationContainer = styled.div`
   width: 100%;
 `;
 
+const DeleteIcon = styled.div`
+  position: absolute;
+  top: 1rem;
+  right: 4rem;
+  background-color: var(--app-red);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+
+  svg {
+    color: white;
+    font-size: 1.5rem;
+  }
+`;
+
+const EditIcon = styled.div`
+  position: absolute;
+  top: 1rem;
+  right: 7rem;
+  background-color: var(--app-yellow);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    display: flex;
+    cursor: pointer;
+    &:hover {
+      background-color: var(--app-yellow);
+    }
+    svg {
+      color: var(--dark-grey);
+    }
+  }
+
+  svg {
+    color: var(--dark-grey);
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+  }
+`;
+
 const CollectionIcon = styled.div`
   position: absolute;
   top: 1rem;
@@ -229,9 +307,19 @@ const CollectionIcon = styled.div`
   cursor: pointer;
   transition: all 0.3s ease;
 
+  @media (max-width: 768px) {
+    cursor: default;
+    pointer-events: none;
+    &:hover {
+      background-color: var(--app-yellow);
+    }
+    svg {
+      color: var(--dark-grey);
+    }
+  }
+
   &:hover {
     background-color: var(--app-red);
-    
     svg {
       color: white;
     }
@@ -241,6 +329,54 @@ const CollectionIcon = styled.div`
     color: var(--dark-grey);
     font-size: 1.5rem;
     transition: all 0.3s ease;
+  }
+`;
+
+const MobileLoginBanner = styled.div`
+  display: none;
+  background-color: var(--grey);
+  color: white;
+  padding: 0.8rem;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  cursor: pointer;
+
+  @media (max-width: 768px) {
+    display: ${props => !localStorage.getItem('access_token') ? 'block' : 'none'};
+  }
+
+  &:hover {
+    background-color: var(--dark-grey);
+  }
+`;
+
+interface AddIconProps {
+  inCollection?: boolean;
+}
+
+const AddIcon = styled.div<AddIconProps>`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background-color: var(--grey);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    display: ${props => !props.inCollection ? 'flex' : 'none'};
+  }
+
+  svg {
+    color: white;
+    font-size: 1.5rem;
   }
 `;
 
@@ -459,19 +595,37 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
     <>
       <Container>
         <Content>
+          <MobileLoginBanner onClick={() => setShowLoginModal(true)}>
+            Inicia sesión para gestionar tu colección
+          </MobileLoginBanner>
           <GridContainer>
             {games.map((game) => (
               <GameCardWrapper key={game.id} href={`/games/${game.id}`}>
                 <GameCard className="game-card">
                   <ImageContainer>
-                    {game.inCollection && (
-                      <CollectionIcon
-                        onMouseEnter={() => setIsHoveringIcon(game.id)}
-                        onMouseLeave={() => setIsHoveringIcon(null)}
-                        onClick={(e) => handleDeleteClick(e, game)}
-                      >
-                        {isHoveringIcon === game.id ? <MdDelete /> : <MdLibraryAddCheck />}
-                      </CollectionIcon>
+                    {localStorage.getItem('access_token') && (
+                      <>
+                        {game.inCollection ? (
+                          <>
+                            <EditIcon onClick={(e) => handleEditCollection(e, game)}>
+                              <MdEdit />
+                            </EditIcon>
+                            <DeleteIcon onClick={(e) => handleDeleteClick(e, game)}>
+                              <MdDelete />
+                            </DeleteIcon>
+                            <CollectionIcon>
+                              <MdLibraryAddCheck />
+                            </CollectionIcon>
+                          </>
+                        ) : (
+                          <AddIcon
+                            inCollection={game.inCollection}
+                            onClick={(e) => handleAddToCollection(e, game)}
+                          >
+                            <MdAdd />
+                          </AddIcon>
+                        )}
+                      </>
                     )}
                     <ImageWrapper className="image-wrapper">
                       <GameImage
