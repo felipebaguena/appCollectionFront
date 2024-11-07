@@ -8,6 +8,10 @@ const CardContainer = styled.div`
   height: 400px;
   margin: 1rem 0;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    height: 300px;
+  }
 `;
 
 const ImageSection = styled.div<{ imageUrl: string }>`
@@ -33,6 +37,10 @@ const ImageSection = styled.div<{ imageUrl: string }>`
       rgba(0, 0, 0, 0.8) 50%,
       rgba(0, 0, 0, 0) 100%
     );
+
+    @media (max-width: 768px) {
+      background: rgba(0, 0, 0, 0.6);
+    }
   }
 `;
 
@@ -48,18 +56,35 @@ const ContentSection = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    top: auto;
+    bottom: 0;
+    background: none;
+    padding: 1.5rem;
+  }
 `;
 
 const Title = styled.h2`
   font-size: 24px;
   color: white;
   margin-bottom: 10px;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
 `;
 
 const Description = styled.p`
   font-size: 16px;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
 `;
 
 const InfoLabel = styled.div`
@@ -77,6 +102,15 @@ const InfoLabel = styled.div`
     background-color: var(--app-yellow-focus);
     color: black;
     transform: scale(1.05);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.8rem;
+    transform: none;
+    
+    &:hover {
+      transform: none;
+    }
   }
 `;
 
