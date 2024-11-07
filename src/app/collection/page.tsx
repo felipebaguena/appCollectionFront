@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { IoFilter, IoClose, IoCloseCircleOutline } from 'react-icons/io5';
+import { IoFilter, IoClose, IoCloseCircleOutline, IoGrid, IoSquare } from 'react-icons/io5';
 import { Platform } from '@/types/platform';
 import { Developer, Genre } from "@/types/game";
 import { SortType } from '@/hooks/useCollectionGames';
 import { useAuth } from '@/contexts/AuthContext';
+import styled from 'styled-components';
 
 import CollectionPlatformFilter from "@/components/collection/CollectionPlatformFilter";
 import CollectionGenreFilter from "@/components/collection/CollectionGenreFilter";
@@ -34,6 +35,41 @@ import {
   ClearFiltersButton,
 } from '@/components/collection/CollectionElements';
 
+const ViewToggleButton = styled.button`
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: var(--background);
+  border: none;
+  padding: 0.4rem;
+  cursor: pointer;
+  color: var(--dark-grey);
+  min-width: 36px;
+  height: 36px;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+
+  &:hover {
+    background: var(--app-yellow);
+  }
+
+  svg {
+    font-size: 1.2rem;
+  }
+`;
+
+const MobileControls = styled.div`
+  display: none;
+  gap: 1rem;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+`;
+
 export default function CollectionPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<Genre[]>([]);
@@ -43,6 +79,7 @@ export default function CollectionPage() {
   const [sortType, setSortType] = useState<SortType>("YEAR_DESC");
   const [yearRange, setYearRange] = useState<{ start: number | null; end: number | null } | null>(null);
   const [collectionStatus, setCollectionStatus] = useState<'ALL' | 'IN_COLLECTION' | 'NOT_IN_COLLECTION'>('ALL');
+  const [isCompactView, setIsCompactView] = useState(false);
   const { isAuthenticated } = useAuth();
 
   const sortOptions = [
@@ -125,6 +162,9 @@ export default function CollectionPage() {
       <Controls>
         <ControlsTop>
           <FiltersSection>
+            <ViewToggleButton onClick={() => setIsCompactView(!isCompactView)}>
+              {isCompactView ? <IoGrid size={20} /> : <IoSquare size={20} />}
+            </ViewToggleButton>
             <FiltersButton onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}>
               Filtros <IoFilter size={18} />
             </FiltersButton>
@@ -225,6 +265,7 @@ export default function CollectionPage() {
           yearRange={yearRange}
           sortType={sortType}
           collectionStatus={isAuthenticated ? collectionStatus : 'ALL'}
+          isCompactView={isCompactView}
         />
       </ContentWrapper>
     </PageContainer>

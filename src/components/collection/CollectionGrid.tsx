@@ -36,7 +36,7 @@ const GridContainer = styled.div`
   }
 `;
 
-const GameCardWrapper = styled(Link)`
+const GameCardWrapper = styled(Link) <{ $isCompact?: boolean }>`
   flex: 0 0 auto;
   width: calc(33.333% - 14px);
   max-width: 400px;
@@ -51,9 +51,9 @@ const GameCardWrapper = styled(Link)`
   }
 
   @media (max-width: 768px) {
-    width: 100%;
-    max-width: 400px;
-    min-width: 250px;
+    width: ${props => props.$isCompact ? 'calc(50% - 10px)' : '100%'};
+    max-width: ${props => props.$isCompact ? '180px' : '400px'};
+    min-width: ${props => props.$isCompact ? '150px' : '250px'};
   }
 
   &:hover {
@@ -76,9 +76,9 @@ const GameCardWrapper = styled(Link)`
   }
 `;
 
-const GameCard = styled.div`
+const GameCard = styled.div<{ $isCompact?: boolean }>`
   background-color: var(--background);
-  padding: 15px;
+  padding: ${props => props.$isCompact ? '8px' : '15px'};
   display: flex;
   flex-direction: column;
   cursor: pointer;
@@ -127,22 +127,22 @@ const GameImage = styled.img`
   object-fit: cover;
 `;
 
-const GameContent = styled.div`
-  padding: 10px 10px;
+const GameContent = styled.div<{ $isCompact?: boolean }>`
+  padding: ${props => props.$isCompact ? '5px 5px' : '10px 10px'};
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
 `;
 
-const GameTitle = styled.h3`
+const GameTitle = styled.h3<{ $isCompact?: boolean }>`
   margin: 0;
-  font-size: 18px;
+  font-size: ${props => props.$isCompact ? '14px' : '18px'};
   color: var(--dark-grey);
   font-weight: bold;
 `;
 
-const GameInfo = styled.div`
-  display: flex;
+const GameInfo = styled.div<{ $isCompact?: boolean }>`
+  display: ${props => props.$isCompact ? 'none' : 'flex'};
   justify-content: space-between;
   font-size: 0.9rem;
   color: var(--grey);
@@ -380,6 +380,57 @@ const AddIcon = styled.div<AddIconProps>`
   }
 `;
 
+const CompactIconsContainer = styled.div`
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.3rem;
+  z-index: 3;
+`;
+
+interface CompactIconProps {
+  variant?: 'edit' | 'delete' | 'add';
+}
+
+const CompactIcon = styled.div<CompactIconProps>`
+  width: 1.8rem;
+  height: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: ${props => {
+    switch (props.variant) {
+      case 'edit':
+        return 'var(--app-yellow)';
+      case 'delete':
+        return 'var(--app-red)';
+      default:
+        return 'var(--grey)';
+    }
+  }};
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+
+  &:hover {
+    background-color: ${props => {
+    switch (props.variant) {
+      case 'edit':
+        return 'var(--app-yellow)';
+      case 'delete':
+        return 'var(--app-red)';
+      default:
+        return 'var(--dark-grey)';
+    }
+  }};
+  }
+
+  svg {
+    font-size: 1.2rem;
+    color: ${props => props.variant === 'edit' ? 'var(--dark-grey)' : 'white'};
+  }
+`;
+
 interface CollectionGridProps {
   selectedPlatformIds: number[];
   selectedGenreIds: number[];
@@ -388,6 +439,7 @@ interface CollectionGridProps {
   yearRange: { start: number | null; end: number | null } | null;
   sortType: SortType;
   collectionStatus: 'ALL' | 'IN_COLLECTION' | 'NOT_IN_COLLECTION';
+  isCompactView?: boolean;
 }
 
 const CollectionGrid: React.FC<CollectionGridProps> = ({
@@ -397,7 +449,8 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
   searchTerm,
   yearRange,
   sortType,
-  collectionStatus
+  collectionStatus,
+  isCompactView
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [showAddToCollectionModal, setShowAddToCollectionModal] = useState(false);
@@ -412,6 +465,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
   const { login, isAuthenticated } = useAuth();
   const router = useRouter();
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [hoveredGameId, setHoveredGameId] = useState<number | null>(null);
 
   const { games, loading, error, totalPages, fetchCollectionGames } = useCollectionGames();
   const { addGameToCollection, isLoading: isAddingGame, error: addGameError } = useUserGames();
@@ -469,15 +523,17 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       : `${API_BASE_URL}/uploads/resources/no-image.jpg`;
   };
 
-  const handleAddToCollection = (e: React.MouseEvent, game: CollectionGame) => {
+  const handleAddToCollection = (e: React.MouseEvent<HTMLDivElement>, game: CollectionGame) => {
     e.preventDefault();
+    e.stopPropagation();
     setSelectedGameId(game.id);
     setSelectedGame(game);
     setShowAddToCollectionModal(true);
   };
 
-  const handleEditCollection = async (e: React.MouseEvent, game: CollectionGame) => {
+  const handleEditCollection = (e: React.MouseEvent<HTMLDivElement>, game: CollectionGame) => {
     e.preventDefault();
+    e.stopPropagation();
     setSelectedGameId(game.id);
     setSelectedGame(game);
     setIsEditing(true);
@@ -546,7 +602,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
     }
   };
 
-  const handleDeleteClick = (e: React.MouseEvent, game: CollectionGame) => {
+  const handleDeleteClick = (e: React.MouseEvent<HTMLDivElement>, game: CollectionGame) => {
     e.preventDefault();
     e.stopPropagation();
     setGameToDelete(game);
@@ -600,30 +656,63 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
           </MobileLoginBanner>
           <GridContainer>
             {games.map((game) => (
-              <GameCardWrapper key={game.id} href={`/games/${game.id}`}>
-                <GameCard className="game-card">
+              <GameCardWrapper key={game.id} href={`/games/${game.id}`} $isCompact={isCompactView}>
+                <GameCard className="game-card" $isCompact={isCompactView}>
                   <ImageContainer>
                     {localStorage.getItem('access_token') && (
                       <>
-                        {game.inCollection ? (
-                          <>
-                            <EditIcon onClick={(e) => handleEditCollection(e, game)}>
-                              <MdEdit />
-                            </EditIcon>
-                            <DeleteIcon onClick={(e) => handleDeleteClick(e, game)}>
-                              <MdDelete />
-                            </DeleteIcon>
-                            <CollectionIcon>
-                              <MdLibraryAddCheck />
-                            </CollectionIcon>
-                          </>
+                        {isCompactView ? (
+                          <CompactIconsContainer>
+                            {game.inCollection ? (
+                              <>
+                                <CompactIcon
+                                  variant="edit"
+                                  onClick={(e) => handleEditCollection(e, game)}
+                                >
+                                  <MdEdit />
+                                </CompactIcon>
+                                <CompactIcon
+                                  variant="delete"
+                                  onClick={(e) => handleDeleteClick(e, game)}
+                                >
+                                  <MdDelete />
+                                </CompactIcon>
+                              </>
+                            ) : (
+                              <CompactIcon
+                                variant="add"
+                                onClick={(e) => handleAddToCollection(e, game)}
+                              >
+                                <MdAdd />
+                              </CompactIcon>
+                            )}
+                          </CompactIconsContainer>
                         ) : (
-                          <AddIcon
-                            inCollection={game.inCollection}
-                            onClick={(e) => handleAddToCollection(e, game)}
-                          >
-                            <MdAdd />
-                          </AddIcon>
+                          <>
+                            {!isCompactView && game.inCollection && (
+                              <>
+                                <EditIcon onClick={(e) => handleEditCollection(e, game)}>
+                                  <MdEdit />
+                                </EditIcon>
+                                <DeleteIcon onClick={(e) => handleDeleteClick(e, game)}>
+                                  <MdDelete />
+                                </DeleteIcon>
+                                <CollectionIcon
+                                  onClick={(e) => handleDeleteClick(e, game)}
+                                  onMouseEnter={() => setHoveredGameId(game.id)}
+                                  onMouseLeave={() => setHoveredGameId(null)}
+                                >
+                                  {hoveredGameId === game.id ? <MdDelete /> : <MdLibraryAddCheck />}
+                                </CollectionIcon>
+                              </>
+                            )}
+                            <AddIcon
+                              onClick={(e) => handleAddToCollection(e, game)}
+                              inCollection={game.inCollection}
+                            >
+                              <MdAdd />
+                            </AddIcon>
+                          </>
                         )}
                       </>
                     )}
@@ -668,9 +757,9 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                       <InfoLabel className="info-label">Más información</InfoLabel>
                     </ExpandedImageWrapper>
                   </ImageContainer>
-                  <GameContent>
-                    <GameTitle>{game.title}</GameTitle>
-                    <GameInfo>
+                  <GameContent $isCompact={isCompactView}>
+                    <GameTitle $isCompact={isCompactView}>{game.title}</GameTitle>
+                    <GameInfo $isCompact={isCompactView}>
                       <GameYear>{game.releaseYear}</GameYear>
                       <GamePlatforms>
                         {game.platforms.length > 2
