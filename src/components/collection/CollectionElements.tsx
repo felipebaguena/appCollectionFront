@@ -2,6 +2,7 @@
 
 import styled from 'styled-components';
 import { NAVBAR_HEIGHT } from '@/components/layout/NavbarElements';
+import { BsGrid, BsGrid3X3 } from 'react-icons/bs';
 
 export const TitleBar = styled.div`
   background-color: var(--app-yellow);
@@ -195,4 +196,29 @@ export const MyCollectionCentralContent = styled.div`
   min-height: 100%;
   justify-content: center;
   color: var(--dark-grey);
-`; 
+`;
+
+export const ViewToggle = styled.button`
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: var(--mid-grey);
+  background-color: transparent;
+  transition: color 0.5s ease, background-color 0.5s ease;
+
+  &:hover {
+    color: var(--app-yellow);
+    background-color: var(--dark-grey);
+  }
+
+  svg {
+    font-size: 1.5rem;
+  }
+
+  @media (max-width: 568px) {
+    flex: 0 0 auto;
+  }
+`;

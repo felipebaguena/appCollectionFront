@@ -8,6 +8,13 @@ import { getImageUrl } from '@/services/api';
 import { FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
 import { NAVBAR_HEIGHT } from '../layout/NavbarElements';
 import { FOOTER_HEIGHT } from '../layout/FooterElements';
+import { MdLibraryAddCheck, MdDelete, MdEdit, MdAdd } from 'react-icons/md';
+import { useUserGame } from '@/hooks/useUserGame';
+import { useUserGames } from '@/hooks/useUserGames';
+import Modal from '@/components/ui/Modal';
+import AddToCollectionForm from '../collection/AddToCollectionForm';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -215,16 +222,78 @@ const GameDetailImageCloseButton = styled.div`
   z-index: 1001;
 `;
 
+const CollectionControls = styled.div`
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  z-index: 2;
+`;
+
+const BaseButton = styled.div`
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  svg {
+    color: var(--dark-grey);
+    font-size: 1.5rem;
+  }
+`;
+
+const EditButton = styled(BaseButton)`
+  background-color: var(--app-yellow);
+  cursor: pointer;
+`;
+
+const DeleteButton = styled(BaseButton)`
+  background-color: var(--app-red);
+  cursor: pointer;
+
+  svg {
+    color: white;
+  }
+`;
+
+const IndicatorButton = styled(BaseButton)`
+  background-color: var(--app-yellow);
+  cursor: default;
+`;
+
 const GameDetails: React.FC<{ id: string }> = ({ id }) => {
   const { game, loading, error, fetchGame } = useGame(id);
   const { gameImages, loading: imagesLoading, fetchGameImages } = useGameImages(Number(id));
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [hoveredHalf, setHoveredHalf] = useState<'left' | 'right' | null>(null);
+  const [showAddToCollectionModal, setShowAddToCollectionModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const { isAuthenticated } = useAuth();
+
+  const { addGameToCollection, isLoading: isAddingGame } = useUserGames();
+  const {
+    userGame,
+    loading: loadingUserGame,
+    updateUserGame,
+    fetchUserGame,
+    clearUserGame,
+    deleteUserGame
+  } = useUserGame(Number(id));
 
   useEffect(() => {
     fetchGame();
     fetchGameImages();
   }, [fetchGame, fetchGameImages]);
+
+  useEffect(() => {
+    if (isEditing && showAddToCollectionModal) {
+      fetchUserGame();
+    }
+  }, [isEditing, showAddToCollectionModal, fetchUserGame]);
 
   if (loading) return <div>Cargando...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -347,83 +416,208 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
     });
   };
 
+  const handleEditCollection = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsEditing(true);
+    setShowAddToCollectionModal(true);
+  };
+
+  const handleAddToCollection = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsEditing(false);
+    setShowAddToCollectionModal(true);
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteUserGame();
+      setShowDeleteModal(false);
+      await fetchGame();
+    } catch (error) {
+      console.error('Error al eliminar el juego:', error);
+    }
+  };
+
+  const handleSubmitForm = async (formData: {
+    rating?: number;
+    status?: number;
+    complete: boolean;
+    notes?: string;
+    platformIds: number[];
+  }) => {
+    if (isEditing) {
+      const result = await updateUserGame({
+        rating: formData.rating || null,
+        status: formData.status || null,
+        complete: formData.complete,
+        notes: formData.notes || null,
+        platformIds: formData.platformIds
+      });
+
+      if (result) {
+        setShowAddToCollectionModal(false);
+        await fetchGame();
+      }
+    } else {
+      const result = await addGameToCollection({
+        gameId: Number(id),
+        ...formData
+      });
+
+      if (result) {
+        setShowAddToCollectionModal(false);
+        await fetchGame();
+      }
+    }
+  };
+
   return (
-    <PageContainer>
-      <HeaderContainer>
-        <HeaderImage src={coverUrl} alt={`Portada de ${game.title}`} />
-        <HeaderOverlay>
-          <HeaderTitle>{game.title}</HeaderTitle>
-          <HeaderDeveloper>{game.developers?.map(d => d.name).join(', ')}</HeaderDeveloper>
+    <>
+      <PageContainer>
+        <HeaderContainer>
+          {isAuthenticated && (
+            <CollectionControls>
+              {game?.inCollection ? (
+                <>
+                  <EditButton onClick={handleEditCollection}>
+                    <MdEdit />
+                  </EditButton>
+                  <DeleteButton onClick={handleDeleteClick}>
+                    <MdDelete />
+                  </DeleteButton>
+                  <IndicatorButton>
+                    <MdLibraryAddCheck />
+                  </IndicatorButton>
+                </>
+              ) : (
+                <EditButton onClick={handleAddToCollection}>
+                  <MdAdd />
+                </EditButton>
+              )}
+            </CollectionControls>
+          )}
+          <HeaderImage src={coverUrl} alt={`Portada de ${game.title}`} />
+          <HeaderOverlay>
+            <HeaderTitle>{game.title}</HeaderTitle>
+            <HeaderDeveloper>{game.developers?.map(d => d.name).join(', ')}</HeaderDeveloper>
 
-          <HeaderInfoGroup>
-            <HeaderLabel>Año de lanzamiento</HeaderLabel>
-            <HeaderValue>{game.releaseYear}</HeaderValue>
-          </HeaderInfoGroup>
-          <HeaderInfoGroup>
-            <HeaderLabel>Géneros</HeaderLabel>
-            <HeaderValue>{game.genres?.map(g => g.name).join(', ') || 'N/A'}</HeaderValue>
-          </HeaderInfoGroup>
-          <HeaderInfoGroup>
-            <HeaderLabel>Plataformas</HeaderLabel>
-            <HeaderValue>{game.platforms?.map(p => p.name).join(', ') || 'N/A'}</HeaderValue>
-          </HeaderInfoGroup>
-        </HeaderOverlay>
-      </HeaderContainer>
+            <HeaderInfoGroup>
+              <HeaderLabel>Año de lanzamiento</HeaderLabel>
+              <HeaderValue>{game.releaseYear}</HeaderValue>
+            </HeaderInfoGroup>
+            <HeaderInfoGroup>
+              <HeaderLabel>Géneros</HeaderLabel>
+              <HeaderValue>{game.genres?.map(g => g.name).join(', ') || 'N/A'}</HeaderValue>
+            </HeaderInfoGroup>
+            <HeaderInfoGroup>
+              <HeaderLabel>Plataformas</HeaderLabel>
+              <HeaderValue>{game.platforms?.map(p => p.name).join(', ') || 'N/A'}</HeaderValue>
+            </HeaderInfoGroup>
+          </HeaderOverlay>
+        </HeaderContainer>
 
-      <Description>
-        <DescriptionContent>
-          <DescriptionText>
-            {formatDescription(game.description)}
-          </DescriptionText>
-        </DescriptionContent>
-      </Description>
+        <Description>
+          <DescriptionContent>
+            <DescriptionText>
+              {formatDescription(game.description)}
+            </DescriptionText>
+          </DescriptionContent>
+        </Description>
 
-      <GallerySection>
-        <GalleryGrid>
-          {gameImages.map((image, index) => (
-            <GalleryImage
-              key={image.id}
-              src={getImageUrl(image.path)}
-              alt={image.filename}
-              onClick={() => handleImageClick(index)}
-            />
-          ))}
-        </GalleryGrid>
-      </GallerySection>
+        <GallerySection>
+          <GalleryGrid>
+            {gameImages.map((image, index) => (
+              <GalleryImage
+                key={image.id}
+                src={getImageUrl(image.path)}
+                alt={image.filename}
+                onClick={() => handleImageClick(index)}
+              />
+            ))}
+          </GalleryGrid>
+        </GallerySection>
 
-      {selectedImageIndex !== null && (
-        <LightboxOverlay onClick={handleClose}>
-          <GameDetailImageCloseButton onClick={handleClose}>
-            <FaTimes size={24} />
-          </GameDetailImageCloseButton>
-          <LightboxContent
-            onClick={(e) => {
-              e.stopPropagation();
-              handleImageNavigation(e);
-            }}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-          >
-            <LightboxImage
-              src={getImageUrl(gameImages[selectedImageIndex].path)}
-              alt={gameImages[selectedImageIndex].filename}
-            />
-            <NavigationButton
-              position="left"
-              isVisible={hoveredHalf === 'left'}
+        {selectedImageIndex !== null && (
+          <LightboxOverlay onClick={handleClose}>
+            <GameDetailImageCloseButton onClick={handleClose}>
+              <FaTimes size={24} />
+            </GameDetailImageCloseButton>
+            <LightboxContent
+              onClick={(e) => {
+                e.stopPropagation();
+                handleImageNavigation(e);
+              }}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
             >
-              <FaChevronLeft size={24} />
-            </NavigationButton>
-            <NavigationButton
-              position="right"
-              isVisible={hoveredHalf === 'right'}
-            >
-              <FaChevronRight size={24} />
-            </NavigationButton>
-          </LightboxContent>
-        </LightboxOverlay>
-      )}
-    </PageContainer>
+              <LightboxImage
+                src={getImageUrl(gameImages[selectedImageIndex].path)}
+                alt={gameImages[selectedImageIndex].filename}
+              />
+              <NavigationButton
+                position="left"
+                isVisible={hoveredHalf === 'left'}
+              >
+                <FaChevronLeft size={24} />
+              </NavigationButton>
+              <NavigationButton
+                position="right"
+                isVisible={hoveredHalf === 'right'}
+              >
+                <FaChevronRight size={24} />
+              </NavigationButton>
+            </LightboxContent>
+          </LightboxOverlay>
+        )}
+      </PageContainer>
+
+      <Modal
+        isOpen={showAddToCollectionModal}
+        onClose={() => {
+          setShowAddToCollectionModal(false);
+          setIsEditing(false);
+          clearUserGame();
+        }}
+        title={game ? isEditing ? `Editar ${game.title} en mi colección` : `Añadir ${game.title} a mi colección` : ''}
+      >
+        <AddToCollectionForm
+          gameId={Number(id)}
+          onSubmit={handleSubmitForm}
+          onCancel={() => {
+            setShowAddToCollectionModal(false);
+            setIsEditing(false);
+            clearUserGame();
+          }}
+          isLoading={isAddingGame || loadingUserGame}
+          initialData={isEditing && userGame ? {
+            rating: typeof userGame.rating === 'string' ? parseFloat(userGame.rating) : userGame.rating,
+            status: typeof userGame.status === 'string' ? parseFloat(userGame.status) : userGame.status,
+            complete: userGame.complete,
+            notes: userGame.notes,
+            platforms: userGame.platforms || []
+          } : undefined}
+          isEditing={isEditing}
+        />
+      </Modal>
+
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        title="Eliminar juego de la colección"
+        message={`¿Estás seguro de que quieres eliminar ${game?.title} de tu colección?`}
+        confirmText="Eliminar"
+        confirmVariant="danger"
+      />
+    </>
   );
 };
 

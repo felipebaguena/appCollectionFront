@@ -8,6 +8,8 @@ import { MyCollectionSortType } from '@/types/collection';
 import { useAuth } from '@/contexts/AuthContext';
 import { DateFormat } from '@/types/date';
 import { CompleteStatus } from '@/types/collection';
+import { BsGrid, BsGrid3X3 } from 'react-icons/bs';
+import styled from 'styled-components';
 
 import CollectionPlatformFilter from "@/components/collection/CollectionPlatformFilter";
 import CollectionGenreFilter from "@/components/collection/CollectionGenreFilter";
@@ -36,7 +38,8 @@ import {
   FiltersSection,
   ChipsContainer,
   ClearFiltersButton,
-  MyCollectionCentralContent
+  MyCollectionCentralContent,
+  ViewToggle
 } from '@/components/collection/CollectionElements';
 
 import { formatDate } from '@/helpers/dateFormatter';
@@ -66,6 +69,7 @@ export default function MyCollectionPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12; // Podemos ajustar esto según necesidades
   const [collectionData, setCollectionData] = useState<CollectionResponse | null>(null);
+  const [isCompactView, setIsCompactView] = useState(false);
 
   const sortOptions = [
     { value: MyCollectionSortType.TITLE_ASC, label: 'Título (A-Z)' },
@@ -250,6 +254,9 @@ export default function MyCollectionPage() {
             )}
           </FiltersSection>
           <ControlsRight>
+            <ViewToggle onClick={() => setIsCompactView(!isCompactView)}>
+              {isCompactView ? <BsGrid size={24} /> : <BsGrid3X3 size={24} />}
+            </ViewToggle>
             <FilterInput
               label="Buscar juego"
               value={searchTerm}
@@ -375,6 +382,7 @@ export default function MyCollectionPage() {
               onPageChange={setCurrentPage}
               itemsPerPage={itemsPerPage}
               onGameDeleted={fetchCollection}
+              isCompactView={isCompactView}
             />
           )}
         </MyCollectionCentralContent>

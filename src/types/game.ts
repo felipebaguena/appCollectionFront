@@ -34,6 +34,7 @@ export interface Game {
   genres: Genre[];
   developers: Developer[];
   images: Image[];
+  inCollection?: boolean;
 }
 
 export interface GameResponse {

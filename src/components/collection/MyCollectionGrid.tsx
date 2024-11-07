@@ -12,13 +12,19 @@ import { MdDelete, MdEdit } from 'react-icons/md';
 import Modal from '@/components/ui/Modal';
 import AddToCollectionForm from './AddToCollectionForm';
 import { Platform } from '@/types/game';
+import CompactCollectionCard from './CompactCollectionCard';
 
-const Container = styled.div`
+const Container = styled.div<{ $isCompact?: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 2rem;
   width: 100%;
+  
+  ${props => props.$isCompact && `
+    max-width: 1240px; // Ajusta esto según necesites (200px * 6 cards + gaps)
+    margin: 0 auto;
+  `}
 `;
 
 const FlexContainer = styled.div`
@@ -27,7 +33,7 @@ const FlexContainer = styled.div`
   gap: 2rem;
   padding: 1.5rem;
   justify-content: flex-start;
-  max-width: 2000px;
+  width: 100%;
   margin: 0 auto;
 `;
 
@@ -99,13 +105,34 @@ const NoGamesMessage = styled.div`
   color: var(--clear-grey);
 `;
 
+const CompactFlexContainer = styled(FlexContainer)`
+  gap: 1rem;
+  justify-content: flex-start;
+
+  ${CardWrapper} {
+    width: 12rem;
+    min-width: unset;
+    flex: 0 0 auto;
+  }
+
+  @media (max-width: 464px) {
+    justify-content: center;
+    
+    ${CardWrapper} {
+      width: 9rem;
+      gap: 0.5rem;
+    }
+  }
+`;
+
 interface MyCollectionGridProps {
     games: UserGameInCollection[];
     totalItems: number;
     currentPage: number;
     onPageChange: (page: number) => void;
     itemsPerPage: number;
-    onGameDeleted?: () => void; // Callback para recargar los datos
+    onGameDeleted?: () => void;
+    isCompactView?: boolean;
 }
 
 const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
@@ -114,7 +141,8 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
     currentPage,
     onPageChange,
     itemsPerPage,
-    onGameDeleted
+    onGameDeleted,
+    isCompactView = false
 }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
@@ -188,31 +216,48 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
 
     return (
         <>
-            <Container>
-                <FlexContainer>
-                    {games.map(game => (
-                        <CardWrapper
-                            key={game.id}
-                            href={`/games/${game.game.id}`}
-                        >
-                            <IconsContainer>
-                                <ActionIcon
-                                    $variant="edit"
-                                    onClick={(e) => handleEditClick(e, game)}
-                                >
-                                    <MdEdit />
-                                </ActionIcon>
-                                <ActionIcon
-                                    $variant="delete"
-                                    onClick={(e) => handleDeleteClick(e, game)}
-                                >
-                                    <MdDelete />
-                                </ActionIcon>
-                            </IconsContainer>
-                            <CollectionCard game={game} />
-                        </CardWrapper>
-                    ))}
-                </FlexContainer>
+            <Container $isCompact={isCompactView}>
+                {isCompactView ? (
+                    <CompactFlexContainer>
+                        {games.map(game => (
+                            <CardWrapper
+                                key={game.id}
+                                href={`/games/${game.game.id}`}
+                            >
+                                <CompactCollectionCard
+                                    game={game}
+                                    onEdit={(e) => handleEditClick(e, game)}
+                                    onDelete={(e) => handleDeleteClick(e, game)}
+                                />
+                            </CardWrapper>
+                        ))}
+                    </CompactFlexContainer>
+                ) : (
+                    <FlexContainer>
+                        {games.map(game => (
+                            <CardWrapper
+                                key={game.id}
+                                href={`/games/${game.game.id}`}
+                            >
+                                <IconsContainer>
+                                    <ActionIcon
+                                        $variant="edit"
+                                        onClick={(e) => handleEditClick(e, game)}
+                                    >
+                                        <MdEdit />
+                                    </ActionIcon>
+                                    <ActionIcon
+                                        $variant="delete"
+                                        onClick={(e) => handleDeleteClick(e, game)}
+                                    >
+                                        <MdDelete />
+                                    </ActionIcon>
+                                </IconsContainer>
+                                <CollectionCard game={game} />
+                            </CardWrapper>
+                        ))}
+                    </FlexContainer>
+                )}
                 <PaginationWrapper>
                     <Pagination
                         currentPage={currentPage}
