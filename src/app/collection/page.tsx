@@ -163,7 +163,7 @@ export default function CollectionPage() {
         <ControlsTop>
           <FiltersSection>
             <ViewToggleButton onClick={() => setIsCompactView(!isCompactView)}>
-              {isCompactView ? <IoGrid size={20} /> : <IoSquare size={20} />}
+              {isCompactView ? <IoSquare size={20} /> : <IoGrid size={20} />}
             </ViewToggleButton>
             <FiltersButton onClick={() => setIsFiltersPanelOpen(!isFiltersPanelOpen)}>
               Filtros <IoFilter size={18} />
