@@ -183,17 +183,30 @@ const HeaderOverlay = styled.div`
   flex-direction: column;
   justify-content: center;
   padding: 2rem;
+
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+  }
 `;
 
 const HeaderTitle = styled(Title)`
   color: white;
   font-size: 2.5rem;
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+  }
 `;
 
 const HeaderDeveloper = styled(Developer)`
   color: rgba(255, 255, 255, 0.9);
   font-size: 1.5rem;
   margin-bottom: 2rem;
+
+  @media (max-width: 600px) {
+    font-size: 1rem;
+  }
 `;
 
 const HeaderInfoGroup = styled(InfoGroup)`
