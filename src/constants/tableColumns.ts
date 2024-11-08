@@ -99,6 +99,13 @@ export const articleColumns = [
     render: (value: { name: string }) => value?.name || "Sin plantilla",
   },
   {
+    key: "relatedGames",
+    label: "Juegos relacionados",
+    sortable: false,
+    render: (value: Array<{ title: string }>) =>
+      value?.map((game) => game.title).join(", ") || "Sin juegos relacionados",
+  },
+  {
     key: "relatedPlatforms",
     label: "Plataformas",
     sortable: false,
@@ -119,12 +126,5 @@ export const articleColumns = [
     render: (value: Array<{ name: string }>) =>
       value?.map((developer) => developer.name).join(", ") ||
       "Sin desarrolladores",
-  },
-  {
-    key: "relatedGames",
-    label: "Juegos relacionados",
-    sortable: false,
-    render: (value: Array<{ title: string }>) =>
-      value?.map((game) => game.title).join(", ") || "Sin juegos relacionados",
   },
 ];

@@ -61,6 +61,8 @@ import CreateDeveloperForm from '@/components/developers/CreateDeveloperForm';
 import { useDeveloper } from '@/hooks/useDeveloper';
 import { Article } from '@/types/article';
 import { useArticle } from '@/hooks/useArticle';
+import CreateArticleForm from '@/components/articles/CreateArticleForm';
+import { useRouter } from 'next/navigation';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -223,8 +225,14 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         setShowGallery(false);
     };
 
+    const router = useRouter();
+
     const handleCreate = () => {
-        setShowCreateModal(true);
+        if (form === 'article') {
+            router.push('/articles');
+        } else {
+            setShowCreateModal(true);
+        }
     };
 
     const handleCloseCreateModal = () => {
@@ -501,6 +509,15 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                         <CreateGameForm
                             onClose={handleCloseCreateModal}
                             onGameCreated={handleItemCreated}
+                            genres={genresOptions}
+                            platforms={platformsOptions}
+                            developers={developersOptions}
+                        />
+                    )}
+                    {form === 'article' && (
+                        <CreateArticleForm
+                            onClose={handleCloseCreateModal}
+                            onArticleCreated={handleItemCreated}
                             genres={genresOptions}
                             platforms={platformsOptions}
                             developers={developersOptions}

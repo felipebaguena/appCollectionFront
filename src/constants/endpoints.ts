@@ -49,4 +49,5 @@ export const ENDPOINTS = {
   GET_ARTICLE: (id: string) => `/articles/${id}`,
   SET_ARTICLE: (id: string) => `/articles/${id}`,
   DELETE_ARTICLE: (id: string) => `/articles/${id}`,
+  CREATE_ARTICLE: "/articles",
 };
