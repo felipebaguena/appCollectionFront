@@ -60,6 +60,7 @@ import EditDeveloperForm from '@/components/developers/EditDeveloperForm';
 import CreateDeveloperForm from '@/components/developers/CreateDeveloperForm';
 import { useDeveloper } from '@/hooks/useDeveloper';
 import { Article } from '@/types/article';
+import { useArticle } from '@/hooks/useArticle';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -117,6 +118,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
 
     const deleteItemId = deleteConfirmation.itemToDelete?.id.toString() || '';
     const { deleteGame } = form === 'game' ? useGame(deleteItemId) : { deleteGame: null };
+    const { deleteArticle } = form === 'article' ? useArticle(deleteItemId) : { deleteArticle: null };
     const { deletePlatform } = form === 'platform' ? usePlatform(deleteItemId) : { deletePlatform: null };
     const { deleteGenre } = form === 'genre' ? useGenre(deleteItemId) : { deleteGenre: null };
     const { deleteDeveloper } = form === 'developer' ? useDeveloper(deleteItemId) : { deleteDeveloper: null };
@@ -177,24 +179,19 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
             try {
                 switch (form) {
                     case 'game':
-                        if (deleteGame) {
-                            await deleteGame();
-                        }
+                        if (deleteGame) await deleteGame();
+                        break;
+                    case 'article':
+                        if (deleteArticle) await deleteArticle();
                         break;
                     case 'platform':
-                        if (deletePlatform) {
-                            await deletePlatform();
-                        }
+                        if (deletePlatform) await deletePlatform();
                         break;
                     case 'genre':
-                        if (deleteGenre) {
-                            await deleteGenre();
-                        }
+                        if (deleteGenre) await deleteGenre();
                         break;
                     case 'developer':
-                        if (deleteDeveloper) {
-                            await deleteDeveloper();
-                        }
+                        if (deleteDeveloper) await deleteDeveloper();
                         break;
                     default:
                         console.error('Tipo de formulario no reconocido:', form);
