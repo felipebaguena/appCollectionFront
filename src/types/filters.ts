@@ -21,6 +21,7 @@ export type FilterType =
   | "platform"
   | "genre"
   | "developer"
+  | "article"
   | "otherType";
 
 export type FilterPackages = {

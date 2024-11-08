@@ -41,7 +41,8 @@ const Navbar = () => {
     { name: "Juegos", route: "/management/manage-games" },
     { name: "Plataformas", route: "/management/manage-platforms" },
     { name: "Géneros", route: "/management/manage-genres" },
-    { name: "Desarrolladores", route: "/management/manage-developers" }
+    { name: "Desarrolladores", route: "/management/manage-developers" },
+    { name: "Artículos", route: "/management/manage-articles" }
   ];
 
   const renderAuthButtons = () => {

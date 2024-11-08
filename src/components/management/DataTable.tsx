@@ -59,6 +59,7 @@ import { useGenre } from '@/hooks/useGenre';
 import EditDeveloperForm from '@/components/developers/EditDeveloperForm';
 import CreateDeveloperForm from '@/components/developers/CreateDeveloperForm';
 import { useDeveloper } from '@/hooks/useDeveloper';
+import { Article } from '@/types/article';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -68,15 +69,16 @@ interface DataTableProps<T extends { id: number }, F extends BaseFilter> {
     endpoint: string;
     initialParams?: Partial<DataTableParams<T>>;
     title?: string;
-    form: 'game' | 'platform' | 'genre' | 'developer' | 'otherType';
+    form: 'game' | 'platform' | 'genre' | 'developer' | 'article' | 'otherType';
     filterPackage: FilterPackage<T, F>;
     breakpoint?: number;
 }
 
-type FormType = 'game' | 'platform' | 'genre' | 'developer' | 'otherType';
+type FormType = 'game' | 'platform' | 'genre' | 'developer' | 'article' | 'otherType';
 
 type ItemType<F extends FormType> =
     F extends 'game' ? Game :
+    F extends 'article' ? Article :
     never;
 
 interface ComponentProps<F extends FormType> {
@@ -312,6 +314,9 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         case 'game':
             ViewComponent = ViewGameForm as React.ComponentType<ComponentProps<'game'>>;
             EditComponent = EditGameForm as React.ComponentType<ComponentProps<'game'>>;
+            break;
+        case 'article':
+            // Por ahora no hay componentes
             break;
         case 'platform':
             EditComponent = EditPlatformForm as React.ComponentType<ComponentProps<'platform'>>;

@@ -72,3 +72,21 @@ export function getPlatformColumns(baseColumns: Column<Platform>[]): Column<Plat
         return customColumn ? { ...column, ...customColumn } : column;
     });
 }
+
+export const getArticleColumns = (columns: any[]) => {
+    return columns.map(column => {
+        switch (column.key) {
+            case 'title':
+                return {
+                    ...column,
+                    render: (value: string) => (
+                        <span title={value}>
+                            {value.length > 50 ? `${value.substring(0, 47)}...` : value}
+                        </span>
+                    ),
+                };
+            default:
+                return column;
+        }
+    });
+};

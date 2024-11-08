@@ -64,3 +64,67 @@ export const developerColumns: Column<Developer>[] = [
   { key: "name", label: "Nombre", sortable: true },
   { key: "code", label: "Código", sortable: true },
 ];
+
+export const articleColumns = [
+  {
+    key: "title",
+    label: "Título",
+    sortable: true,
+  },
+  {
+    key: "createdAt",
+    label: "Fecha de creación",
+    sortable: true,
+    render: (value: string) => new Date(value).toLocaleDateString(),
+  },
+  {
+    key: "publishedAt",
+    label: "Fecha de publicación",
+    sortable: true,
+    render: (value: string | null) =>
+      value ? new Date(value).toLocaleDateString() : "No publicado",
+  },
+  {
+    key: "published",
+    label: "Estado",
+    sortable: true,
+    render: (value: boolean) => {
+      return value ? "Publicado" : "Sin publicar";
+    },
+  },
+  {
+    key: "template",
+    label: "Plantilla",
+    sortable: false,
+    render: (value: { name: string }) => value?.name || "Sin plantilla",
+  },
+  {
+    key: "relatedPlatforms",
+    label: "Plataformas",
+    sortable: false,
+    render: (value: Array<{ name: string }>) =>
+      value?.map((platform) => platform.name).join(", ") || "Sin plataformas",
+  },
+  {
+    key: "relatedGenres",
+    label: "Géneros",
+    sortable: false,
+    render: (value: Array<{ name: string }>) =>
+      value?.map((genre) => genre.name).join(", ") || "Sin géneros",
+  },
+  {
+    key: "relatedDevelopers",
+    label: "Desarrolladores",
+    sortable: false,
+    render: (value: Array<{ name: string }>) =>
+      value?.map((developer) => developer.name).join(", ") ||
+      "Sin desarrolladores",
+  },
+  {
+    key: "relatedGames",
+    label: "Juegos relacionados",
+    sortable: false,
+    render: (value: Array<{ title: string }>) =>
+      value?.map((game) => game.title).join(", ") || "Sin juegos relacionados",
+  },
+];
