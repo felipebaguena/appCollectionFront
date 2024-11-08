@@ -50,4 +50,5 @@ export const ENDPOINTS = {
   SET_ARTICLE: (id: string) => `/articles/${id}`,
   DELETE_ARTICLE: (id: string) => `/articles/${id}`,
   CREATE_ARTICLE: "/articles",
+  GET_GAMES_SEARCH: (title: string) => `/games/search?title=${title}`,
 };

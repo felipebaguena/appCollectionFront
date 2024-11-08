@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { useGames } from '@/hooks/useGames';
 import { api } from '@/services/api';
 import { ENDPOINTS } from '@/constants/endpoints';
-import CustomSelect from '@/components/ui/CustomSelect';
 import MultiSelect from '@/components/ui/Multiselect';
 import {
     StyledForm,
@@ -16,6 +15,7 @@ import {
 } from '@/components/ui/FormElements';
 import Button from '@/components/ui/Button';
 import { PageWrapper } from '@/components/layout/LayoutElements';
+import SearchableGameSelect from '@/components/ui/SearchableGameSelect';
 
 interface Option {
     id: number;
@@ -87,6 +87,12 @@ const SelectionsContainer = styled.div`
   gap: 1rem;
 `;
 
+const GameSelectorContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
 const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     onClose,
     onArticleCreated,
@@ -94,7 +100,9 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     platforms,
     developers
 }) => {
-    const { games } = useGames();
+    const { searchGames } = useGames();
+    const [searchResults, setSearchResults] = useState<Array<{ id: number, title: string }>>([]);
+    const [searchValue, setSearchValue] = useState('');
     const [formData, setFormData] = useState({
         title: '',
         content: '',
@@ -145,6 +153,16 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         }
     };
 
+    const handleGameSearch = async (value: string) => {
+        setSearchValue(value);
+        if (value.length >= 2) {
+            const results = await searchGames(value);
+            setSearchResults(results);
+        } else {
+            setSearchResults([]);
+        }
+    };
+
     return (
         <ArticleFormContainer>
             <ContentContainer>
@@ -184,14 +202,9 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
 
                     <InputGroup>
                         <Label>Juego relacionado</Label>
-                        <CustomSelect
-                            options={games.map(game => ({
-                                value: game.id.toString(),
-                                label: game.title
-                            }))}
-                            value={selectedGameId}
-                            onChange={handleGameChange}
-                            placeholder="Selecciona un juego"
+                        <SearchableGameSelect
+                            selectedGameId={selectedGameId}
+                            onGameChange={handleGameChange}
                         />
                     </InputGroup>
 

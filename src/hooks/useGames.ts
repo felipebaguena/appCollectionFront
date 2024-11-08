@@ -85,6 +85,18 @@ export const useGames = () => {
     }
   };
 
+  const searchGames = useCallback(async (title: string) => {
+    try {
+      const gamesData = await api.get<Game[]>(
+        ENDPOINTS.GET_GAMES_SEARCH(title)
+      );
+      return gamesData;
+    } catch (error) {
+      setError("Error al buscar juegos");
+      return [];
+    }
+  }, []);
+
   return {
     games,
     genres,
@@ -93,6 +105,7 @@ export const useGames = () => {
     loading,
     error,
     createGame,
+    searchGames,
     // ... (otras funciones que puedas tener)
   };
 };
