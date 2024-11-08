@@ -95,6 +95,12 @@ const SearchableGameSelect: React.FC<SearchableGameSelectProps> = ({
         }
     };
 
+    const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+        }
+    };
+
     const handleGameSelect = (game: Game) => {
         onGameChange(game.id.toString());
         setSelectedTitle(game.title);
@@ -115,14 +121,18 @@ const SearchableGameSelect: React.FC<SearchableGameSelectProps> = ({
                 value={searchTerm}
                 onChange={handleInputChange}
                 onFocus={handleInputFocus}
+                onKeyDown={handleInputKeyDown}
             />
             {isOpen && games.length > 0 && (
-                <DropdownList>
+                <DropdownList onClick={(e) => e.preventDefault()}>
                     {games.map(game => (
                         <GameItem
                             key={game.id}
                             isSelected={selectedGameId === game.id.toString()}
-                            onClick={() => handleGameSelect(game)}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                handleGameSelect(game);
+                            }}
                         >
                             {game.title}
                         </GameItem>

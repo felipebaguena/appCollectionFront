@@ -12,6 +12,7 @@ interface MultiSelectProps {
     selectedOptions: Option[];
     onChange: (selected: Option[]) => void;
     placeholder: string;
+    dropUp?: boolean;
 }
 
 const SelectContainer = styled.div`
@@ -37,15 +38,15 @@ const SelectButton = styled.button`
   }
 `;
 
-const OptionsList = styled.ul`
+const OptionsList = styled.ul<{ dropUp: boolean }>`
   position: absolute;
-  top: 100%;
+  ${props => props.dropUp ? 'bottom: 100%' : 'top: 100%'};
   left: 0;
   right: 0;
   max-height: 200px;
   overflow-y: auto;
   border: 1px solid #ddd;
-  border-top: none;
+  border-${props => props.dropUp ? 'bottom' : 'top'}: none;
   background-color: white;
   z-index: 1;
   padding: 0;
@@ -68,7 +69,7 @@ const OptionItem = styled.li<{ isSelected: boolean }>`
   }
 `;
 
-const MultiSelect: React.FC<MultiSelectProps> = ({ options, selectedOptions, onChange, placeholder }) => {
+const MultiSelect: React.FC<MultiSelectProps> = ({ options, selectedOptions, onChange, placeholder, dropUp = false }) => {
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -107,7 +108,7 @@ const MultiSelect: React.FC<MultiSelectProps> = ({ options, selectedOptions, onC
                 {selectedOptions.length > 0 ? selectedOptions.map(o => o.name).join(', ') : placeholder}
             </SelectButton>
             {isOpen && (
-                <OptionsList>
+                <OptionsList dropUp={dropUp}>
                     {options.map(option => (
                         <OptionItem
                             key={option.id}

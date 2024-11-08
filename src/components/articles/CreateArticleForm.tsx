@@ -229,6 +229,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                             )}
                             onChange={handleMultiSelectChange('relatedGenres')}
                             placeholder="Selecciona géneros"
+                            dropUp={true}
                         />
                     </InputGroup>
 
@@ -241,6 +242,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                             )}
                             onChange={handleMultiSelectChange('relatedDevelopers')}
                             placeholder="Selecciona desarrolladores"
+                            dropUp={true}
                         />
                     </InputGroup>
 
