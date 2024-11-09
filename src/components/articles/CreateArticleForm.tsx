@@ -16,6 +16,7 @@ import {
 import Button from '@/components/ui/Button';
 import { PageWrapper } from '@/components/layout/LayoutElements';
 import SearchableGameSelect from '@/components/ui/SearchableGameSelect';
+import { TitleBar } from '@/components/collection/CollectionElements';
 
 interface Option {
     id: number;
@@ -32,10 +33,6 @@ interface CreateArticleFormProps {
 }
 
 const ArticleFormContainer = styled(PageWrapper)`
-  padding: 2rem;
-  margin-top: 4rem; // Para el Navbar
-  margin-bottom: 4rem; // Para el Footer
-  min-height: calc(100vh - 8rem); // 100vh menos los márgenes
   background: white;
 `;
 
@@ -45,16 +42,17 @@ const ContentContainer = styled.div`
   width: 100%;
 `;
 
-const FormHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+const TitleText = styled.h2`
+    color: var(--dark-grey);
+    margin: 0;
+    font-size: 1.2rem;
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
 `;
 
-const Title = styled.h2`
-  color: var(--text-color);
-  margin: 0;
+const FormContent = styled.div`
+    padding: 2rem;
 `;
 
 const Input = styled.input`
@@ -91,6 +89,10 @@ const GameSelectorContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+`;
+
+const ArticleLabel = styled(Label)`
+    color: var(--dark-grey);
 `;
 
 const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
@@ -165,97 +167,92 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
 
     return (
         <ArticleFormContainer>
-            <ContentContainer>
-                <FormHeader>
-                    <Title>Crear Nuevo Artículo</Title>
-                    <Button
-                        $variant="cancel"
-                        onClick={onClose}
-                        type="button"
-                    >
-                        ✕
-                    </Button>
-                </FormHeader>
-                <StyledForm onSubmit={handleSubmit}>
-                    <InputGroup>
-                        <Label htmlFor="title">Título</Label>
-                        <Input
-                            type="text"
-                            id="title"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleChange}
-                            required
-                        />
-                    </InputGroup>
+            <TitleBar>
+                <TitleText>Crear Nuevo Artículo</TitleText>
+            </TitleBar>
+            <FormContent>
+                <ContentContainer>
+                    <StyledForm onSubmit={handleSubmit}>
+                        <InputGroup>
+                            <ArticleLabel htmlFor="title">Título</ArticleLabel>
+                            <Input
+                                type="text"
+                                id="title"
+                                name="title"
+                                value={formData.title}
+                                onChange={handleChange}
+                                required
+                            />
+                        </InputGroup>
 
-                    <InputGroup>
-                        <Label htmlFor="content">Contenido</Label>
-                        <TextArea
-                            id="content"
-                            name="content"
-                            value={formData.content}
-                            onChange={handleChange}
-                            required
-                        />
-                    </InputGroup>
+                        <InputGroup>
+                            <ArticleLabel htmlFor="content">Contenido</ArticleLabel>
+                            <TextArea
+                                id="content"
+                                name="content"
+                                value={formData.content}
+                                onChange={handleChange}
+                                required
+                            />
+                        </InputGroup>
 
-                    <InputGroup>
-                        <Label>Juego relacionado</Label>
-                        <SearchableGameSelect
-                            selectedGameId={selectedGameId}
-                            onGameChange={handleGameChange}
-                        />
-                    </InputGroup>
+                        <InputGroup>
+                            <ArticleLabel>Juego relacionado</ArticleLabel>
+                            <SearchableGameSelect
+                                selectedGameId={selectedGameId}
+                                onGameChange={handleGameChange}
+                            />
+                        </InputGroup>
 
-                    <InputGroup>
-                        <Label>Plataformas</Label>
-                        <MultiSelect
-                            options={platforms}
-                            selectedOptions={platforms.filter(p =>
-                                formData.relatedPlatforms.includes(p.id)
-                            )}
-                            onChange={handleMultiSelectChange('relatedPlatforms')}
-                            placeholder="Selecciona plataformas"
-                        />
-                    </InputGroup>
+                        <InputGroup>
+                            <ArticleLabel>Plataformas</ArticleLabel>
+                            <MultiSelect
+                                options={platforms}
+                                selectedOptions={platforms.filter(p =>
+                                    formData.relatedPlatforms.includes(p.id)
+                                )}
+                                onChange={handleMultiSelectChange('relatedPlatforms')}
+                                placeholder="Selecciona plataformas"
+                            />
+                        </InputGroup>
 
-                    <InputGroup>
-                        <Label>Géneros</Label>
-                        <MultiSelect
-                            options={genres}
-                            selectedOptions={genres.filter(g =>
-                                formData.relatedGenres.includes(g.id)
-                            )}
-                            onChange={handleMultiSelectChange('relatedGenres')}
-                            placeholder="Selecciona géneros"
-                            dropUp={true}
-                        />
-                    </InputGroup>
+                        <InputGroup>
+                            <ArticleLabel>Géneros</ArticleLabel>
+                            <MultiSelect
+                                options={genres}
+                                selectedOptions={genres.filter(g =>
+                                    formData.relatedGenres.includes(g.id)
+                                )}
+                                onChange={handleMultiSelectChange('relatedGenres')}
+                                placeholder="Selecciona géneros"
+                                dropUp={true}
+                            />
+                        </InputGroup>
 
-                    <InputGroup>
-                        <Label>Desarrolladores</Label>
-                        <MultiSelect
-                            options={developers}
-                            selectedOptions={developers.filter(d =>
-                                formData.relatedDevelopers.includes(d.id)
-                            )}
-                            onChange={handleMultiSelectChange('relatedDevelopers')}
-                            placeholder="Selecciona desarrolladores"
-                            dropUp={true}
-                        />
-                    </InputGroup>
+                        <InputGroup>
+                            <ArticleLabel>Desarrolladores</ArticleLabel>
+                            <MultiSelect
+                                options={developers}
+                                selectedOptions={developers.filter(d =>
+                                    formData.relatedDevelopers.includes(d.id)
+                                )}
+                                onChange={handleMultiSelectChange('relatedDevelopers')}
+                                placeholder="Selecciona desarrolladores"
+                                dropUp={true}
+                            />
+                        </InputGroup>
 
-                    <ButtonContainer>
-                        <Button $variant="primary" type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? 'Creando...' : 'Crear artículo'}
-                        </Button>
-                        <Button $variant="cancel" type="button" onClick={onClose} disabled={isSubmitting}>
-                            Cancelar
-                        </Button>
-                    </ButtonContainer>
-                </StyledForm>
-            </ContentContainer>
+                        <ButtonContainer>
+                            <Button $variant="primary" type="submit" disabled={isSubmitting}>
+                                {isSubmitting ? 'Creando...' : 'Crear artículo'}
+                            </Button>
+                            <Button $variant="cancel" type="button" onClick={onClose} disabled={isSubmitting}>
+                                Cancelar
+                            </Button>
+                        </ButtonContainer>
+                    </StyledForm>
+                </ContentContainer>
+            </FormContent>
         </ArticleFormContainer>
     );
 };
