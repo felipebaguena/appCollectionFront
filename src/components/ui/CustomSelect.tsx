@@ -99,16 +99,24 @@ const CustomSelect: React.FC<SelectProps> = ({ options, value, onChange, placeho
     };
   }, []);
 
-  const handleOptionClick = (optionValue: string) => {
+  const handleOptionClick = (e: React.MouseEvent, optionValue: string) => {
+    e.preventDefault();
+    e.stopPropagation();
     onChange(optionValue);
     setIsOpen(false);
+  };
+
+  const toggleSelect = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsOpen(!isOpen);
   };
 
   const selectedOption = options.find(option => option.value === value);
 
   return (
     <SelectContainer ref={containerRef}>
-      <SelectButton onClick={() => setIsOpen(!isOpen)}>
+      <SelectButton onClick={toggleSelect}>
         {selectedOption ? selectedOption.label : placeholder}
       </SelectButton>
       {isOpen && (
@@ -117,7 +125,7 @@ const CustomSelect: React.FC<SelectProps> = ({ options, value, onChange, placeho
             <OptionItem
               key={option.value}
               isSelected={option.value === value}
-              onClick={() => handleOptionClick(option.value)}
+              onClick={(e) => handleOptionClick(e, option.value)}
             >
               {option.label}
             </OptionItem>

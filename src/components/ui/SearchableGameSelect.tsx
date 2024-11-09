@@ -22,6 +22,7 @@ const SearchInput = styled.input`
     padding: 8px;
     border: 1px solid #ddd;
     outline: none;
+    color: var(--grey);
     
     &:focus {
         border-color: var(--app-yellow);
@@ -117,7 +118,7 @@ const SearchableGameSelect: React.FC<SearchableGameSelectProps> = ({
         <SelectContainer ref={containerRef}>
             <SearchInput
                 type="text"
-                placeholder="Buscar juego..."
+                placeholder="Buscar juego"
                 value={searchTerm}
                 onChange={handleInputChange}
                 onFocus={handleInputFocus}

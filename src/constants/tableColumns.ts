@@ -72,6 +72,11 @@ export const articleColumns = [
     sortable: true,
   },
   {
+    key: "subtitle",
+    label: "Subtítulo",
+    sortable: true,
+  },
+  {
     key: "createdAt",
     label: "Fecha de creación",
     sortable: true,

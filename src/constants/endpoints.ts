@@ -51,4 +51,5 @@ export const ENDPOINTS = {
   DELETE_ARTICLE: (id: string) => `/articles/${id}`,
   CREATE_ARTICLE: "/articles",
   GET_GAMES_SEARCH: (title: string) => `/games/search?title=${title}`,
+  GET_ACTIVE_TEMPLATES: "/article-templates/active",
 };

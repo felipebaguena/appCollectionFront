@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useGames } from '@/hooks/useGames';
 import { api } from '@/services/api';
@@ -17,6 +17,8 @@ import Button from '@/components/ui/Button';
 import { PageWrapper } from '@/components/layout/LayoutElements';
 import SearchableGameSelect from '@/components/ui/SearchableGameSelect';
 import { TitleBar } from '@/components/collection/CollectionElements';
+import CustomSelect from '@/components/ui/CustomSelect';
+import { useTemplates } from '@/hooks/useTemplates';
 
 interface Option {
     id: number;
@@ -79,18 +81,6 @@ const TextArea = styled.textarea`
   }
 `;
 
-const SelectionsContainer = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-`;
-
-const GameSelectorContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
 const ArticleLabel = styled(Label)`
     color: var(--dark-grey);
 `;
@@ -107,6 +97,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     const [searchValue, setSearchValue] = useState('');
     const [formData, setFormData] = useState({
         title: '',
+        subtitle: '',
         content: '',
         templateId: 1,
         relatedGames: [] as number[],
@@ -117,6 +108,11 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     const [selectedGameId, setSelectedGameId] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { templates, fetchTemplates } = useTemplates();
+
+    useEffect(() => {
+        fetchTemplates();
+    }, [fetchTemplates]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -165,6 +161,19 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         }
     };
 
+    const isFormValid = () => {
+        return formData.title.trim() !== '' &&
+            formData.subtitle.trim() !== '' &&
+            formData.content.trim() !== '';
+    };
+
+    const handleTemplateChange = (value: string) => {
+        setFormData(prev => ({
+            ...prev,
+            templateId: parseInt(value)
+        }));
+    };
+
     return (
         <ArticleFormContainer>
             <TitleBar>
@@ -173,6 +182,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
             <FormContent>
                 <ContentContainer>
                     <StyledForm onSubmit={handleSubmit}>
+
                         <InputGroup>
                             <ArticleLabel htmlFor="title">Título</ArticleLabel>
                             <Input
@@ -186,6 +196,18 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                         </InputGroup>
 
                         <InputGroup>
+                            <ArticleLabel htmlFor="subtitle">Subtítulo</ArticleLabel>
+                            <Input
+                                type="text"
+                                id="subtitle"
+                                name="subtitle"
+                                value={formData.subtitle}
+                                onChange={handleChange}
+                                required
+                            />
+                        </InputGroup>
+
+                        <InputGroup>
                             <ArticleLabel htmlFor="content">Contenido</ArticleLabel>
                             <TextArea
                                 id="content"
@@ -193,6 +215,19 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                                 value={formData.content}
                                 onChange={handleChange}
                                 required
+                            />
+                        </InputGroup>
+
+                        <InputGroup>
+                            <ArticleLabel>Plantilla</ArticleLabel>
+                            <CustomSelect
+                                options={templates.map(template => ({
+                                    value: template.id.toString(),
+                                    label: template.name
+                                }))}
+                                value={formData.templateId.toString()}
+                                onChange={handleTemplateChange}
+                                placeholder="Seleccionar plantilla..."
                             />
                         </InputGroup>
 
@@ -243,10 +278,19 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                         </InputGroup>
 
                         <ButtonContainer>
-                            <Button $variant="primary" type="submit" disabled={isSubmitting}>
+                            <Button
+                                $variant="primary"
+                                type="submit"
+                                disabled={isSubmitting || !isFormValid()}
+                            >
                                 {isSubmitting ? 'Creando...' : 'Crear artículo'}
                             </Button>
-                            <Button $variant="cancel" type="button" onClick={onClose} disabled={isSubmitting}>
+                            <Button
+                                $variant="cancel"
+                                type="button"
+                                onClick={onClose}
+                                disabled={isSubmitting}
+                            >
                                 Cancelar
                             </Button>
                         </ButtonContainer>
