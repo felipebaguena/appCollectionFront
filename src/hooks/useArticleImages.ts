@@ -10,10 +10,18 @@ interface ArticleImage {
   gameId: number;
 }
 
+interface GameArticleImage extends ArticleImage {
+  isSelected?: boolean;
+}
+
 export const useArticleImages = (articleId: number, gameId: number) => {
   const [articleImages, setArticleImages] = useState<ArticleImage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [gameArticleImages, setGameArticleImages] = useState<
+    GameArticleImage[]
+  >([]);
+  const [isSelectingMode, setIsSelectingMode] = useState(false);
 
   const fetchArticleImages = useCallback(async () => {
     setLoading(true);
@@ -104,6 +112,52 @@ export const useArticleImages = (articleId: number, gameId: number) => {
     }
   }, []);
 
+  const fetchGameArticleImages = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const images = await api.get<ArticleImage[]>(
+        ENDPOINTS.GET_GAME_ARTICLE_IMAGES(gameId.toString())
+      );
+
+      // Marcar las imágenes que ya están seleccionadas para este artículo
+      const imagesWithSelection = images.map((img) => ({
+        ...img,
+        isSelected: articleImages.some((artImg) => artImg.id === img.id),
+      }));
+
+      setGameArticleImages(imagesWithSelection);
+    } catch (error) {
+      setError("Error al cargar las imágenes del juego");
+    } finally {
+      setLoading(false);
+    }
+  }, [gameId, articleImages]);
+
+  const updateArticleImages = useCallback(
+    async (selectedImageIds: number[]) => {
+      setLoading(true);
+      setError(null);
+      try {
+        await api.request(
+          ENDPOINTS.UPDATE_ARTICLE_IMAGES(articleId.toString()),
+          {
+            method: "PUT",
+            body: { imageIds: selectedImageIds },
+          }
+        );
+        await fetchArticleImages();
+        setIsSelectingMode(false);
+      } catch (error) {
+        setError("Error al actualizar las imágenes del artículo");
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [articleId, fetchArticleImages]
+  );
+
   return {
     articleImages,
     loading,
@@ -112,5 +166,10 @@ export const useArticleImages = (articleId: number, gameId: number) => {
     uploadImage,
     deleteImage,
     deleteMultipleImages,
+    gameArticleImages,
+    isSelectingMode,
+    setIsSelectingMode,
+    fetchGameArticleImages,
+    updateArticleImages,
   };
 };

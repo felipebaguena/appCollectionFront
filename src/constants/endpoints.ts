@@ -55,4 +55,6 @@ export const ENDPOINTS = {
   UPLOAD_ARTICLE_IMAGE: "/article-images",
   GET_ARTICLE_IMAGES: (articleId: string) =>
     `/article-images/article/${articleId}`,
+  GET_GAME_ARTICLE_IMAGES: (gameId: string) => `/article-images/game/${gameId}`,
+  UPDATE_ARTICLE_IMAGES: (articleId: string) => `/articles/${articleId}/images`,
 };
