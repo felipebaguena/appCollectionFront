@@ -63,6 +63,7 @@ import { Article } from '@/types/article';
 import { useArticle } from '@/hooks/useArticle';
 import CreateArticleForm from '@/components/articles/CreateArticleForm';
 import { useRouter } from 'next/navigation';
+import ArticleGalleryModal from '@/components/articles/ArticleGalleryModal';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -270,7 +271,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
             />
         );
 
-        if (form === 'game') {
+        if (form === 'game' || form === 'article') {
             buttons.push(
                 <GalleryButtonDataTable key="gallery" onClick={() => handleGalleryAction(item)} title="Galería" />
             );
@@ -494,12 +495,24 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
             {selectedItem && actionType === 'view' && renderComponent(ViewComponent, selectedItem)}
             {selectedItem && actionType === 'edit' && renderComponent(EditComponent, selectedItem)}
             {showGallery && selectedItem && (
-                <GameGalleryModal
-                    isOpen={showGallery}
-                    onClose={handleCloseGallery}
-                    game={selectedItem as unknown as Game}
-                    getImageUrl={getImageUrl}
-                />
+                <>
+                    {form === 'game' && (
+                        <GameGalleryModal
+                            isOpen={showGallery}
+                            onClose={handleCloseGallery}
+                            game={selectedItem as unknown as Game}
+                            getImageUrl={getImageUrl}
+                        />
+                    )}
+                    {form === 'article' && (
+                        <ArticleGalleryModal
+                            isOpen={showGallery}
+                            onClose={handleCloseGallery}
+                            article={selectedItem as unknown as Article}
+                            getImageUrl={getImageUrl}
+                        />
+                    )}
+                </>
             )}
 
             {/* Modal para la creación */}
