@@ -19,6 +19,11 @@ import SearchableGameSelect from '@/components/ui/SearchableGameSelect';
 import { TitleBar } from '@/components/collection/CollectionElements';
 import CustomSelect from '@/components/ui/CustomSelect';
 import { useTemplates } from '@/hooks/useTemplates';
+import SearchableSelect from '@/components/ui/SearchableSelect';
+import { useGenres } from '@/hooks/useGenres';
+import { usePlatforms } from '@/hooks/usePlatforms';
+import { useDevelopers } from '@/hooks/useDevelopers';
+import { Game } from '@/types/game';
 
 interface Option {
     id: number;
@@ -109,6 +114,9 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { templates, fetchTemplates } = useTemplates();
+    const { searchGenres } = useGenres();
+    const { searchPlatforms } = usePlatforms();
+    const { searchDevelopers } = useDevelopers();
 
     useEffect(() => {
         fetchTemplates();
@@ -119,12 +127,45 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleGameChange = (value: string) => {
+    const handleGameChange = async (value: string) => {
         setSelectedGameId(value);
-        setFormData(prev => ({
-            ...prev,
-            relatedGames: [parseInt(value)]
-        }));
+
+        if (value) {
+            try {
+                const gameDetails = await api.get<Game>(ENDPOINTS.GET_GAME(value));
+
+                if (gameDetails) {
+                    setFormData(prev => ({
+                        ...prev,
+                        relatedGames: [gameDetails.id],
+                        relatedPlatforms: gameDetails.platforms.map(p => p.id),
+                        relatedGenres: gameDetails.genres.map(g => g.id),
+                        relatedDevelopers: gameDetails.developers.map(d => d.id)
+                    }));
+                } else {
+                    console.error("No se encontró el juego seleccionado");
+                    setFormData(prev => ({
+                        ...prev,
+                        relatedGames: [parseInt(value)]
+                    }));
+                }
+            } catch (error) {
+                console.error("Error al obtener los detalles del juego:", error);
+                setFormData(prev => ({
+                    ...prev,
+                    relatedGames: [parseInt(value)]
+                }));
+            }
+        } else {
+            // Limpiar las selecciones si no hay juego seleccionado
+            setFormData(prev => ({
+                ...prev,
+                relatedGames: [],
+                relatedPlatforms: [],
+                relatedGenres: [],
+                relatedDevelopers: []
+            }));
+        }
     };
 
     const handleMultiSelectChange = (name: string) => (selected: Option[]) => {
@@ -171,6 +212,13 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         setFormData(prev => ({
             ...prev,
             templateId: parseInt(value)
+        }));
+    };
+
+    const handleOptionsChange = (fieldName: string) => (newOptions: Option[]) => {
+        setFormData(prev => ({
+            ...prev,
+            [fieldName]: newOptions.map(option => option.id)
         }));
     };
 
@@ -241,39 +289,37 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
 
                         <InputGroup>
                             <ArticleLabel>Plataformas</ArticleLabel>
-                            <MultiSelect
-                                options={platforms}
+                            <SearchableSelect
                                 selectedOptions={platforms.filter(p =>
                                     formData.relatedPlatforms.includes(p.id)
                                 )}
-                                onChange={handleMultiSelectChange('relatedPlatforms')}
-                                placeholder="Selecciona plataformas"
+                                onOptionsChange={handleOptionsChange('relatedPlatforms')}
+                                searchFunction={searchPlatforms}
+                                placeholder="Buscar plataforma..."
                             />
                         </InputGroup>
 
                         <InputGroup>
                             <ArticleLabel>Géneros</ArticleLabel>
-                            <MultiSelect
-                                options={genres}
+                            <SearchableSelect
                                 selectedOptions={genres.filter(g =>
                                     formData.relatedGenres.includes(g.id)
                                 )}
-                                onChange={handleMultiSelectChange('relatedGenres')}
-                                placeholder="Selecciona géneros"
-                                dropUp={true}
+                                onOptionsChange={handleOptionsChange('relatedGenres')}
+                                searchFunction={searchGenres}
+                                placeholder="Buscar género..."
                             />
                         </InputGroup>
 
                         <InputGroup>
                             <ArticleLabel>Desarrolladores</ArticleLabel>
-                            <MultiSelect
-                                options={developers}
+                            <SearchableSelect
                                 selectedOptions={developers.filter(d =>
                                     formData.relatedDevelopers.includes(d.id)
                                 )}
-                                onChange={handleMultiSelectChange('relatedDevelopers')}
-                                placeholder="Selecciona desarrolladores"
-                                dropUp={true}
+                                onOptionsChange={handleOptionsChange('relatedDevelopers')}
+                                searchFunction={searchDevelopers}
+                                placeholder="Buscar desarrollador..."
                             />
                         </InputGroup>
 
