@@ -79,10 +79,13 @@ export const useArticleImages = (articleId: number, gameId: number) => {
     setError(null);
     try {
       await api.delete(
-        ENDPOINTS.DELETE_IMAGE(imageId.toString()),
+        ENDPOINTS.DELETE_ARTICLE_IMAGE(imageId.toString()),
         imageId.toString()
       );
       setArticleImages((prevImages) =>
+        prevImages.filter((img) => img.id !== imageId)
+      );
+      setGameArticleImages((prevImages) =>
         prevImages.filter((img) => img.id !== imageId)
       );
     } catch (error) {
@@ -97,11 +100,21 @@ export const useArticleImages = (articleId: number, gameId: number) => {
     setLoading(true);
     setError(null);
     try {
-      await api.request(ENDPOINTS.DELETE_MULTIPLE_IMAGES, {
-        method: "DELETE",
-        body: { ids: imageIds },
-      });
+      // Borrar las imágenes una por una
+      await Promise.all(
+        imageIds.map((id) =>
+          api.delete(
+            ENDPOINTS.DELETE_ARTICLE_IMAGE(id.toString()),
+            id.toString()
+          )
+        )
+      );
+
+      // Actualizar los estados
       setArticleImages((prevImages) =>
+        prevImages.filter((img) => !imageIds.includes(img.id))
+      );
+      setGameArticleImages((prevImages) =>
         prevImages.filter((img) => !imageIds.includes(img.id))
       );
     } catch (error) {
@@ -158,6 +171,32 @@ export const useArticleImages = (articleId: number, gameId: number) => {
     [articleId, fetchArticleImages]
   );
 
+  const uploadToGameGallery = useCallback(
+    async (file: File) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const response = await api.postFormData<ArticleImage>(
+          ENDPOINTS.UPLOAD_GAME_ARTICLE_IMAGE(gameId.toString()),
+          formData
+        );
+
+        // Actualizar la lista de imágenes de la galería
+        setGameArticleImages((prev) => [...prev, response]);
+        return response;
+      } catch (error) {
+        setError("Error al subir la imagen a la galería");
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [gameId]
+  );
+
   return {
     articleImages,
     loading,
@@ -171,5 +210,6 @@ export const useArticleImages = (articleId: number, gameId: number) => {
     setIsSelectingMode,
     fetchGameArticleImages,
     updateArticleImages,
+    uploadToGameGallery,
   };
 };

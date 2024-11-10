@@ -137,8 +137,7 @@ const DeleteIcon = styled(IconBase) <{ isVisible: boolean }>`
 
 const SelectedImage = styled(GalleryImage) <{ $isSelected: boolean }>`
   position: relative;
-  border-color: ${props => props.$isSelected ? 'red' : 'transparent'};
-  opacity: ${props => props.$isSelected ? 0.5 : 1};
+  border: ${props => props.$isSelected ? '4px solid var(--app-yellow)' : '4px solid transparent'};
   
   &::after {
     content: '';
@@ -147,16 +146,40 @@ const SelectedImage = styled(GalleryImage) <{ $isSelected: boolean }>`
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: red;
-    opacity: ${props => props.$isSelected ? 0.3 : 0};
+    background-color: var(--app-yellow);
+    opacity: ${props => props.$isSelected ? 0.2 : 0};
     transition: opacity 0.2s ease-in-out;
   }
 
   &:hover {
-    border-color: red;
-
+    border-color: var(--app-yellow);
     &::after {
-      opacity: 0.3;
+      opacity: 0.2;
+    }
+  }
+`;
+
+// Añadir nuevo componente para imágenes en modo borrado
+const DeleteModeImage = styled(GalleryImage) <{ $isSelected: boolean }>`
+  position: relative;
+  border: ${props => props.$isSelected ? '4px solid var(--app-red)' : '4px solid transparent'};
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--app-red);
+    opacity: ${props => props.$isSelected ? 0.2 : 0};
+    transition: opacity 0.2s ease-in-out;
+  }
+
+  &:hover {
+    border-color: var(--app-red);
+    &::after {
+      opacity: 0.2;
     }
   }
 `;
@@ -195,7 +218,8 @@ const ArticleGalleryModal: React.FC<GalleryModalProps> = ({
         updateArticleImages,
         uploadImage,
         deleteImage,
-        deleteMultipleImages
+        deleteMultipleImages,
+        uploadToGameGallery
     } = useArticleImages(article.id, gameId || 0);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -204,12 +228,14 @@ const ArticleGalleryModal: React.FC<GalleryModalProps> = ({
     const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
     const [isDeleteMode, setIsDeleteMode] = useState(false);
     const [selectedImages, setSelectedImages] = useState<number[]>([]);
+    const [selectedForDelete, setSelectedForDelete] = useState<number[]>([]);
     const [confirmationModal, setConfirmationModal] = useState({
         isOpen: false,
         title: '',
         message: '',
         onConfirm: () => { },
     });
+    const [selectedPendingImages, setSelectedPendingImages] = useState<string[]>([]);
 
     useEffect(() => {
         if (isOpen) {
@@ -286,44 +312,73 @@ const ArticleGalleryModal: React.FC<GalleryModalProps> = ({
         fileInputRef.current?.click();
     };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
-        if (files) {
-            const newPendingImages = Array.from(files).map(file => ({
-                id: Math.random().toString(36).substr(2, 9),
-                file,
-                previewUrl: URL.createObjectURL(file)
-            }));
-            setPendingImages(prev => [...prev, ...newPendingImages]);
-        }
+        if (!files) return;
+
+        // Tanto en modo normal como en modo selección, crear imágenes temporales
+        const newPendingImages = Array.from(files).map(file => ({
+            id: Math.random().toString(36).substr(2, 9),
+            file,
+            previewUrl: URL.createObjectURL(file)
+        }));
+        setPendingImages(prev => [...prev, ...newPendingImages]);
     };
 
     const handleConfirmUpload = async () => {
-        for (const pendingImage of pendingImages) {
+        const selectedImages = pendingImages.filter(img => selectedPendingImages.includes(img.id));
+
+        for (const pendingImage of selectedImages) {
             try {
-                await uploadImage(pendingImage.file);
+                if (isSelectingMode) {
+                    await uploadToGameGallery(pendingImage.file);
+                } else {
+                    await uploadImage(pendingImage.file);
+                }
             } catch (error) {
                 console.error("Error uploading image:", error);
             }
         }
+
         setPendingImages([]);
-        fetchArticleImages();
+        setSelectedPendingImages([]);
+        if (isSelectingMode) {
+            await fetchGameArticleImages();
+        } else {
+            await fetchArticleImages();
+        }
     };
 
     const handleDeleteModeToggle = () => {
-        setIsDeleteMode(!isDeleteMode);
-        setSelectedImages([]);
+        if (isDeleteMode) {
+            setSelectedForDelete([]);
+            setSelectedImages(articleImages.map(img => img.id));
+        } else {
+            setSelectedForDelete([]);
+        }
+        setIsDeleteMode(prev => !prev);
     };
 
     const handleImageSelect = (imageId: number) => {
         if (isSelectingMode) {
-            setSelectedImages(prev =>
-                prev.includes(imageId) ? prev.filter(id => id !== imageId) : [...prev, imageId]
-            );
-        } else if (isDeleteMode) {
-            setSelectedImages(prev =>
-                prev.includes(imageId) ? prev.filter(id => id !== imageId) : [...prev, imageId]
-            );
+            if (isDeleteMode) {
+                setSelectedForDelete(prev =>
+                    prev.includes(imageId)
+                        ? prev.filter(id => id !== imageId)
+                        : [...prev, imageId]
+                );
+            } else {
+                setSelectedImages(prev => {
+                    if (prev.includes(imageId)) {
+                        return prev.filter(id => id !== imageId);
+                    }
+                    if (prev.length >= article.template.imageCount) {
+                        console.error(`Este artículo requiere exactamente ${article.template.imageCount} imágenes`);
+                        return prev;
+                    }
+                    return [...prev, imageId];
+                });
+            }
         } else {
             handleImageClick(articleImages.findIndex(img => img.id === imageId));
         }
@@ -337,6 +392,8 @@ const ArticleGalleryModal: React.FC<GalleryModalProps> = ({
             onConfirm: async () => {
                 try {
                     await deleteImage(imageId);
+                    await fetchArticleImages();
+                    setSelectedImages(prev => prev.filter(id => id !== imageId));
                 } catch (error) {
                     console.error("Error al borrar la imagen:", error);
                 }
@@ -349,11 +406,14 @@ const ArticleGalleryModal: React.FC<GalleryModalProps> = ({
         setConfirmationModal({
             isOpen: true,
             title: 'Confirmar eliminación múltiple',
-            message: `¿Seguro que deseas borrar ${selectedImages.length} imágenes seleccionadas?`,
+            message: `¿Seguro que deseas borrar ${selectedForDelete.length} imágenes seleccionadas?`,
             onConfirm: async () => {
                 try {
-                    await deleteMultipleImages(selectedImages);
-                    setSelectedImages([]);
+                    await Promise.all(selectedForDelete.map(id => deleteImage(id)));
+                    setSelectedForDelete([]);
+                    await fetchArticleImages();
+                    const remainingImages = articleImages.filter(img => !selectedForDelete.includes(img.id));
+                    setSelectedImages(remainingImages.slice(0, article.template.imageCount).map(img => img.id));
                 } catch (error) {
                     console.error("Error al borrar las imágenes seleccionadas:", error);
                 }
@@ -364,7 +424,7 @@ const ArticleGalleryModal: React.FC<GalleryModalProps> = ({
 
     const handleToggleSelectMode = () => {
         if (!isSelectingMode) {
-            setSelectedImages(articleImages.map(img => img.id));
+            setSelectedImages(articleImages.slice(0, article.template.imageCount).map(img => img.id));
         } else {
             setSelectedImages([]);
         }
@@ -380,6 +440,47 @@ const ArticleGalleryModal: React.FC<GalleryModalProps> = ({
         }
     };
 
+    const handleUploadToGalleryClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handlePendingImageSelect = (imageId: string) => {
+        setSelectedPendingImages(prev => {
+            if (prev.includes(imageId)) {
+                return prev.filter(id => id !== imageId);
+            }
+            if (!isSelectingMode && prev.length >= article.template.imageCount) {
+                console.error(`No puedes seleccionar más de ${article.template.imageCount} imágenes para este tipo de artículo`);
+                return prev;
+            }
+            return [...prev, imageId];
+        });
+    };
+
+    const handleConfirmGalleryUpload = async () => {
+        const selectedImages = pendingImages.filter(img => selectedPendingImages.includes(img.id));
+
+        for (const pendingImage of selectedImages) {
+            try {
+                await uploadToGameGallery(pendingImage.file);
+            } catch (error) {
+                console.error("Error uploading image to gallery:", error);
+            }
+        }
+
+        setPendingImages([]);
+        setSelectedPendingImages([]);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = ''; // Resetear el input file
+        }
+        await fetchGameArticleImages();
+    };
+
+    const handleUploadToGalleryFromArticle = () => {
+        setIsSelectingMode(true);
+        handleUploadToGalleryClick(); // Esto abrirá directamente el selector de archivos
+    };
+
     const modalContent = (
         <>
             {loading && <p>Cargando imágenes...</p>}
@@ -388,16 +489,55 @@ const ArticleGalleryModal: React.FC<GalleryModalProps> = ({
                 <>
                     <GalleryContainer>
                         {isSelectingMode ? (
-                            gameArticleImages.map((img) => (
-                                <div key={img.id} style={{ position: 'relative' }}>
-                                    <SelectedImage
-                                        src={getImageUrl(img.path)}
-                                        alt={img.filename}
-                                        onClick={() => handleImageSelect(img.id)}
-                                        $isSelected={selectedImages.includes(img.id)}
-                                    />
-                                </div>
-                            ))
+                            <>
+                                {pendingImages.map((img) => (
+                                    <PendingImageWrapper key={img.id}>
+                                        <PendingImage
+                                            src={img.previewUrl}
+                                            alt="Pending upload"
+                                            onClick={() => handlePendingImageSelect(img.id)}
+                                            style={{
+                                                border: selectedPendingImages.includes(img.id) ? '4px solid var(--app-yellow)' : '2px solid transparent',
+                                                opacity: selectedPendingImages.includes(img.id) ? 1 : 0.6
+                                            }}
+                                        />
+                                        <PendingIcon>
+                                            <FaClock />
+                                        </PendingIcon>
+                                    </PendingImageWrapper>
+                                ))}
+                                {gameArticleImages.map((img) => (
+                                    <div key={img.id} style={{ position: 'relative' }}>
+                                        {pendingImages.length > 0 ? (
+                                            <GalleryImage
+                                                src={getImageUrl(img.path)}
+                                                alt={img.filename}
+                                                style={{ cursor: 'default' }}
+                                            />
+                                        ) : isDeleteMode ? (
+                                            <DeleteModeImage
+                                                src={getImageUrl(img.path)}
+                                                alt={img.filename}
+                                                onClick={() => handleImageSelect(img.id)}
+                                                $isSelected={selectedForDelete.includes(img.id)}
+                                            />
+                                        ) : (
+                                            <SelectedImage
+                                                src={getImageUrl(img.path)}
+                                                alt={img.filename}
+                                                onClick={() => handleImageSelect(img.id)}
+                                                $isSelected={selectedImages.includes(img.id)}
+                                            />
+                                        )}
+                                        <DeleteIcon
+                                            isVisible={isDeleteMode && pendingImages.length === 0}
+                                            onClick={() => handleDeleteImage(img.id)}
+                                        >
+                                            <FaTimes />
+                                        </DeleteIcon>
+                                    </div>
+                                ))}
+                            </>
                         ) : (
                             <>
                                 {pendingImages.map((img) => (
@@ -405,6 +545,11 @@ const ArticleGalleryModal: React.FC<GalleryModalProps> = ({
                                         <PendingImage
                                             src={img.previewUrl}
                                             alt="Pending upload"
+                                            onClick={() => handlePendingImageSelect(img.id)}
+                                            style={{
+                                                border: selectedPendingImages.includes(img.id) ? '4px solid var(--app-yellow)' : '2px solid transparent',
+                                                opacity: selectedPendingImages.includes(img.id) ? 1 : 0.6
+                                            }}
                                         />
                                         <PendingIcon>
                                             <FaClock />
@@ -413,26 +558,11 @@ const ArticleGalleryModal: React.FC<GalleryModalProps> = ({
                                 ))}
                                 {articleImages.map((img) => (
                                     <div key={img.id} style={{ position: 'relative' }}>
-                                        {isDeleteMode ? (
-                                            <SelectedImage
-                                                src={getImageUrl(img.path)}
-                                                alt={img.filename}
-                                                onClick={() => handleImageSelect(img.id)}
-                                                $isSelected={selectedImages.includes(img.id)}
-                                            />
-                                        ) : (
-                                            <GalleryImage
-                                                src={getImageUrl(img.path)}
-                                                alt={img.filename}
-                                                onClick={() => handleImageClick(articleImages.indexOf(img))}
-                                            />
-                                        )}
-                                        <DeleteIcon
-                                            isVisible={isDeleteMode}
-                                            onClick={() => handleDeleteImage(img.id)}
-                                        >
-                                            <FaTimes />
-                                        </DeleteIcon>
+                                        <GalleryImage
+                                            src={getImageUrl(img.path)}
+                                            alt={img.filename}
+                                            onClick={() => handleImageClick(articleImages.indexOf(img))}
+                                        />
                                     </div>
                                 ))}
                             </>
@@ -441,30 +571,76 @@ const ArticleGalleryModal: React.FC<GalleryModalProps> = ({
                     <ButtonContainer>
                         {!isSelectingMode ? (
                             <>
-                                <Button $variant="primary" onClick={handleUploadClick}>
-                                    Subir imagen
-                                </Button>
-                                <Button $variant="dark" onClick={handleDeleteModeToggle}>
-                                    {isDeleteMode ? 'Salir del borrado' : 'Borrar imágenes'}
-                                </Button>
+                                {articleImages.length < article.template.imageCount ? (
+                                    <Button $variant="primary" onClick={handleUploadClick}>
+                                        Subir imagen
+                                    </Button>
+                                ) : null}
                                 <Button $variant="primary" onClick={handleToggleSelectMode}>
                                     Actualizar imágenes
                                 </Button>
+                                {pendingImages.length > 0 && (
+                                    <Button
+                                        $variant="primary"
+                                        onClick={handleConfirmUpload}
+                                        disabled={selectedPendingImages.length === 0 || selectedPendingImages.length > article.template.imageCount}
+                                    >
+                                        Confirmar subida ({selectedPendingImages.length}/{article.template.imageCount})
+                                    </Button>
+                                )}
                             </>
                         ) : (
                             <>
-                                <Button $variant="primary" onClick={handleSaveSelection}>
-                                    Guardar selección ({selectedImages.length})
-                                </Button>
+                                {pendingImages.length === 0 ? (
+                                    <>
+                                        <Button $variant="primary" onClick={handleUploadToGalleryClick}>
+                                            Subir imagen a galería
+                                        </Button>
+                                        {!isDeleteMode && (
+                                            <Button
+                                                $variant="primary"
+                                                onClick={handleSaveSelection}
+                                                disabled={selectedImages.length !== article.template.imageCount}
+                                            >
+                                                Guardar selección ({selectedImages.length}/{article.template.imageCount})
+                                            </Button>
+                                        )}
+                                        <Button $variant="dark" onClick={handleDeleteModeToggle}>
+                                            {isDeleteMode ? 'Salir del borrado' : 'Borrar imágenes'}
+                                        </Button>
+                                        {isDeleteMode && selectedForDelete.length > 0 && (
+                                            <Button $variant="danger" onClick={handleDeleteSelectedImages}>
+                                                Borrar seleccionadas ({selectedForDelete.length})
+                                            </Button>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button $variant="primary" onClick={handleUploadToGalleryClick}>
+                                            Subir más imágenes
+                                        </Button>
+                                        <Button
+                                            $variant="primary"
+                                            onClick={handleConfirmGalleryUpload}
+                                            disabled={selectedPendingImages.length === 0}
+                                        >
+                                            Confirmar subida ({selectedPendingImages.length} imágenes)
+                                        </Button>
+                                        <Button $variant="dark" onClick={() => {
+                                            setPendingImages([]);
+                                            setSelectedPendingImages([]);
+                                            if (fileInputRef.current) {
+                                                fileInputRef.current.value = ''; // Resetear el input file
+                                            }
+                                        }}>
+                                            Cancelar subida
+                                        </Button>
+                                    </>
+                                )}
                                 <Button $variant="dark" onClick={handleToggleSelectMode}>
                                     Cancelar
                                 </Button>
                             </>
-                        )}
-                        {pendingImages.length > 0 && (
-                            <Button $variant="primary" onClick={handleConfirmUpload}>
-                                Confirmar subida ({pendingImages.length})
-                            </Button>
                         )}
                         <Button $variant="cancel" onClick={onClose}>
                             Cerrar galería
