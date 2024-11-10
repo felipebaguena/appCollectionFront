@@ -52,4 +52,7 @@ export const ENDPOINTS = {
   CREATE_ARTICLE: "/articles",
   GET_GAMES_SEARCH: (title: string) => `/games/search?title=${title}`,
   GET_ACTIVE_TEMPLATES: "/article-templates/active",
+  UPLOAD_ARTICLE_IMAGE: "/article-images",
+  GET_ARTICLE_IMAGES: (articleId: string) =>
+    `/article-images/article/${articleId}`,
 };
