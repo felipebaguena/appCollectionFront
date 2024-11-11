@@ -72,11 +72,6 @@ export const articleColumns = [
     sortable: true,
   },
   {
-    key: "subtitle",
-    label: "Subtítulo",
-    sortable: true,
-  },
-  {
     key: "createdAt",
     label: "Fecha de creación",
     sortable: true,
@@ -105,32 +100,10 @@ export const articleColumns = [
   },
   {
     key: "relatedGames",
-    label: "Juegos relacionados",
+    label: "Juegos relacionado",
     sortable: false,
     render: (value: Array<{ title: string }>) =>
       value?.map((game) => game.title).join(", ") || "Sin juegos relacionados",
-  },
-  {
-    key: "relatedPlatforms",
-    label: "Plataformas",
-    sortable: false,
-    render: (value: Array<{ name: string }>) =>
-      value?.map((platform) => platform.name).join(", ") || "Sin plataformas",
-  },
-  {
-    key: "relatedGenres",
-    label: "Géneros",
-    sortable: false,
-    render: (value: Array<{ name: string }>) =>
-      value?.map((genre) => genre.name).join(", ") || "Sin géneros",
-  },
-  {
-    key: "relatedDevelopers",
-    label: "Desarrolladores",
-    sortable: false,
-    render: (value: Array<{ name: string }>) =>
-      value?.map((developer) => developer.name).join(", ") ||
-      "Sin desarrolladores",
   },
   {
     key: "coverId",
