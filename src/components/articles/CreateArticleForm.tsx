@@ -33,6 +33,8 @@ import { ArticleImage } from '@/types/article';
 import StandardReviewTemplate from '../templates/StandardReviewTemplate';
 
 
+
+
 interface Option {
     id: number;
     name: string;
@@ -337,15 +339,15 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
 
     return (
         <ArticleFormContainer>
-            <TitleBar>
-                <TitleText>
-                    {currentStep === 'data'
-                        ? 'Crear Nuevo Artículo'
-                        : currentStep === 'preview'
-                            ? 'Vista Previa'
+            {currentStep !== 'preview' && (
+                <TitleBar>
+                    <TitleText>
+                        {currentStep === 'data'
+                            ? 'Crear Nuevo Artículo'
                             : 'Seleccionar Imágenes'}
-                </TitleText>
-            </TitleBar>
+                    </TitleText>
+                </TitleBar>
+            )}
             <FormContent>
                 <ContentContainer>
                     {currentStep === 'data' ? (
@@ -480,6 +482,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                                     contentImageIds={pendingArticleData.contentImageIds}
                                     gameId={pendingArticleData.relatedGames[0]}
                                     getImageUrl={getImageUrl}
+                                    isPreview={true}
                                 />
                                 <ButtonContainer>
                                     <Button
