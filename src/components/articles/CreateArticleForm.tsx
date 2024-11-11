@@ -134,12 +134,6 @@ interface GameArticleImage {
     gameId: number;
 }
 
-// Función para convertir GameArticleImage a ArticleImage
-const convertToArticleImage = (gameImage: GameArticleImage): ArticleImage => ({
-    ...gameImage,
-    isCover: false // Por defecto, ninguna imagen es de portada
-});
-
 const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     onClose,
     onArticleCreated,
