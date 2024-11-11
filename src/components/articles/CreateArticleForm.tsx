@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { useGames } from '@/hooks/useGames';
 import { api, getImageUrl } from '@/services/api';
 import { ENDPOINTS } from '@/constants/endpoints';
-import MultiSelect from '@/components/ui/Multiselect';
 import {
     StyledForm,
     InputGroup,
@@ -26,8 +25,9 @@ import { useDevelopers } from '@/hooks/useDevelopers';
 import { Game } from '@/types/game';
 import { useArticle } from '@/hooks/useArticle';
 import { useArticleImages } from '@/hooks/useArticleImages';
-import ImageSelectionStep from '@/components/ui/ImageSelectionStep';
+
 import { ArticleTemplate } from '@/types/articleTemplate';
+import ImageSelectionStep from './ImageSelectionStep';
 
 
 interface Option {

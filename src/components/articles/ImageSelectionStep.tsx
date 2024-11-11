@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useArticleImages } from '@/hooks/useArticleImages';
-import Button from './Button';
-import { ButtonContainer } from './FormElements';
+import Button from '../ui/Button';
+import { ButtonContainer } from '../ui/FormElements';
 import { FaClock } from 'react-icons/fa';
 
 interface ImageSelectionStepProps {
