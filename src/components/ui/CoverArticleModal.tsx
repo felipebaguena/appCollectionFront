@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useArticleImages } from '@/hooks/useArticleImages';
 import Button from './Button';
 import Modal from './Modal';
 import { ButtonContainer } from './FormElements';
 import { Article } from '@/types/article';
+import { FaClock } from 'react-icons/fa';
 
 interface CoverArticleModalProps {
     isOpen: boolean;
@@ -12,6 +13,12 @@ interface CoverArticleModalProps {
     article: Article | null;
     getImageUrl: (path: string) => string;
     onCoverUpdated: () => void;
+}
+
+interface PendingImage {
+    id: string;
+    file: File;
+    previewUrl: string;
 }
 
 const StyledImage = styled.img`
@@ -61,6 +68,40 @@ const GalleryImage = styled.img`
   }
 `;
 
+const PendingImageWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 150px;
+`;
+
+const PendingImage = styled(GalleryImage)`
+  opacity: 0.6;
+`;
+
+const PendingIcon = styled.div`
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: white;
+  padding: 5px;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const HiddenFileInput = styled.input`
+  display: none;
+`;
+
+const NonInteractiveGalleryImage = styled.img`
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  cursor: default;
+  border: 4px solid transparent;
+`;
+
 const CoverArticleModal: React.FC<CoverArticleModalProps> = ({
     isOpen,
     onClose,
@@ -70,6 +111,9 @@ const CoverArticleModal: React.FC<CoverArticleModalProps> = ({
 }) => {
     const [showGallery, setShowGallery] = useState(false);
     const [selectedImageId, setSelectedImageId] = useState<number | null>(null);
+    const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
+    const [selectedPendingImages, setSelectedPendingImages] = useState<string[]>([]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const gameId = article?.relatedGames?.[0]?.id || 0;
     const {
@@ -77,7 +121,8 @@ const CoverArticleModal: React.FC<CoverArticleModalProps> = ({
         loading,
         error,
         fetchGameArticleImages,
-        setCoverImage
+        setCoverImage,
+        uploadToGameGallery
     } = useArticleImages(article?.id || 0, gameId);
 
     useEffect(() => {
@@ -122,6 +167,50 @@ const CoverArticleModal: React.FC<CoverArticleModalProps> = ({
         }
     };
 
+    const handleUploadToGalleryClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (!files) return;
+
+        const newPendingImages = Array.from(files).map(file => ({
+            id: Math.random().toString(36).substr(2, 9),
+            file,
+            previewUrl: URL.createObjectURL(file)
+        }));
+        setPendingImages(prev => [...prev, ...newPendingImages]);
+    };
+
+    const handlePendingImageSelect = (imageId: string) => {
+        setSelectedPendingImages(prev => {
+            if (prev.includes(imageId)) {
+                return prev.filter(id => id !== imageId);
+            }
+            return [...prev, imageId];
+        });
+    };
+
+    const handleConfirmGalleryUpload = async () => {
+        const selectedImages = pendingImages.filter(img => selectedPendingImages.includes(img.id));
+
+        for (const pendingImage of selectedImages) {
+            try {
+                await uploadToGameGallery(pendingImage.file);
+            } catch (error) {
+                console.error("Error uploading image to gallery:", error);
+            }
+        }
+
+        setPendingImages([]);
+        setSelectedPendingImages([]);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+        await fetchGameArticleImages();
+    };
+
     if (!article) return null;
 
     const imageSrc = article.coverImage ? getImageUrl(article.coverImage.path) : null;
@@ -132,28 +221,88 @@ const CoverArticleModal: React.FC<CoverArticleModalProps> = ({
             {loading && <p>Cargando imágenes...</p>}
             {error && <p>Error: {error}</p>}
             <GalleryContainer>
+                {pendingImages.map((img) => (
+                    <PendingImageWrapper key={img.id}>
+                        <PendingImage
+                            src={img.previewUrl}
+                            alt="Pending upload"
+                            onClick={() => handlePendingImageSelect(img.id)}
+                            style={{
+                                border: selectedPendingImages.includes(img.id) ? '4px solid var(--app-yellow)' : '2px solid transparent',
+                                opacity: selectedPendingImages.includes(img.id) ? 1 : 0.6
+                            }}
+                        />
+                        <PendingIcon>
+                            <FaClock />
+                        </PendingIcon>
+                    </PendingImageWrapper>
+                ))}
                 {gameArticleImages.map((img) => (
-                    <GalleryImage
-                        key={img.id}
-                        src={getImageUrl(img.path)}
-                        alt={img.filename}
-                        onClick={() => handleImageSelect(img.id)}
-                        className={selectedImageId === img.id ? 'selected' : ''}
-                    />
+                    pendingImages.length > 0 ? (
+                        <NonInteractiveGalleryImage
+                            key={img.id}
+                            src={getImageUrl(img.path)}
+                            alt={img.filename}
+                        />
+                    ) : (
+                        <GalleryImage
+                            key={img.id}
+                            src={getImageUrl(img.path)}
+                            alt={img.filename}
+                            onClick={() => handleImageSelect(img.id)}
+                            className={selectedImageId === img.id ? 'selected' : ''}
+                        />
+                    )
                 ))}
             </GalleryContainer>
             <ButtonContainer>
-                <Button
-                    $variant="primary"
-                    onClick={handleSaveNewCover}
-                    disabled={!selectedImageId || loading}
-                >
-                    Guardar nueva portada
-                </Button>
+                {pendingImages.length === 0 ? (
+                    <>
+                        <Button $variant="primary" onClick={handleUploadToGalleryClick}>
+                            Subir imagen a galería
+                        </Button>
+                        <Button
+                            $variant="primary"
+                            onClick={handleSaveNewCover}
+                            disabled={!selectedImageId}
+                        >
+                            Guardar como portada
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Button $variant="primary" onClick={handleUploadToGalleryClick}>
+                            Subir más imágenes
+                        </Button>
+                        <Button
+                            $variant="primary"
+                            onClick={handleConfirmGalleryUpload}
+                            disabled={selectedPendingImages.length === 0}
+                        >
+                            Confirmar subida ({selectedPendingImages.length} imágenes)
+                        </Button>
+                        <Button $variant="dark" onClick={() => {
+                            setPendingImages([]);
+                            setSelectedPendingImages([]);
+                            if (fileInputRef.current) {
+                                fileInputRef.current.value = '';
+                            }
+                        }}>
+                            Cancelar subida
+                        </Button>
+                    </>
+                )}
                 <Button $variant="cancel" onClick={() => setShowGallery(false)}>
                     Cancelar
                 </Button>
             </ButtonContainer>
+            <HiddenFileInput
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                multiple
+            />
         </>
     ) : (
         <>
