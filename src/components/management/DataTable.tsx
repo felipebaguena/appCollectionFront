@@ -253,9 +253,21 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     const getActionButtons = (form: FormType, item: T) => {
         const buttons = [];
 
-        if (ViewComponent) {
+        if (form === 'article') {
             buttons.push(
-                <ViewButtonDataTable key="view" onClick={() => handleAction(item, 'view')} title="Ver" />
+                <ViewButtonDataTable
+                    key="view"
+                    onClick={() => router.push(`/articles/${item.id}`)}
+                    title="Ver artículo"
+                />
+            );
+        } else if (ViewComponent) {
+            buttons.push(
+                <ViewButtonDataTable
+                    key="view"
+                    onClick={() => handleAction(item, 'view')}
+                    title="Ver"
+                />
             );
         }
 

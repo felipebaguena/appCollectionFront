@@ -7,9 +7,11 @@ interface StandardReviewTemplateProps {
     title: string;
     subtitle: string;
     content: string;
-    coverImageId: number | null;
-    contentImageIds: number[];
-    gameId: number;
+    coverImageId?: number | null;
+    coverImagePath?: string;
+    contentImageIds?: number[];
+    contentImagePaths?: string[];
+    gameId?: number;
     getImageUrl: (path: string) => string;
     isPreview?: boolean;
 }
@@ -140,7 +142,9 @@ const StandardReviewTemplate: React.FC<StandardReviewTemplateProps> = ({
     subtitle,
     content,
     coverImageId,
+    coverImagePath,
     contentImageIds,
+    contentImagePaths,
     gameId,
     getImageUrl,
     isPreview = false
@@ -150,25 +154,40 @@ const StandardReviewTemplate: React.FC<StandardReviewTemplateProps> = ({
         loading,
         error,
         fetchGameArticleImages,
-    } = useArticleImages(0, gameId);
+    } = useArticleImages(0, gameId || 0);
 
     useEffect(() => {
-        fetchGameArticleImages();
-    }, [fetchGameArticleImages]);
+        if (gameId && contentImageIds) {
+            fetchGameArticleImages();
+        }
+    }, [fetchGameArticleImages, gameId, contentImageIds]);
 
     if (loading) return <div>Cargando imágenes...</div>;
     if (error) return <div>Error: {error}</div>;
 
-    const coverImage = gameArticleImages.find(img => img.id === coverImageId);
-    const contentImages = contentImageIds
-        .map(id => gameArticleImages.find(img => img.id === id))
-        .filter(img => img !== undefined);
+    let coverImageUrl = '';
+    let contentImages: { path: string }[] = [];
+
+    if (coverImagePath) {
+        coverImageUrl = getImageUrl(coverImagePath);
+    } else if (gameArticleImages.length > 0 && coverImageId) {
+        const coverImage = gameArticleImages.find(img => img.id === coverImageId);
+        coverImageUrl = coverImage ? getImageUrl(coverImage.path) : '';
+    }
+
+    if (contentImagePaths) {
+        contentImages = contentImagePaths.map(path => ({ path }));
+    } else if (gameArticleImages.length > 0 && contentImageIds) {
+        contentImages = contentImageIds
+            .map(id => gameArticleImages.find(img => img.id === id))
+            .filter(img => img !== undefined) as { path: string }[];
+    }
 
     // Dividir el contenido en párrafos y limpiar los saltos de línea
     const paragraphs = content
-        .replace(/\\n\\n/g, '\n\n')  // Reemplazar \n\n literales por saltos de línea reales
+        .replace(/\\n\\n/g, '\n\n')
         .split('\n\n')
-        .map(p => p.trim());  // Limpiar espacios en blanco extras
+        .map(p => p.trim());
 
     // Función para renderizar el contenido con imágenes intercaladas
     const renderContent = () => {
@@ -206,8 +225,6 @@ const StandardReviewTemplate: React.FC<StandardReviewTemplateProps> = ({
 
         return allElements;
     };
-
-    const coverImageUrl = coverImage ? getImageUrl(coverImage.path) : '';
 
     return (
         <>

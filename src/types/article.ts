@@ -12,11 +12,7 @@ export enum PublishedStatus {
 
 export interface ArticleImage {
   id: number;
-  filename: string;
   path: string;
-  articleId: number;
-  gameId: number;
-  isCover: boolean;
 }
 
 export interface Article {
@@ -25,18 +21,16 @@ export interface Article {
   subtitle: string;
   content: string;
   published: boolean;
-  publishedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
+  publishedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
   template: ArticleTemplate;
   relatedGames: Game[];
   relatedPlatforms: Platform[];
   relatedGenres: Genre[];
   relatedDevelopers: Developer[];
-  coverImage: {
-    id: number;
-    path: string;
-  } | null;
+  coverImage: ArticleImage | null;
+  contentImages: ArticleImage[];
 }
 
 export interface ArticleDateRange {
