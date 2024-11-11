@@ -60,4 +60,5 @@ export const ENDPOINTS = {
   DELETE_ARTICLE_IMAGE: (id: string) => `/article-images/${id}`,
   UPLOAD_GAME_ARTICLE_IMAGE: (gameId: string) =>
     `/article-images/game/${gameId}/upload`,
+  SET_ARTICLE_COVER: "/article-images/set-cover",
 };

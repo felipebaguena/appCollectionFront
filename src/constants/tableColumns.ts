@@ -132,4 +132,9 @@ export const articleColumns = [
       value?.map((developer) => developer.name).join(", ") ||
       "Sin desarrolladores",
   },
+  {
+    key: "coverId",
+    label: "Portada",
+    sortable: false,
+  },
 ];

@@ -64,6 +64,7 @@ import { useArticle } from '@/hooks/useArticle';
 import CreateArticleForm from '@/components/articles/CreateArticleForm';
 import { useRouter } from 'next/navigation';
 import ArticleGalleryModal from '@/components/articles/ArticleGalleryModal';
+import CoverArticleModal from '@/components/ui/CoverArticleModal';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -118,6 +119,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         isOpen: false,
         itemToDelete: null as T | null,
     });
+    const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
 
     const deleteItemId = deleteConfirmation.itemToDelete?.id.toString() || '';
     const { deleteGame } = form === 'game' ? useGame(deleteItemId) : { deleteGame: null };
@@ -286,16 +288,27 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 return {
                     ...column,
                     render: (_: unknown, item: T) => {
-                        const game = item as unknown as Game;
-                        const coverImage = game.images.find(img => img.isCover);
-                        const imageSrc = coverImage ? getImageUrl(coverImage.path) : NO_IMAGE_URL;
-
-                        return (
-                            <CoverThumbnail
-                                style={{ backgroundImage: `url(${imageSrc})` }}
-                                onClick={() => handleViewCover(game)}
-                            />
-                        );
+                        if (form === 'game') {
+                            const game = item as unknown as Game;
+                            const coverImage = game.images.find(img => img.isCover);
+                            const imageSrc = coverImage ? getImageUrl(coverImage.path) : NO_IMAGE_URL;
+                            return (
+                                <CoverThumbnail
+                                    style={{ backgroundImage: `url(${imageSrc})` }}
+                                    onClick={() => handleViewCover(game)}
+                                />
+                            );
+                        } else if (form === 'article') {
+                            const article = item as unknown as Article;
+                            const imageSrc = article.coverImage ? getImageUrl(article.coverImage.path) : NO_IMAGE_URL;
+                            return (
+                                <CoverThumbnail
+                                    style={{ backgroundImage: `url(${imageSrc})` }}
+                                    onClick={() => handleViewArticleCover(article)}
+                                />
+                            );
+                        }
+                        return null;
                     },
                 };
             }
@@ -382,6 +395,10 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
             }
             return !!value;
         });
+    };
+
+    const handleViewArticleCover = (article: Article) => {
+        setSelectedArticle(article);
     };
 
     return (
@@ -488,6 +505,15 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 isOpen={!!selectedGame}
                 onClose={() => setSelectedGame(null)}
                 game={selectedGame}
+                getImageUrl={getImageUrl}
+                onCoverUpdated={handleCoverUpdated}
+            />
+
+            {/* Modal para la imagen de portada de artículo */}
+            <CoverArticleModal
+                isOpen={!!selectedArticle}
+                onClose={() => setSelectedArticle(null)}
+                article={selectedArticle}
                 getImageUrl={getImageUrl}
                 onCoverUpdated={handleCoverUpdated}
             />

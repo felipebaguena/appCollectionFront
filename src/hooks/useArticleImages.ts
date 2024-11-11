@@ -197,6 +197,26 @@ export const useArticleImages = (articleId: number, gameId: number) => {
     [gameId]
   );
 
+  const setCoverImage = useCallback(
+    async (articleId: number, imageId: number) => {
+      setLoading(true);
+      setError(null);
+      try {
+        await api.post(ENDPOINTS.SET_ARTICLE_COVER, {
+          articleId,
+          imageId,
+        });
+        await fetchArticleImages();
+      } catch (error) {
+        setError("Error al establecer la imagen de portada");
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [fetchArticleImages]
+  );
+
   return {
     articleImages,
     loading,
@@ -211,5 +231,6 @@ export const useArticleImages = (articleId: number, gameId: number) => {
     fetchGameArticleImages,
     updateArticleImages,
     uploadToGameGallery,
+    setCoverImage,
   };
 };

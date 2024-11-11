@@ -1,7 +1,22 @@
+import { Game } from "./game";
+import { Platform } from "./platform";
+import { Genre } from "./genre";
+import { Developer } from "./developer";
+import { ArticleTemplate } from "./articleTemplate";
+
 export enum PublishedStatus {
   ALL = "ALL",
   PUBLISHED = "PUBLISHED",
   UNPUBLISHED = "UNPUBLISHED",
+}
+
+export interface ArticleImage {
+  id: number;
+  filename: string;
+  path: string;
+  articleId: number;
+  gameId: number;
+  isCover: boolean;
 }
 
 export interface Article {
@@ -9,41 +24,19 @@ export interface Article {
   title: string;
   subtitle: string;
   content: string;
-  createdAt: string;
-  publishedAt: string | null;
   published: boolean;
-  coverImageId: number | null;
-  templateId: number;
-  relatedPlatforms: Array<{
+  publishedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  template: ArticleTemplate;
+  relatedGames: Game[];
+  relatedPlatforms: Platform[];
+  relatedGenres: Genre[];
+  relatedDevelopers: Developer[];
+  coverImage: {
     id: number;
-    name: string;
-    code: string;
-  }>;
-  relatedGenres: Array<{
-    id: number;
-    name: string;
-    code: string;
-  }>;
-  relatedDevelopers: Array<{
-    id: number;
-    name: string;
-    code: string;
-  }>;
-  relatedGames: Array<{
-    id: number;
-    title: string;
-    releaseYear: number;
-    description: string;
-    coverId: number;
-  }>;
-  template: {
-    id: number;
-    name: string;
-    code: string;
-    description: string;
-    isActive: boolean;
-    imageCount: number;
-  };
+    path: string;
+  } | null;
 }
 
 export interface ArticleDateRange {
