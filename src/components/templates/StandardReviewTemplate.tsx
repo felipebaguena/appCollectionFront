@@ -22,6 +22,7 @@ const TemplateContainer = styled.article<{ backgroundImage: string }>`
     margin: 2rem auto;
     z-index: 1;
     padding-bottom: 4rem;
+    margin-top: 4rem;
 `;
 
 const MainContent = styled.div`
@@ -66,8 +67,12 @@ const PageBackground = styled.div<{ backgroundImage: string }>`
 `;
 
 const HeaderSection = styled.header`
+display: flex;
+flex-direction: column;
+justify-content: flex-end;
+align-items: center;
     position: relative;
-    padding: 1rem 1rem;
+    padding: 2rem 2rem 1rem 2rem;
     text-align: center;
     margin-bottom: 2rem;
     z-index: 1;

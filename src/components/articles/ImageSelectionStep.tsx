@@ -283,7 +283,11 @@ const ImageSelectionStep: React.FC<ImageSelectionStepProps> = ({
                 <ButtonContainer>
                     {pendingImages.length === 0 ? (
                         <>
-                            <Button $variant="primary" onClick={handleUploadClick}>
+                            <Button
+                                type="button"
+                                $variant="primary"
+                                onClick={handleUploadClick}
+                            >
                                 Subir nueva imagen
                             </Button>
                             {!isSelectingArticleImages && selectedCoverImage && (
@@ -305,10 +309,15 @@ const ImageSelectionStep: React.FC<ImageSelectionStepProps> = ({
                         </>
                     ) : (
                         <>
-                            <Button $variant="primary" onClick={handleUploadClick}>
+                            <Button
+                                type="button"
+                                $variant="primary"
+                                onClick={handleUploadClick}
+                            >
                                 Subir más imágenes
                             </Button>
                             <Button
+                                type="button"
                                 $variant="primary"
                                 onClick={handleConfirmUpload}
                                 disabled={selectedPendingImages.length === 0}
@@ -316,6 +325,7 @@ const ImageSelectionStep: React.FC<ImageSelectionStepProps> = ({
                                 Confirmar subida ({selectedPendingImages.length} imágenes)
                             </Button>
                             <Button
+                                type="button"
                                 $variant="dark"
                                 onClick={() => {
                                     setPendingImages([]);
