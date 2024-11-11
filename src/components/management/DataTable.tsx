@@ -64,7 +64,7 @@ import { useArticle } from '@/hooks/useArticle';
 import CreateArticleForm from '@/components/articles/CreateArticleForm';
 import { useRouter } from 'next/navigation';
 import ArticleGalleryModal from '@/components/articles/ArticleGalleryModal';
-import CoverArticleModal from '@/components/ui/CoverArticleModal';
+import CoverArticleModal from '@/components/articles/CoverArticleModal';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;

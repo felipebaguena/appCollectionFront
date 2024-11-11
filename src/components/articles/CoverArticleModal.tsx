@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useArticleImages } from '@/hooks/useArticleImages';
-import Button from './Button';
-import Modal from './Modal';
-import { ButtonContainer } from './FormElements';
+import Button from '../ui/Button';
+import Modal from '../ui/Modal';
+import { ButtonContainer } from '../ui/FormElements';
 import { Article } from '@/types/article';
 import { FaClock } from 'react-icons/fa';
 
