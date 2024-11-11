@@ -339,7 +339,11 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         <ArticleFormContainer>
             <TitleBar>
                 <TitleText>
-                    {currentStep === 'data' ? 'Crear Nuevo Artículo' : 'Seleccionar Imágenes'}
+                    {currentStep === 'data'
+                        ? 'Crear Nuevo Artículo'
+                        : currentStep === 'preview'
+                            ? 'Vista Previa'
+                            : 'Seleccionar Imágenes'}
                 </TitleText>
             </TitleBar>
             <FormContent>
@@ -455,7 +459,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                                 </Button>
                             </ButtonContainer>
                         </StyledForm>
-                    ) : (
+                    ) : currentStep === 'images' ? (
                         <ImageSelectionStep
                             gameId={pendingArticleData?.relatedGames[0] ?? 0}
                             templateImageCount={getTemplateImageCount(pendingArticleData?.templateId ?? 0)}
@@ -465,42 +469,43 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                             isSubmitting={isSubmitting}
                             getImageUrl={getImageUrl}
                         />
-                    )}
-                    {currentStep === 'preview' && pendingArticleData && (
-                        <>
-                            <StandardReviewTemplate
-                                title={pendingArticleData.title}
-                                subtitle={pendingArticleData.subtitle}
-                                content={pendingArticleData.content}
-                                coverImageId={pendingArticleData.coverImageId}
-                                contentImageIds={pendingArticleData.contentImageIds}
-                                gameId={pendingArticleData.relatedGames[0]}
-                                getImageUrl={getImageUrl}
-                            />
-                            <ButtonContainer>
-                                <Button
-                                    $variant="primary"
-                                    onClick={() => {
-                                        if (pendingArticleData) {
-                                            handleCreateArticle({
-                                                coverImageId: pendingArticleData.coverImageId,
-                                                articleImages: pendingArticleData.contentImageIds
-                                            });
-                                        }
-                                    }}
-                                    disabled={isSubmitting || !pendingArticleData}
-                                >
-                                    {isSubmitting ? 'Creando...' : 'Crear artículo'}
-                                </Button>
-                                <Button
-                                    $variant="dark"
-                                    onClick={() => setCurrentStep('images')}
-                                    disabled={isSubmitting}
-                                >
-                                    Volver
-                                </Button>
-                            </ButtonContainer>
-                        </>
+                    ) : (
+                        pendingArticleData && (
+                            <>
+                                <StandardReviewTemplate
+                                    title={pendingArticleData.title}
+                                    subtitle={pendingArticleData.subtitle}
+                                    content={pendingArticleData.content}
+                                    coverImageId={pendingArticleData.coverImageId}
+                                    contentImageIds={pendingArticleData.contentImageIds}
+                                    gameId={pendingArticleData.relatedGames[0]}
+                                    getImageUrl={getImageUrl}
+                                />
+                                <ButtonContainer>
+                                    <Button
+                                        $variant="primary"
+                                        onClick={() => {
+                                            if (pendingArticleData) {
+                                                handleCreateArticle({
+                                                    coverImageId: pendingArticleData.coverImageId,
+                                                    articleImages: pendingArticleData.contentImageIds
+                                                });
+                                            }
+                                        }}
+                                        disabled={isSubmitting || !pendingArticleData}
+                                    >
+                                        {isSubmitting ? 'Creando...' : 'Crear artículo'}
+                                    </Button>
+                                    <Button
+                                        $variant="dark"
+                                        onClick={() => setCurrentStep('images')}
+                                        disabled={isSubmitting}
+                                    >
+                                        Volver
+                                    </Button>
+                                </ButtonContainer>
+                            </>
+                        )
                     )}
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                 </ContentContainer>
