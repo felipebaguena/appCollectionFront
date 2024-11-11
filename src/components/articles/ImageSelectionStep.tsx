@@ -5,6 +5,11 @@ import Button from '../ui/Button';
 import { ButtonContainer } from '../ui/FormElements';
 import { FaClock } from 'react-icons/fa';
 
+export interface ImageSelectionData {
+    coverImageId: number | null;
+    articleImages: number[];
+}
+
 interface ImageSelectionStepProps {
     gameId: number;
     templateImageCount: number;
@@ -12,6 +17,7 @@ interface ImageSelectionStepProps {
     onBack: () => void;
     isSubmitting: boolean;
     getImageUrl: (path: string) => string;
+    onPreview?: (imageData: ImageSelectionData) => void;
 }
 
 interface PendingImage {
@@ -97,7 +103,8 @@ const ImageSelectionStep: React.FC<ImageSelectionStepProps> = ({
     onSubmit,
     onBack,
     isSubmitting,
-    getImageUrl
+    getImageUrl,
+    onPreview
 }) => {
     const [selectedCoverImage, setSelectedCoverImage] = useState<number | null>(null);
     const [selectedArticleImages, setSelectedArticleImages] = useState<number[]>([]);
@@ -200,8 +207,23 @@ const ImageSelectionStep: React.FC<ImageSelectionStepProps> = ({
             selectedArticleImages.length === templateImageCount;
     };
 
+    const handleSubmitOrPreview = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const imageData: ImageSelectionData = {
+            coverImageId: selectedCoverImage,
+            articleImages: selectedArticleImages
+        };
+
+        if (onPreview) {
+            onPreview(imageData);
+        } else {
+            onSubmit(e);
+        }
+    };
+
     return (
-        <form onSubmit={onSubmit}>
+        <form onSubmit={handleSubmitOrPreview}>
             <StepContainer>
                 <SectionTitle>
                     {isSelectingArticleImages
@@ -314,7 +336,7 @@ const ImageSelectionStep: React.FC<ImageSelectionStepProps> = ({
                             $variant="primary"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? 'Creando...' : 'Crear artículo'}
+                            {onPreview ? 'Vista previa' : isSubmitting ? 'Creando...' : 'Crear artículo'}
                         </Button>
                     )}
 

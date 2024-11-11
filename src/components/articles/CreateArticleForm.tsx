@@ -29,6 +29,9 @@ import { useArticleImages } from '@/hooks/useArticleImages';
 import { ArticleTemplate } from '@/types/articleTemplate';
 import ImageSelectionStep from './ImageSelectionStep';
 
+import { ArticleImage } from '@/types/article';
+import StandardReviewTemplate from '../templates/StandardReviewTemplate';
+
 
 interface Option {
     id: number;
@@ -106,6 +109,7 @@ interface ImageSelectionData {
 }
 
 interface CreateArticleData {
+    id?: number;
     title: string;
     subtitle: string;
     content: string;
@@ -119,6 +123,21 @@ interface CreateArticleData {
     published: boolean;
 }
 
+// Definir la interfaz para las imágenes que vienen del juego
+interface GameArticleImage {
+    id: number;
+    filename: string;
+    path: string;
+    articleId: number;
+    gameId: number;
+}
+
+// Función para convertir GameArticleImage a ArticleImage
+const convertToArticleImage = (gameImage: GameArticleImage): ArticleImage => ({
+    ...gameImage,
+    isCover: false // Por defecto, ninguna imagen es de portada
+});
+
 const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     onClose,
     onArticleCreated,
@@ -129,15 +148,15 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     const { searchGames } = useGames();
     const [searchResults, setSearchResults] = useState<Array<{ id: number, title: string }>>([]);
     const [searchValue, setSearchValue] = useState('');
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<Omit<CreateArticleData, 'coverImageId' | 'contentImageIds' | 'published'>>({
         title: '',
         subtitle: '',
         content: '',
         templateId: 1,
-        relatedGames: [] as number[],
-        relatedPlatforms: [] as number[],
-        relatedDevelopers: [] as number[],
-        relatedGenres: [] as number[]
+        relatedGames: [],
+        relatedPlatforms: [],
+        relatedDevelopers: [],
+        relatedGenres: []
     });
     const [selectedGameId, setSelectedGameId] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -146,13 +165,13 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     const { searchGenres } = useGenres();
     const { searchPlatforms } = usePlatforms();
     const { searchDevelopers } = useDevelopers();
-    const [currentStep, setCurrentStep] = useState<'data' | 'images'>('data');
-    const [pendingArticleData, setPendingArticleData] = useState<any>(null);
-    const [createdArticleId, setCreatedArticleId] = useState<number | null>(null);
+    const [currentStep, setCurrentStep] = useState<'data' | 'images' | 'preview'>('data');
+    const [pendingArticleData, setPendingArticleData] = useState<CreateArticleData | null>(null);
+    const [previewImages, setPreviewImages] = useState<ArticleImage[]>([]);
 
-    const { updateArticle } = useArticle(createdArticleId?.toString() || '');
-    const { setCoverImage, updateArticleImages } = useArticleImages(
-        createdArticleId || 0,
+    const { updateArticle } = useArticle(pendingArticleData?.id?.toString() || '');
+    const { setCoverImage, updateArticleImages, gameArticleImages } = useArticleImages(
+        pendingArticleData?.id || 0,
         formData.relatedGames[0] || 0
     );
 
@@ -219,7 +238,12 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
             setError("Debes seleccionar un juego relacionado");
             return;
         }
-        setPendingArticleData(formData);
+        setPendingArticleData({
+            ...formData,
+            coverImageId: null,
+            contentImageIds: [],
+            published: false
+        });
         setCurrentStep('images');
     };
 
@@ -229,7 +253,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
 
         try {
             const articleData: CreateArticleData = {
-                ...pendingArticleData,
+                ...pendingArticleData!,
                 coverImageId: imageData.coverImageId,
                 contentImageIds: imageData.articleImages,
                 published: false // Por defecto, el artículo se crea como no publicado
@@ -280,6 +304,35 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         const template = templates.find(t => t.id === templateId);
         if (!template) return 0;
         return (template as ArticleTemplate).imageCount || 0;
+    };
+
+    const handlePreview = (imageData: ImageSelectionData) => {
+        if (pendingArticleData && gameArticleImages) {
+            setPendingArticleData({
+                ...pendingArticleData,
+                coverImageId: imageData.coverImageId,
+                contentImageIds: imageData.articleImages
+            });
+
+            // Aquí está la clave: usar gameArticleImages directamente
+            const coverImage = gameArticleImages.find(img => img.id === imageData.coverImageId);
+            const contentImages = imageData.articleImages.map(id =>
+                gameArticleImages.find(img => img.id === id)
+            ).filter(img => img !== undefined);
+
+            setPreviewImages(contentImages as ArticleImage[]);
+            setCurrentStep('preview');
+        }
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (pendingArticleData) {
+            handleCreateArticle({
+                coverImageId: pendingArticleData.coverImageId,
+                articleImages: pendingArticleData.contentImageIds
+            });
+        }
     };
 
     return (
@@ -404,21 +457,50 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                         </StyledForm>
                     ) : (
                         <ImageSelectionStep
-                            gameId={pendingArticleData.relatedGames[0]}
-                            templateImageCount={getTemplateImageCount(pendingArticleData.templateId)}
-                            onSubmit={(e: React.FormEvent) => {
-                                e.preventDefault();
-                                const formElement = e.target as HTMLFormElement;
-                                const formData = new FormData(formElement);
-                                handleCreateArticle({
-                                    coverImageId: Number(formData.get('coverImageId')) || null,
-                                    articleImages: formData.getAll('articleImages').map(Number)
-                                });
-                            }}
+                            gameId={pendingArticleData?.relatedGames[0] ?? 0}
+                            templateImageCount={getTemplateImageCount(pendingArticleData?.templateId ?? 0)}
+                            onSubmit={handleSubmit}
+                            onPreview={handlePreview}
                             onBack={() => setCurrentStep('data')}
                             isSubmitting={isSubmitting}
                             getImageUrl={getImageUrl}
                         />
+                    )}
+                    {currentStep === 'preview' && pendingArticleData && (
+                        <>
+                            <StandardReviewTemplate
+                                title={pendingArticleData.title}
+                                subtitle={pendingArticleData.subtitle}
+                                content={pendingArticleData.content}
+                                coverImageId={pendingArticleData.coverImageId}
+                                contentImageIds={pendingArticleData.contentImageIds}
+                                gameId={pendingArticleData.relatedGames[0]}
+                                getImageUrl={getImageUrl}
+                            />
+                            <ButtonContainer>
+                                <Button
+                                    $variant="primary"
+                                    onClick={() => {
+                                        if (pendingArticleData) {
+                                            handleCreateArticle({
+                                                coverImageId: pendingArticleData.coverImageId,
+                                                articleImages: pendingArticleData.contentImageIds
+                                            });
+                                        }
+                                    }}
+                                    disabled={isSubmitting || !pendingArticleData}
+                                >
+                                    {isSubmitting ? 'Creando...' : 'Crear artículo'}
+                                </Button>
+                                <Button
+                                    $variant="dark"
+                                    onClick={() => setCurrentStep('images')}
+                                    disabled={isSubmitting}
+                                >
+                                    Volver
+                                </Button>
+                            </ButtonContainer>
+                        </>
                     )}
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                 </ContentContainer>
