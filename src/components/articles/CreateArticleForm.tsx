@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useGames } from '@/hooks/useGames';
-import { api } from '@/services/api';
+import { api, getImageUrl } from '@/services/api';
 import { ENDPOINTS } from '@/constants/endpoints';
 import MultiSelect from '@/components/ui/Multiselect';
 import {
@@ -24,6 +24,11 @@ import { useGenres } from '@/hooks/useGenres';
 import { usePlatforms } from '@/hooks/usePlatforms';
 import { useDevelopers } from '@/hooks/useDevelopers';
 import { Game } from '@/types/game';
+import { useArticle } from '@/hooks/useArticle';
+import { useArticleImages } from '@/hooks/useArticleImages';
+import ImageSelectionStep from '@/components/ui/ImageSelectionStep';
+import { ArticleTemplate } from '@/types/articleTemplate';
+
 
 interface Option {
     id: number;
@@ -90,6 +95,30 @@ const ArticleLabel = styled(Label)`
     color: var(--dark-grey);
 `;
 
+interface CreatedArticle {
+    id: number;
+    // ... otros campos necesarios
+}
+
+interface ImageSelectionData {
+    coverImageId: number | null;
+    articleImages: number[];
+}
+
+interface CreateArticleData {
+    title: string;
+    subtitle: string;
+    content: string;
+    templateId: number;
+    coverImageId: number | null;
+    contentImageIds: number[];
+    relatedGames: number[];
+    relatedPlatforms: number[];
+    relatedGenres: number[];
+    relatedDevelopers: number[];
+    published: boolean;
+}
+
 const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     onClose,
     onArticleCreated,
@@ -117,6 +146,15 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     const { searchGenres } = useGenres();
     const { searchPlatforms } = usePlatforms();
     const { searchDevelopers } = useDevelopers();
+    const [currentStep, setCurrentStep] = useState<'data' | 'images'>('data');
+    const [pendingArticleData, setPendingArticleData] = useState<any>(null);
+    const [createdArticleId, setCreatedArticleId] = useState<number | null>(null);
+
+    const { updateArticle } = useArticle(createdArticleId?.toString() || '');
+    const { setCoverImage, updateArticleImages } = useArticleImages(
+        createdArticleId || 0,
+        formData.relatedGames[0] || 0
+    );
 
     useEffect(() => {
         fetchTemplates();
@@ -175,13 +213,29 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleNextStep = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!formData.relatedGames.length) {
+            setError("Debes seleccionar un juego relacionado");
+            return;
+        }
+        setPendingArticleData(formData);
+        setCurrentStep('images');
+    };
+
+    const handleCreateArticle = async (imageData: ImageSelectionData) => {
         setIsSubmitting(true);
         setError(null);
 
         try {
-            await api.post(ENDPOINTS.CREATE_ARTICLE, formData);
+            const articleData: CreateArticleData = {
+                ...pendingArticleData,
+                coverImageId: imageData.coverImageId,
+                contentImageIds: imageData.articleImages,
+                published: false // Por defecto, el artículo se crea como no publicado
+            };
+
+            await api.post<CreatedArticle>(ENDPOINTS.CREATE_ARTICLE, articleData);
             onArticleCreated();
             onClose();
         } catch (error) {
@@ -222,125 +276,151 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         }));
     };
 
+    const getTemplateImageCount = (templateId: number): number => {
+        const template = templates.find(t => t.id === templateId);
+        if (!template) return 0;
+        return (template as ArticleTemplate).imageCount || 0;
+    };
+
     return (
         <ArticleFormContainer>
             <TitleBar>
-                <TitleText>Crear Nuevo Artículo</TitleText>
+                <TitleText>
+                    {currentStep === 'data' ? 'Crear Nuevo Artículo' : 'Seleccionar Imágenes'}
+                </TitleText>
             </TitleBar>
             <FormContent>
                 <ContentContainer>
-                    <StyledForm onSubmit={handleSubmit}>
+                    {currentStep === 'data' ? (
+                        <StyledForm onSubmit={handleNextStep}>
+                            <InputGroup>
+                                <ArticleLabel htmlFor="title">Título</ArticleLabel>
+                                <Input
+                                    type="text"
+                                    id="title"
+                                    name="title"
+                                    value={formData.title}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </InputGroup>
 
-                        <InputGroup>
-                            <ArticleLabel htmlFor="title">Título</ArticleLabel>
-                            <Input
-                                type="text"
-                                id="title"
-                                name="title"
-                                value={formData.title}
-                                onChange={handleChange}
-                                required
-                            />
-                        </InputGroup>
+                            <InputGroup>
+                                <ArticleLabel htmlFor="subtitle">Subtítulo</ArticleLabel>
+                                <Input
+                                    type="text"
+                                    id="subtitle"
+                                    name="subtitle"
+                                    value={formData.subtitle}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </InputGroup>
 
-                        <InputGroup>
-                            <ArticleLabel htmlFor="subtitle">Subtítulo</ArticleLabel>
-                            <Input
-                                type="text"
-                                id="subtitle"
-                                name="subtitle"
-                                value={formData.subtitle}
-                                onChange={handleChange}
-                                required
-                            />
-                        </InputGroup>
+                            <InputGroup>
+                                <ArticleLabel htmlFor="content">Contenido</ArticleLabel>
+                                <TextArea
+                                    id="content"
+                                    name="content"
+                                    value={formData.content}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </InputGroup>
 
-                        <InputGroup>
-                            <ArticleLabel htmlFor="content">Contenido</ArticleLabel>
-                            <TextArea
-                                id="content"
-                                name="content"
-                                value={formData.content}
-                                onChange={handleChange}
-                                required
-                            />
-                        </InputGroup>
+                            <InputGroup>
+                                <ArticleLabel>Plantilla</ArticleLabel>
+                                <CustomSelect
+                                    options={templates.map(template => ({
+                                        value: template.id.toString(),
+                                        label: template.name
+                                    }))}
+                                    value={formData.templateId.toString()}
+                                    onChange={handleTemplateChange}
+                                    placeholder="Seleccionar plantilla..."
+                                />
+                            </InputGroup>
 
-                        <InputGroup>
-                            <ArticleLabel>Plantilla</ArticleLabel>
-                            <CustomSelect
-                                options={templates.map(template => ({
-                                    value: template.id.toString(),
-                                    label: template.name
-                                }))}
-                                value={formData.templateId.toString()}
-                                onChange={handleTemplateChange}
-                                placeholder="Seleccionar plantilla..."
-                            />
-                        </InputGroup>
+                            <InputGroup>
+                                <ArticleLabel>Juego relacionado</ArticleLabel>
+                                <SearchableGameSelect
+                                    selectedGameId={selectedGameId}
+                                    onGameChange={handleGameChange}
+                                />
+                            </InputGroup>
 
-                        <InputGroup>
-                            <ArticleLabel>Juego relacionado</ArticleLabel>
-                            <SearchableGameSelect
-                                selectedGameId={selectedGameId}
-                                onGameChange={handleGameChange}
-                            />
-                        </InputGroup>
+                            <InputGroup>
+                                <ArticleLabel>Plataformas</ArticleLabel>
+                                <SearchableSelect
+                                    selectedOptions={platforms.filter(p =>
+                                        formData.relatedPlatforms.includes(p.id)
+                                    )}
+                                    onOptionsChange={handleOptionsChange('relatedPlatforms')}
+                                    searchFunction={searchPlatforms}
+                                    placeholder="Buscar plataforma..."
+                                />
+                            </InputGroup>
 
-                        <InputGroup>
-                            <ArticleLabel>Plataformas</ArticleLabel>
-                            <SearchableSelect
-                                selectedOptions={platforms.filter(p =>
-                                    formData.relatedPlatforms.includes(p.id)
-                                )}
-                                onOptionsChange={handleOptionsChange('relatedPlatforms')}
-                                searchFunction={searchPlatforms}
-                                placeholder="Buscar plataforma..."
-                            />
-                        </InputGroup>
+                            <InputGroup>
+                                <ArticleLabel>Géneros</ArticleLabel>
+                                <SearchableSelect
+                                    selectedOptions={genres.filter(g =>
+                                        formData.relatedGenres.includes(g.id)
+                                    )}
+                                    onOptionsChange={handleOptionsChange('relatedGenres')}
+                                    searchFunction={searchGenres}
+                                    placeholder="Buscar género..."
+                                />
+                            </InputGroup>
 
-                        <InputGroup>
-                            <ArticleLabel>Géneros</ArticleLabel>
-                            <SearchableSelect
-                                selectedOptions={genres.filter(g =>
-                                    formData.relatedGenres.includes(g.id)
-                                )}
-                                onOptionsChange={handleOptionsChange('relatedGenres')}
-                                searchFunction={searchGenres}
-                                placeholder="Buscar género..."
-                            />
-                        </InputGroup>
+                            <InputGroup>
+                                <ArticleLabel>Desarrolladores</ArticleLabel>
+                                <SearchableSelect
+                                    selectedOptions={developers.filter(d =>
+                                        formData.relatedDevelopers.includes(d.id)
+                                    )}
+                                    onOptionsChange={handleOptionsChange('relatedDevelopers')}
+                                    searchFunction={searchDevelopers}
+                                    placeholder="Buscar desarrollador..."
+                                />
+                            </InputGroup>
 
-                        <InputGroup>
-                            <ArticleLabel>Desarrolladores</ArticleLabel>
-                            <SearchableSelect
-                                selectedOptions={developers.filter(d =>
-                                    formData.relatedDevelopers.includes(d.id)
-                                )}
-                                onOptionsChange={handleOptionsChange('relatedDevelopers')}
-                                searchFunction={searchDevelopers}
-                                placeholder="Buscar desarrollador..."
-                            />
-                        </InputGroup>
-
-                        <ButtonContainer>
-                            <Button
-                                $variant="primary"
-                                type="submit"
-                                disabled={isSubmitting || !isFormValid()}
-                            >
-                                {isSubmitting ? 'Creando...' : 'Crear artículo'}
-                            </Button>
-                            <Button
-                                $variant="cancel"
-                                type="button"
-                                onClick={onClose}
-                                disabled={isSubmitting}
-                            >
-                                Cancelar
-                            </Button>
-                        </ButtonContainer>
-                    </StyledForm>
+                            <ButtonContainer>
+                                <Button
+                                    $variant="primary"
+                                    type="submit"
+                                    disabled={!isFormValid()}
+                                >
+                                    Siguiente
+                                </Button>
+                                <Button
+                                    $variant="cancel"
+                                    type="button"
+                                    onClick={onClose}
+                                >
+                                    Cancelar
+                                </Button>
+                            </ButtonContainer>
+                        </StyledForm>
+                    ) : (
+                        <ImageSelectionStep
+                            gameId={pendingArticleData.relatedGames[0]}
+                            templateImageCount={getTemplateImageCount(pendingArticleData.templateId)}
+                            onSubmit={(e: React.FormEvent) => {
+                                e.preventDefault();
+                                const formElement = e.target as HTMLFormElement;
+                                const formData = new FormData(formElement);
+                                handleCreateArticle({
+                                    coverImageId: Number(formData.get('coverImageId')) || null,
+                                    articleImages: formData.getAll('articleImages').map(Number)
+                                });
+                            }}
+                            onBack={() => setCurrentStep('data')}
+                            isSubmitting={isSubmitting}
+                            getImageUrl={getImageUrl}
+                        />
+                    )}
+                    {error && <ErrorMessage>{error}</ErrorMessage>}
                 </ContentContainer>
             </FormContent>
         </ArticleFormContainer>
