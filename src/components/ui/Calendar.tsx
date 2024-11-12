@@ -129,26 +129,68 @@ const DropdownItem = styled.button<{ $isSelected?: boolean }>`
   }
 `;
 
-const TimeContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 16px;
-  align-items: center;
+const TimeInputContainer = styled.div`
+    position: relative;
+    display: flex;
+    flex-direction: column;
 `;
 
 const TimeInput = styled.input`
-  width: 50px;
-  padding: 4px;
-  text-align: center;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  
-  &::-webkit-inner-spin-button,
-  &::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
+    width: 5rem;
+    padding: 6px 24px 6px 6px;
+    text-align: left;
+    border: 1px solid var(--clear-grey);
+    font-size: 14px;
+    
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: var(--app-yellow);
+        border-radius: 0;
+    }
+`;
+
+const TimeControls = styled.div`
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    width: 2rem;
+`;
+
+const TimeButton = styled.button`
+    padding: 0;
+    height: 50%;
+    border: 1px solid var(--clear-grey);
+    background: transparent;
+    color: var(--mid-grey);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+
+    &:hover,
+    &:active {
+        background-color: var(--app-yellow);
+        color: var(--dark-grey);
+    }
+`;
+
+const TimeContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+    align-items: center;
+    padding: 0 8px;
 `;
 
 const TimeSeparator = styled.span`
@@ -169,8 +211,8 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, da
     const [currentDate, setCurrentDate] = useState(new Date());
     const [showMonthDropdown, setShowMonthDropdown] = useState(false);
     const [showYearDropdown, setShowYearDropdown] = useState(false);
-    const [hours, setHours] = useState(selectedDate?.getHours() || 0);
-    const [minutes, setMinutes] = useState(selectedDate?.getMinutes() || 0);
+    const [hours, setHours] = useState(new Date().getHours());
+    const [minutes, setMinutes] = useState(new Date().getMinutes());
     const calendarRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -415,23 +457,51 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, da
 
             {hasTime && (
                 <TimeContainer>
-                    <TimeInput
-                        type="number"
-                        min="0"
-                        max="23"
-                        value={hours}
-                        onChange={(e) => handleTimeChange('hours', e.target.value)}
-                        placeholder="HH"
-                    />
+                    <TimeInputContainer>
+                        <TimeInput
+                            type="number"
+                            min="0"
+                            max="23"
+                            value={hours}
+                            onChange={(e) => handleTimeChange('hours', e.target.value)}
+                            placeholder="HH"
+                        />
+                        <TimeControls>
+                            <TimeButton
+                                onClick={() => handleTimeChange('hours', (hours + 1).toString())}
+                            >
+                                ▲
+                            </TimeButton>
+                            <TimeButton
+                                onClick={() => handleTimeChange('hours', (hours - 1).toString())}
+                            >
+                                ▼
+                            </TimeButton>
+                        </TimeControls>
+                    </TimeInputContainer>
                     <TimeSeparator>:</TimeSeparator>
-                    <TimeInput
-                        type="number"
-                        min="0"
-                        max="59"
-                        value={minutes}
-                        onChange={(e) => handleTimeChange('minutes', e.target.value)}
-                        placeholder="MM"
-                    />
+                    <TimeInputContainer>
+                        <TimeInput
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={minutes}
+                            onChange={(e) => handleTimeChange('minutes', e.target.value)}
+                            placeholder="MM"
+                        />
+                        <TimeControls>
+                            <TimeButton
+                                onClick={() => handleTimeChange('minutes', (minutes + 1).toString())}
+                            >
+                                ▲
+                            </TimeButton>
+                            <TimeButton
+                                onClick={() => handleTimeChange('minutes', (minutes - 1).toString())}
+                            >
+                                ▼
+                            </TimeButton>
+                        </TimeControls>
+                    </TimeInputContainer>
                 </TimeContainer>
             )}
         </CalendarContainer>
