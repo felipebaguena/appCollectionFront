@@ -30,10 +30,6 @@ import { ArticleTemplate, TemplateCode, templateComponents } from '@/types/artic
 import ImageSelectionStep from './ImageSelectionStep';
 
 import { ArticleImage } from '@/types/article';
-import StandardReviewTemplate from '../templates/StandardReviewTemplate';
-
-
-
 
 interface Option {
     id: number;
@@ -337,7 +333,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         const selectedTemplate = templates.find(t => t.id === pendingArticleData.templateId);
         const TemplateComponent = selectedTemplate
             ? templateComponents[selectedTemplate.code as TemplateCode]
-            : templateComponents[TemplateCode.STANDARD_REVIEW];
+            : templateComponents[TemplateCode.STANDARD_TEMPLATE];
 
         return (
             <>

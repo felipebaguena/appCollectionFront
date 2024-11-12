@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
-import StandardReviewTemplate from '../templates/StandardReviewTemplate';
+import StandardTemplate from '../templates/StandardTemplate';
 // Importar futuros templates aquí
 // import CompactReviewTemplate from '../templates/CompactReviewTemplate';
 // import NewsTemplate from '../templates/NewsTemplate';
@@ -14,7 +14,7 @@ interface ArticleDetailProps {
 
 // Mapa de templates
 const templateComponents = {
-    [TemplateCode.STANDARD_REVIEW]: StandardReviewTemplate,
+    [TemplateCode.STANDARD_TEMPLATE]: StandardTemplate,
     // Añadir futuros templates aquí
     // [TemplateCode.COMPACT_REVIEW]: CompactReviewTemplate,
     // [TemplateCode.NEWS]: NewsTemplate,
@@ -32,7 +32,7 @@ const ArticleDetail: React.FC<ArticleDetailProps> = ({ id }) => {
     if (!article) return <div>No se encontró el artículo</div>;
 
     // Obtener el componente del template basado en el código
-    const TemplateComponent = templateComponents[article.template.code] || StandardReviewTemplate;
+    const TemplateComponent = templateComponents[article.template.code] || StandardTemplate;
 
     // Props comunes para todos los templates
     const commonProps = {

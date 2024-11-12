@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useArticleImages } from '@/hooks/useArticleImages';
 import { NAVBAR_HEIGHT } from '../layout/NavbarElements';
 
-interface StandardReviewTemplateProps {
+interface StandardTemplate {
     title: string;
     subtitle: string;
     content: string;
@@ -142,7 +142,7 @@ const PreviewBanner = styled.div`
     font-weight: bold;
 `;
 
-const StandardReviewTemplate: React.FC<StandardReviewTemplateProps> = ({
+const StandardTemplate: React.FC<StandardTemplate> = ({
     title,
     subtitle,
     content,
@@ -256,4 +256,4 @@ const StandardReviewTemplate: React.FC<StandardReviewTemplateProps> = ({
     );
 };
 
-export default StandardReviewTemplate; 
+export default StandardTemplate; 
