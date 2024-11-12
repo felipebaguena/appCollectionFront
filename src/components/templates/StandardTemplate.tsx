@@ -75,8 +75,6 @@ const StandardTemplate: React.FC<TemplateProps> = ({
         scheduledPublishAt
     });
 
-    console.log('Template props:', { published, publishedAt, scheduledPublishAt });
-
     return (
         <>
             {isPreview && <PreviewBanner>Vista Previa</PreviewBanner>}

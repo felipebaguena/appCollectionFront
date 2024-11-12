@@ -37,16 +37,9 @@ export const useGameImages = (gameId: number) => {
       setLoading(true);
       setError(null);
       try {
-        console.log(
-          "Llamando a la API para establecer la portada:",
-          imageId,
-          "para el juego:",
-          gameId
-        );
         const response = await api.post(ENDPOINTS.SET_COVER(imageId), {
           gameId: gameId,
         });
-        console.log("Respuesta de la API:", response);
 
         setGameImages((prevImages) =>
           prevImages.map((img) => ({
@@ -74,17 +67,10 @@ export const useGameImages = (gameId: number) => {
         formData.append("image", file, file.name);
         formData.append("gameId", gameId.toString());
 
-        console.log("Enviando formData:", {
-          image: file.name,
-          gameId: gameId.toString(),
-        });
-
         const response = await api.postFormData<GameImage>(
           ENDPOINTS.UPLOAD_GAME_IMAGE,
           formData
         );
-
-        console.log("Respuesta del servidor:", response);
 
         setGameImages((prevImages) => [...prevImages, response]);
         return response;

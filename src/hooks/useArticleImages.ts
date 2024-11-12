@@ -48,18 +48,10 @@ export const useArticleImages = (articleId: number, gameId: number) => {
         formData.append("articleId", articleId.toString());
         formData.append("gameId", gameId.toString());
 
-        console.log("Enviando formData:", {
-          image: file.name,
-          articleId: articleId.toString(),
-          gameId: gameId.toString(),
-        });
-
         const response = await api.postFormData<ArticleImage>(
           ENDPOINTS.UPLOAD_ARTICLE_IMAGE,
           formData
         );
-
-        console.log("Respuesta del servidor:", response);
 
         setArticleImages((prevImages) => [...prevImages, response]);
         return response;

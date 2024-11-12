@@ -19,12 +19,6 @@ const ArticleDetail: React.FC<ArticleDetailProps> = ({ id }) => {
     if (error) return <div>Error: {error}</div>;
     if (!article) return <div>No se encontró el artículo</div>;
 
-    console.log('Article data:', {
-        published: article.published,
-        publishedAt: article.publishedAt,
-        scheduledPublishAt: article.scheduledPublishAt
-    });
-
     const TemplateComponent = templateComponents[article.template.code as TemplateCode] || templateComponents[TemplateCode.STANDARD_TEMPLATE];
 
     const commonProps = {
@@ -39,8 +33,6 @@ const ArticleDetail: React.FC<ArticleDetailProps> = ({ id }) => {
         publishedAt: article.publishedAt,
         scheduledPublishAt: article.scheduledPublishAt
     };
-
-    console.log('Common props:', commonProps);
 
     return <TemplateComponent {...commonProps} />;
 };
