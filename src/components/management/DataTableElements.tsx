@@ -229,8 +229,8 @@ export const ActionEditButton = styled(ActionButton).attrs({ $variant: 'primary'
 export const ActionDeleteButton = styled(ActionButton).attrs({ $variant: 'danger' })``;
 export const ActionGalleryButton = styled(ActionButton).attrs({ $variant: 'dark' })``;
 export const ActionScheduleButton = styled(ActionButton).attrs({ $variant: 'cancel' })``;
-export const ActionPublishButton = styled(ActionButton).attrs({ $variant: 'cancel' })``;
-export const ActionUnpublishButton = styled(ActionButton).attrs({ $variant: 'cancel' })``;
+export const ActionPublishButton = styled(ActionButton).attrs({ $variant: 'outline' })``;
+export const ActionUnpublishButton = styled(ActionButton).attrs({ $variant: 'outline' })``;
 
 export const ViewButtonDataTable = (props: React.ComponentProps<typeof ActionViewButton>) => (
   <ActionViewButton {...props}>
