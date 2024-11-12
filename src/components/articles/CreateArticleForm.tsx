@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useGames } from '@/hooks/useGames';
 import { api, getImageUrl } from '@/services/api';
 import { ENDPOINTS } from '@/constants/endpoints';
 import {
@@ -23,13 +22,10 @@ import { useGenres } from '@/hooks/useGenres';
 import { usePlatforms } from '@/hooks/usePlatforms';
 import { useDevelopers } from '@/hooks/useDevelopers';
 import { Game } from '@/types/game';
-import { useArticle } from '@/hooks/useArticle';
 import { useArticleImages } from '@/hooks/useArticleImages';
 
 import { ArticleTemplate, TemplateCode, templateComponents } from '@/types/articleTemplate';
 import ImageSelectionStep from './ImageSelectionStep';
-
-import { ArticleImage } from '@/types/article';
 
 interface Option {
     id: number;
@@ -96,9 +92,15 @@ const ArticleLabel = styled(Label)`
     color: var(--dark-grey);
 `;
 
+const RequiredArticleLabel = styled(ArticleLabel)`
+    &::after {
+        content: ' *';
+        color: var(--danger-color, red);
+    }
+`;
+
 interface CreatedArticle {
     id: number;
-    // ... otros campos necesarios
 }
 
 interface ImageSelectionData {
@@ -121,14 +123,16 @@ interface CreateArticleData {
     published: boolean;
 }
 
-// Definir la interfaz para las imágenes que vienen del juego
-interface GameArticleImage {
-    id: number;
-    filename: string;
-    path: string;
-    articleId: number;
-    gameId: number;
-}
+const ButtonAndMessageContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    width: 100%;
+`;
+
+const ValidationMessage = styled(ErrorMessage)`
+    margin-top: 0.5rem;
+`;
 
 const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     onClose,
@@ -137,9 +141,6 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     platforms,
     developers
 }) => {
-    const { searchGames } = useGames();
-    const [searchResults, setSearchResults] = useState<Array<{ id: number, title: string }>>([]);
-    const [searchValue, setSearchValue] = useState('');
     const [formData, setFormData] = useState<Omit<CreateArticleData, 'coverImageId' | 'contentImageIds' | 'published'>>({
         title: '',
         subtitle: '',
@@ -159,10 +160,9 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
     const { searchDevelopers } = useDevelopers();
     const [currentStep, setCurrentStep] = useState<'data' | 'images' | 'preview'>('data');
     const [pendingArticleData, setPendingArticleData] = useState<CreateArticleData | null>(null);
-    const [previewImages, setPreviewImages] = useState<ArticleImage[]>([]);
+    const [showValidationMessage, setShowValidationMessage] = useState(false);
 
-    const { updateArticle } = useArticle(pendingArticleData?.id?.toString() || '');
-    const { setCoverImage, updateArticleImages, gameArticleImages } = useArticleImages(
+    const { gameArticleImages } = useArticleImages(
         pendingArticleData?.id || 0,
         formData.relatedGames[0] || 0
     );
@@ -217,19 +217,13 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         }
     };
 
-    const handleMultiSelectChange = (name: string) => (selected: Option[]) => {
-        setFormData(prev => ({
-            ...prev,
-            [name]: selected.map(item => item.id)
-        }));
-    };
-
     const handleNextStep = (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.relatedGames.length) {
             setError("Debes seleccionar un juego relacionado");
             return;
         }
+        setError(null);
         setPendingArticleData({
             ...formData,
             coverImageId: null,
@@ -262,20 +256,11 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         }
     };
 
-    const handleGameSearch = async (value: string) => {
-        setSearchValue(value);
-        if (value.length >= 2) {
-            const results = await searchGames(value);
-            setSearchResults(results);
-        } else {
-            setSearchResults([]);
-        }
-    };
-
     const isFormValid = () => {
         return formData.title.trim() !== '' &&
             formData.subtitle.trim() !== '' &&
-            formData.content.trim() !== '';
+            formData.content.trim() !== '' &&
+            formData.relatedGames.length > 0;
     };
 
     const handleTemplateChange = (value: string) => {
@@ -305,14 +290,6 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                 coverImageId: imageData.coverImageId,
                 contentImageIds: imageData.articleImages
             });
-
-            // Aquí está la clave: usar gameArticleImages directamente
-            const coverImage = gameArticleImages.find(img => img.id === imageData.coverImageId);
-            const contentImages = imageData.articleImages.map(id =>
-                gameArticleImages.find(img => img.id === id)
-            ).filter(img => img !== undefined);
-
-            setPreviewImages(contentImages as ArticleImage[]);
             setCurrentStep('preview');
         }
     };
@@ -390,7 +367,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                     {currentStep === 'data' ? (
                         <StyledForm onSubmit={handleNextStep}>
                             <InputGroup>
-                                <ArticleLabel htmlFor="title">Título</ArticleLabel>
+                                <RequiredArticleLabel htmlFor="title">Título</RequiredArticleLabel>
                                 <Input
                                     type="text"
                                     id="title"
@@ -402,7 +379,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                             </InputGroup>
 
                             <InputGroup>
-                                <ArticleLabel htmlFor="subtitle">Subtítulo</ArticleLabel>
+                                <RequiredArticleLabel htmlFor="subtitle">Subtítulo</RequiredArticleLabel>
                                 <Input
                                     type="text"
                                     id="subtitle"
@@ -414,7 +391,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                             </InputGroup>
 
                             <InputGroup>
-                                <ArticleLabel htmlFor="content">Contenido</ArticleLabel>
+                                <RequiredArticleLabel htmlFor="content">Contenido</RequiredArticleLabel>
                                 <TextArea
                                     id="content"
                                     name="content"
@@ -438,7 +415,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                             </InputGroup>
 
                             <InputGroup>
-                                <ArticleLabel>Juego relacionado</ArticleLabel>
+                                <RequiredArticleLabel>Juego relacionado</RequiredArticleLabel>
                                 <SearchableGameSelect
                                     selectedGameId={selectedGameId}
                                     onGameChange={handleGameChange}
@@ -481,22 +458,34 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                                 />
                             </InputGroup>
 
-                            <ButtonContainer>
-                                <Button
-                                    $variant="primary"
-                                    type="submit"
-                                    disabled={!isFormValid()}
-                                >
-                                    Siguiente
-                                </Button>
-                                <Button
-                                    $variant="cancel"
-                                    type="button"
-                                    onClick={onClose}
-                                >
-                                    Cancelar
-                                </Button>
-                            </ButtonContainer>
+                            <ButtonAndMessageContainer>
+                                <ButtonContainer>
+                                    <div
+                                        onMouseEnter={() => !isFormValid() && setShowValidationMessage(true)}
+                                        onMouseLeave={() => setShowValidationMessage(false)}
+                                    >
+                                        <Button
+                                            $variant="primary"
+                                            type="submit"
+                                            disabled={!isFormValid()}
+                                        >
+                                            Siguiente
+                                        </Button>
+                                    </div>
+                                    <Button
+                                        $variant="cancel"
+                                        type="button"
+                                        onClick={onClose}
+                                    >
+                                        Cancelar
+                                    </Button>
+                                </ButtonContainer>
+                                {showValidationMessage && (
+                                    <ValidationMessage>
+                                        Por favor, completa todos los campos obligatorios (*)
+                                    </ValidationMessage>
+                                )}
+                            </ButtonAndMessageContainer>
                         </StyledForm>
                     ) : currentStep === 'images' ? (
                         <ImageSelectionStep
