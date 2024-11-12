@@ -3,6 +3,7 @@ import { FaEye, FaEdit, FaTrash, FaImages, FaPlus, FaSync, FaSortUp, FaSortDown,
 import Button from '../ui/Button';
 import { keyframes } from 'styled-components';
 import { useState } from 'react';
+import { MdSchedule } from 'react-icons/md';
 
 const fadeInOut = keyframes`
   0% {
@@ -227,6 +228,7 @@ export const ActionViewButton = styled(ActionButton).attrs({ $variant: 'dark' })
 export const ActionEditButton = styled(ActionButton).attrs({ $variant: 'primary' })``;
 export const ActionDeleteButton = styled(ActionButton).attrs({ $variant: 'danger' })``;
 export const ActionGalleryButton = styled(ActionButton).attrs({ $variant: 'dark' })``;
+export const ActionScheduleButton = styled(ActionButton).attrs({ $variant: 'cancel' })``;
 
 export const ViewButtonDataTable = (props: React.ComponentProps<typeof ActionViewButton>) => (
   <ActionViewButton {...props}>
@@ -259,6 +261,12 @@ export const CreateButtonDataTable = (props: React.ComponentProps<typeof Button>
   >
     <FaPlus />
   </Button>
+);
+
+export const ScheduleButtonDataTable = (props: React.ComponentProps<typeof ActionScheduleButton>) => (
+  <ActionScheduleButton {...props}>
+    <MdSchedule />
+  </ActionScheduleButton>
 );
 
 export const RefreshButton = (props: React.ComponentProps<typeof Button>) => {
@@ -420,3 +428,5 @@ export const FilterButton = styled(Button)`
 export const CompactFilterGroup = styled(FilterGroup)`
     width: auto;
 `;
+
+

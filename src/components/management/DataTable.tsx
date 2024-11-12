@@ -34,7 +34,8 @@ import {
     FilterButton,
     FilterGroup,
     FilterLabel,
-    CompactFilterGroup
+    CompactFilterGroup,
+    ScheduleButtonDataTable,
 } from './DataTableElements';
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
@@ -66,6 +67,7 @@ import { useRouter } from 'next/navigation';
 import ArticleGalleryModal from '@/components/articles/ArticleGalleryModal';
 import CoverArticleModal from '@/components/articles/CoverArticleModal';
 import EditArticleForm from '@/components/articles/EditArticleForm';
+import ScheduleArticleForm from '../articles/ScheduleArticleForm';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -121,6 +123,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         itemToDelete: null as T | null,
     });
     const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
+    const [showSchedule, setShowSchedule] = useState(false);
 
     const deleteItemId = deleteConfirmation.itemToDelete?.id.toString() || '';
     const { deleteGame } = form === 'game' ? useGame(deleteItemId) : { deleteGame: null };
@@ -255,11 +258,42 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         const buttons = [];
 
         if (form === 'article') {
+            const article = item as unknown as Article;
+
             buttons.push(
                 <ViewButtonDataTable
                     key="view"
                     onClick={() => router.push(`/articles/${item.id}`)}
                     title="Ver artículo"
+                />
+            );
+
+            // Solo mostrar el botón de programar si el artículo no está publicado
+            if (!article.published) {
+                buttons.push(
+                    <ScheduleButtonDataTable
+                        key="schedule"
+                        onClick={() => handleScheduleAction(item)}
+                        title="Programar artículo"
+                    />
+                );
+            }
+
+            buttons.push(
+                <EditButtonDataTable
+                    key="edit"
+                    onClick={() => handleAction(item, 'edit')}
+                    title="Editar"
+                />,
+                <DeleteButtonDataTable
+                    key="delete"
+                    onClick={() => setDeleteConfirmation({ isOpen: true, itemToDelete: item })}
+                    title="Borrar"
+                />,
+                <GalleryButtonDataTable
+                    key="gallery"
+                    onClick={() => handleGalleryAction(item)}
+                    title="Galería"
                 />
             );
         } else if (ViewComponent) {
@@ -270,26 +304,34 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                     title="Ver"
                 />
             );
-        }
 
-        if (EditComponent) {
+            if (EditComponent) {
+                buttons.push(
+                    <EditButtonDataTable
+                        key="edit"
+                        onClick={() => handleAction(item, 'edit')}
+                        title="Editar"
+                    />
+                );
+            }
+
             buttons.push(
-                <EditButtonDataTable key="edit" onClick={() => handleAction(item, 'edit')} title="Editar" />
+                <DeleteButtonDataTable
+                    key="delete"
+                    onClick={() => setDeleteConfirmation({ isOpen: true, itemToDelete: item })}
+                    title="Borrar"
+                />
             );
-        }
 
-        buttons.push(
-            <DeleteButtonDataTable
-                key="delete"
-                onClick={() => setDeleteConfirmation({ isOpen: true, itemToDelete: item })}
-                title="Borrar"
-            />
-        );
-
-        if (form === 'game' || form === 'article') {
-            buttons.push(
-                <GalleryButtonDataTable key="gallery" onClick={() => handleGalleryAction(item)} title="Galería" />
-            );
+            if (form === 'game') {
+                buttons.push(
+                    <GalleryButtonDataTable
+                        key="gallery"
+                        onClick={() => handleGalleryAction(item)}
+                        title="Galería"
+                    />
+                );
+            }
         }
 
         return buttons;
@@ -412,6 +454,11 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
 
     const handleViewArticleCover = (article: Article) => {
         setSelectedArticle(article);
+    };
+
+    const handleScheduleAction = (item: T) => {
+        setSelectedItem(item);
+        setShowSchedule(true);
     };
 
     return (
@@ -606,6 +653,17 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 cancelText="Cancelar"
                 confirmVariant="danger"
             />
+
+            {showSchedule && selectedItem && (
+                <ScheduleArticleForm
+                    item={selectedItem as unknown as Article}
+                    onClose={() => {
+                        setSelectedItem(null);
+                        setShowSchedule(false);
+                        refreshDataAndResetPage();
+                    }}
+                />
+            )}
         </DataTableContainer>
     );
 }

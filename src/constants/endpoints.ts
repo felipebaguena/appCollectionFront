@@ -61,4 +61,5 @@ export const ENDPOINTS = {
   UPLOAD_GAME_ARTICLE_IMAGE: (gameId: string) =>
     `/article-images/game/${gameId}/upload`,
   SET_ARTICLE_COVER: "/article-images/set-cover",
+  SCHEDULE_ARTICLE: (id: string) => `/articles/${id}/schedule`,
 };

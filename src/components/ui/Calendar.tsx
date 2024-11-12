@@ -67,7 +67,12 @@ const DaysGrid = styled.div`
   gap: 4px;
 `;
 
-const DayCell = styled.button<{ $isToday?: boolean; $isSelected?: boolean; $isCurrentMonth: boolean }>`
+const DayCell = styled.button<{
+    $isToday?: boolean;
+    $isSelected?: boolean;
+    $isCurrentMonth: boolean;
+    $isDisabled?: boolean;
+}>`
   aspect-ratio: 1;
   border: none;
   background: ${props => props.$isSelected ? 'var(--app-yellow)' : 'none'};
@@ -92,6 +97,12 @@ const DayCell = styled.button<{ $isToday?: boolean; $isSelected?: boolean; $isCu
             : 'var(--clear-grey)'
     };
   }
+
+  ${props => props.$isDisabled && `
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  `}
 `;
 
 const Dropdown = styled.div`
@@ -118,17 +129,48 @@ const DropdownItem = styled.button<{ $isSelected?: boolean }>`
   }
 `;
 
+const TimeContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+  align-items: center;
+`;
+
+const TimeInput = styled.input`
+  width: 50px;
+  padding: 4px;
+  text-align: center;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+`;
+
+const TimeSeparator = styled.span`
+  color: var(--dark-grey);
+  font-weight: 500;
+`;
+
 interface CalendarProps {
     selectedDate: Date | null;
     onChange: (date: Date) => void;
     onClose?: () => void;
     dateFormat?: DateFormat;
+    hasTime?: boolean;
+    disablePastDates?: boolean;
 }
 
-const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, dateFormat }) => {
+const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, dateFormat, hasTime = false, disablePastDates = false }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [showMonthDropdown, setShowMonthDropdown] = useState(false);
     const [showYearDropdown, setShowYearDropdown] = useState(false);
+    const [hours, setHours] = useState(selectedDate?.getHours() || 0);
+    const [minutes, setMinutes] = useState(selectedDate?.getMinutes() || 0);
     const calendarRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -207,9 +249,11 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, da
             daysArray.push(
                 <DayCell
                     key={`prev-${i}`}
-                    onClick={() => onChange(date)}
+                    onClick={() => !isDateDisabled(date) && onChange(date)}
                     $isCurrentMonth={false}
                     $isSelected={isSelected(date)}
+                    $isDisabled={isDateDisabled(date)}
+                    disabled={isDateDisabled(date)}
                 >
                     {daysInPrevMonth - i}
                 </DayCell>
@@ -222,10 +266,12 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, da
             daysArray.push(
                 <DayCell
                     key={i}
-                    onClick={() => onChange(date)}
+                    onClick={() => !isDateDisabled(date) && onChange(date)}
                     $isToday={isToday(date)}
                     $isSelected={isSelected(date)}
                     $isCurrentMonth={true}
+                    $isDisabled={isDateDisabled(date)}
+                    disabled={isDateDisabled(date)}
                 >
                     {i}
                 </DayCell>
@@ -233,15 +279,17 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, da
         }
 
         // Días del mes siguiente
-        const remainingDays = 42 - daysArray.length; // 6 semanas x 7 días
+        const remainingDays = 42 - daysArray.length;
         for (let i = 1; i <= remainingDays; i++) {
             const date = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, i);
             daysArray.push(
                 <DayCell
                     key={`next-${i}`}
-                    onClick={() => onChange(date)}
+                    onClick={() => !isDateDisabled(date) && onChange(date)}
                     $isCurrentMonth={false}
                     $isSelected={isSelected(date)}
+                    $isDisabled={isDateDisabled(date)}
+                    disabled={isDateDisabled(date)}
                 >
                     {i}
                 </DayCell>
@@ -249,6 +297,64 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, da
         }
 
         return daysArray;
+    };
+
+    const isDateDisabled = (date: Date) => {
+        if (!disablePastDates) return false;
+        const now = new Date();
+        return date < new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    };
+
+    const handleTimeChange = (type: 'hours' | 'minutes', value: string) => {
+        const numValue = parseInt(value) || 0;
+        const now = new Date();
+
+        if (type === 'hours') {
+            let validHours = Math.min(Math.max(numValue, 0), 23);
+
+            if (disablePastDates && selectedDate &&
+                selectedDate.getDate() === now.getDate() &&
+                selectedDate.getMonth() === now.getMonth() &&
+                selectedDate.getFullYear() === now.getFullYear()) {
+                validHours = Math.max(validHours, now.getHours());
+                if (validHours === now.getHours()) {
+                    setMinutes(Math.max(minutes, now.getMinutes()));
+                }
+            }
+
+            setHours(validHours);
+            if (selectedDate) {
+                const newDate = new Date(selectedDate);
+                newDate.setHours(validHours);
+                onChange(newDate);
+            }
+        } else {
+            let validMinutes = Math.min(Math.max(numValue, 0), 59);
+
+            if (disablePastDates && selectedDate &&
+                selectedDate.getDate() === now.getDate() &&
+                selectedDate.getMonth() === now.getMonth() &&
+                selectedDate.getFullYear() === now.getFullYear() &&
+                hours === now.getHours()) {
+                validMinutes = Math.max(validMinutes, now.getMinutes());
+            }
+
+            setMinutes(validMinutes);
+            if (selectedDate) {
+                const newDate = new Date(selectedDate);
+                newDate.setMinutes(validMinutes);
+                onChange(newDate);
+            }
+        }
+    };
+
+    const handleDateChange = (date: Date) => {
+        const newDate = new Date(date);
+        if (hasTime) {
+            newDate.setHours(hours);
+            newDate.setMinutes(minutes);
+        }
+        onChange(newDate);
     };
 
     return (
@@ -306,6 +412,28 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onChange, onClose, da
             <DaysGrid>
                 {renderDays()}
             </DaysGrid>
+
+            {hasTime && (
+                <TimeContainer>
+                    <TimeInput
+                        type="number"
+                        min="0"
+                        max="23"
+                        value={hours}
+                        onChange={(e) => handleTimeChange('hours', e.target.value)}
+                        placeholder="HH"
+                    />
+                    <TimeSeparator>:</TimeSeparator>
+                    <TimeInput
+                        type="number"
+                        min="0"
+                        max="59"
+                        value={minutes}
+                        onChange={(e) => handleTimeChange('minutes', e.target.value)}
+                        placeholder="MM"
+                    />
+                </TimeContainer>
+            )}
         </CalendarContainer>
     );
 };

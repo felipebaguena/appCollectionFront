@@ -15,6 +15,10 @@ interface UpdateArticleRequest {
   relatedDeveloperIds: number[];
 }
 
+interface ScheduleArticleRequest {
+  publishAt: string;
+}
+
 export const useArticle = (id: string) => {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(false);
@@ -66,6 +70,30 @@ export const useArticle = (id: string) => {
     }
   };
 
+  const scheduleArticle = async (publishAt: Date) => {
+    setLoading(true);
+    try {
+      const scheduleData: ScheduleArticleRequest = {
+        publishAt: publishAt.toISOString(),
+      };
+
+      const updatedArticle = await api.put<Article>(
+        ENDPOINTS.SCHEDULE_ARTICLE(id),
+        id,
+        scheduleData
+      );
+
+      setArticle(updatedArticle);
+      setError(null);
+      return updatedArticle;
+    } catch (error) {
+      setError("Error al programar el artículo");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     article,
     loading,
@@ -73,5 +101,6 @@ export const useArticle = (id: string) => {
     fetchArticle,
     updateArticle,
     deleteArticle,
+    scheduleArticle,
   };
 };
