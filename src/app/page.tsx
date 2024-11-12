@@ -10,6 +10,7 @@ import {
 import GameGrid from '@/components/home/GameGrid';
 import InfoCard from '@/components/home/InfoCard';
 import CRTScanlines from '@/components/ui/CRTScanlines';
+import HomeArticlesSection from '@/components/home/HomeArticlesSection';
 
 const BANNER_HOME_IMAGE = "http://localhost:3000/uploads/front/9012830ed42a379256f01ed070157d7f.jpg"
 const INFO_CARD_IMAGE = "http://localhost:3000/uploads/front/garou.jpg"
@@ -17,13 +18,14 @@ const INFO_CARD_IMAGE = "http://localhost:3000/uploads/front/garou.jpg"
 export default function HomePage() {
   return (
     <>
-      <BannerContainer height='24rem'>
+      {/* <BannerContainer height='24rem'>
         <CRTScanlines />
         <BannerBackground
           imageUrl={BANNER_HOME_IMAGE}
           oldTvEffect='vibrant'
         />
-      </BannerContainer>
+      </BannerContainer> */}
+      <HomeArticlesSection />
       <HomeContent>
         <HomeSection>
           <GameGrid />
