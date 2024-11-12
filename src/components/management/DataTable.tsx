@@ -312,7 +312,20 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                     title="Galería"
                 />
             );
-        } else if (ViewComponent) {
+        } else if (form === 'platform' || form === 'genre' || form === 'developer') {
+            buttons.push(
+                <EditButtonDataTable
+                    key="edit"
+                    onClick={() => handleAction(item, 'edit')}
+                    title="Editar"
+                />,
+                <DeleteButtonDataTable
+                    key="delete"
+                    onClick={() => setDeleteConfirmation({ isOpen: true, itemToDelete: item })}
+                    title="Borrar"
+                />
+            );
+        } else if (form === 'game' && ViewComponent) {
             buttons.push(
                 <ViewButtonDataTable
                     key="view"
@@ -336,18 +349,13 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                     key="delete"
                     onClick={() => setDeleteConfirmation({ isOpen: true, itemToDelete: item })}
                     title="Borrar"
+                />,
+                <GalleryButtonDataTable
+                    key="gallery"
+                    onClick={() => handleGalleryAction(item)}
+                    title="Galería"
                 />
             );
-
-            if (form === 'game') {
-                buttons.push(
-                    <GalleryButtonDataTable
-                        key="gallery"
-                        onClick={() => handleGalleryAction(item)}
-                        title="Galería"
-                    />
-                );
-            }
         }
 
         return buttons;
