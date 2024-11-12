@@ -36,6 +36,8 @@ import {
     FilterLabel,
     CompactFilterGroup,
     ScheduleButtonDataTable,
+    PublishButtonDataTable,
+    UnpublishButtonDataTable,
 } from './DataTableElements';
 import { getImageUrl } from '@/services/api';
 import { Game } from '@/types/game';
@@ -68,6 +70,7 @@ import ArticleGalleryModal from '@/components/articles/ArticleGalleryModal';
 import CoverArticleModal from '@/components/articles/CoverArticleModal';
 import EditArticleForm from '@/components/articles/EditArticleForm';
 import ScheduleArticleForm from '../articles/ScheduleArticleForm';
+import PublishActionsArticleForm from '../articles/PublishActionsArticleForm';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -124,6 +127,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     });
     const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
     const [showSchedule, setShowSchedule] = useState(false);
+    const [showPublishActions, setShowPublishActions] = useState(false);
 
     const deleteItemId = deleteConfirmation.itemToDelete?.id.toString() || '';
     const { deleteGame } = form === 'game' ? useGame(deleteItemId) : { deleteGame: null };
@@ -268,13 +272,25 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                 />
             );
 
-            // Solo mostrar el botón de programar si el artículo no está publicado
             if (!article.published) {
                 buttons.push(
                     <ScheduleButtonDataTable
                         key="schedule"
                         onClick={() => handleScheduleAction(item)}
                         title="Programar artículo"
+                    />,
+                    <PublishButtonDataTable
+                        key="publish"
+                        onClick={() => handlePublishAction(item)}
+                        title="Publicar artículo"
+                    />
+                );
+            } else {
+                buttons.push(
+                    <UnpublishButtonDataTable
+                        key="unpublish"
+                        onClick={() => handlePublishAction(item)}
+                        title="Despublicar artículo"
                     />
                 );
             }
@@ -459,6 +475,11 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
     const handleScheduleAction = (item: T) => {
         setSelectedItem(item);
         setShowSchedule(true);
+    };
+
+    const handlePublishAction = (item: T) => {
+        setSelectedItem(item);
+        setShowPublishActions(true);
     };
 
     return (
@@ -660,6 +681,17 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                     onClose={() => {
                         setSelectedItem(null);
                         setShowSchedule(false);
+                        refreshDataAndResetPage();
+                    }}
+                />
+            )}
+
+            {showPublishActions && selectedItem && (
+                <PublishActionsArticleForm
+                    item={selectedItem as unknown as Article}
+                    onClose={() => {
+                        setSelectedItem(null);
+                        setShowPublishActions(false);
                         refreshDataAndResetPage();
                     }}
                 />

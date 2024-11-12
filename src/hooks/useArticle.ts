@@ -94,6 +94,44 @@ export const useArticle = (id: string) => {
     }
   };
 
+  const publishArticle = async () => {
+    setLoading(true);
+    try {
+      const updatedArticle = await api.put<Article>(
+        ENDPOINTS.PUBLISH_ARTICLE(id),
+        id,
+        {}
+      );
+      setArticle(updatedArticle);
+      setError(null);
+      return updatedArticle;
+    } catch (error) {
+      setError("Error al publicar el artículo");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const unpublishArticle = async () => {
+    setLoading(true);
+    try {
+      const updatedArticle = await api.put<Article>(
+        ENDPOINTS.UNPUBLISH_ARTICLE(id),
+        id,
+        {}
+      );
+      setArticle(updatedArticle);
+      setError(null);
+      return updatedArticle;
+    } catch (error) {
+      setError("Error al despublicar el artículo");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     article,
     loading,
@@ -102,5 +140,7 @@ export const useArticle = (id: string) => {
     updateArticle,
     deleteArticle,
     scheduleArticle,
+    publishArticle,
+    unpublishArticle,
   };
 };

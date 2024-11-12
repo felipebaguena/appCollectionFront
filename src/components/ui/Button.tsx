@@ -2,8 +2,17 @@
 
 import styled, { css } from "styled-components";
 
+export type ButtonVariant =
+  | 'dark'
+  | 'primary'
+  | 'secondary'
+  | 'danger'
+  | 'cancel'
+  | 'upload'
+  | 'refresh'
+
 export interface ButtonProps {
-  $variant?: "primary" | "secondary" | "danger" | "dark" | "cancel" | "upload" | "refresh";
+  $variant?: ButtonVariant;
   $customColor?: string;
   $primary?: boolean;
   $fullWidth?: boolean;

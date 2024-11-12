@@ -3,7 +3,7 @@ import { FaEye, FaEdit, FaTrash, FaImages, FaPlus, FaSync, FaSortUp, FaSortDown,
 import Button from '../ui/Button';
 import { keyframes } from 'styled-components';
 import { useState } from 'react';
-import { MdSchedule } from 'react-icons/md';
+import { MdSchedule, MdPublish, MdUnpublished } from 'react-icons/md';
 
 const fadeInOut = keyframes`
   0% {
@@ -229,6 +229,8 @@ export const ActionEditButton = styled(ActionButton).attrs({ $variant: 'primary'
 export const ActionDeleteButton = styled(ActionButton).attrs({ $variant: 'danger' })``;
 export const ActionGalleryButton = styled(ActionButton).attrs({ $variant: 'dark' })``;
 export const ActionScheduleButton = styled(ActionButton).attrs({ $variant: 'cancel' })``;
+export const ActionPublishButton = styled(ActionButton).attrs({ $variant: 'cancel' })``;
+export const ActionUnpublishButton = styled(ActionButton).attrs({ $variant: 'cancel' })``;
 
 export const ViewButtonDataTable = (props: React.ComponentProps<typeof ActionViewButton>) => (
   <ActionViewButton {...props}>
@@ -267,6 +269,18 @@ export const ScheduleButtonDataTable = (props: React.ComponentProps<typeof Actio
   <ActionScheduleButton {...props}>
     <MdSchedule />
   </ActionScheduleButton>
+);
+
+export const PublishButtonDataTable = (props: React.ComponentProps<typeof ActionPublishButton>) => (
+  <ActionPublishButton {...props}>
+    <MdPublish />
+  </ActionPublishButton>
+);
+
+export const UnpublishButtonDataTable = (props: React.ComponentProps<typeof ActionUnpublishButton>) => (
+  <ActionUnpublishButton {...props}>
+    <MdUnpublished />
+  </ActionUnpublishButton>
 );
 
 export const RefreshButton = (props: React.ComponentProps<typeof Button>) => {
