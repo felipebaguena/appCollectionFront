@@ -5,6 +5,16 @@ import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
 import { Article } from "@/types/article";
 
+interface UpdateArticleRequest {
+  title: string;
+  subtitle: string;
+  content: string;
+  relatedGameIds: number[];
+  relatedPlatformIds: number[];
+  relatedGenreIds: number[];
+  relatedDeveloperIds: number[];
+}
+
 export const useArticle = (id: string) => {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(false);
@@ -23,7 +33,7 @@ export const useArticle = (id: string) => {
     }
   }, [id]);
 
-  const updateArticle = async (updatedArticleData: Partial<Article>) => {
+  const updateArticle = async (updatedArticleData: UpdateArticleRequest) => {
     setLoading(true);
     try {
       const updatedArticle = await api.put<Article>(

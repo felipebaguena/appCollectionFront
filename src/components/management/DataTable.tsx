@@ -65,6 +65,7 @@ import CreateArticleForm from '@/components/articles/CreateArticleForm';
 import { useRouter } from 'next/navigation';
 import ArticleGalleryModal from '@/components/articles/ArticleGalleryModal';
 import CoverArticleModal from '@/components/articles/CoverArticleModal';
+import EditArticleForm from '@/components/articles/EditArticleForm';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 const NO_IMAGE_URL = `${API_BASE_URL}/uploads/resources/no-image.jpg`;
@@ -347,7 +348,7 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
             EditComponent = EditGameForm as React.ComponentType<ComponentProps<'game'>>;
             break;
         case 'article':
-            // Por ahora no hay componentes
+            EditComponent = EditArticleForm as React.ComponentType<ComponentProps<'article'>>;
             break;
         case 'platform':
             EditComponent = EditPlatformForm as React.ComponentType<ComponentProps<'platform'>>;
