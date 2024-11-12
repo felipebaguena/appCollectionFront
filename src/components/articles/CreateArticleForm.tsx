@@ -26,7 +26,7 @@ import { Game } from '@/types/game';
 import { useArticle } from '@/hooks/useArticle';
 import { useArticleImages } from '@/hooks/useArticleImages';
 
-import { ArticleTemplate } from '@/types/articleTemplate';
+import { ArticleTemplate, TemplateCode, templateComponents } from '@/types/articleTemplate';
 import ImageSelectionStep from './ImageSelectionStep';
 
 import { ArticleImage } from '@/types/article';
@@ -331,6 +331,53 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         }
     };
 
+    const renderPreview = () => {
+        if (!pendingArticleData) return null;
+
+        const selectedTemplate = templates.find(t => t.id === pendingArticleData.templateId);
+        const TemplateComponent = selectedTemplate
+            ? templateComponents[selectedTemplate.code as TemplateCode]
+            : templateComponents[TemplateCode.STANDARD_REVIEW];
+
+        return (
+            <>
+                <TemplateComponent
+                    title={pendingArticleData.title}
+                    subtitle={pendingArticleData.subtitle}
+                    content={pendingArticleData.content}
+                    coverImageId={pendingArticleData.coverImageId}
+                    contentImageIds={pendingArticleData.contentImageIds}
+                    gameId={pendingArticleData.relatedGames[0]}
+                    getImageUrl={getImageUrl}
+                    isPreview={true}
+                />
+                <ButtonContainer>
+                    <Button
+                        $variant="primary"
+                        onClick={() => {
+                            if (pendingArticleData) {
+                                handleCreateArticle({
+                                    coverImageId: pendingArticleData.coverImageId,
+                                    articleImages: pendingArticleData.contentImageIds
+                                });
+                            }
+                        }}
+                        disabled={isSubmitting || !pendingArticleData}
+                    >
+                        {isSubmitting ? 'Creando...' : 'Crear artículo'}
+                    </Button>
+                    <Button
+                        $variant="dark"
+                        onClick={() => setCurrentStep('images')}
+                        disabled={isSubmitting}
+                    >
+                        Volver
+                    </Button>
+                </ButtonContainer>
+            </>
+        );
+    };
+
     return (
         <ArticleFormContainer>
             {currentStep !== 'preview' && (
@@ -466,43 +513,7 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
                             getImageUrl={getImageUrl}
                         />
                     ) : (
-                        pendingArticleData && (
-                            <>
-                                <StandardReviewTemplate
-                                    title={pendingArticleData.title}
-                                    subtitle={pendingArticleData.subtitle}
-                                    content={pendingArticleData.content}
-                                    coverImageId={pendingArticleData.coverImageId}
-                                    contentImageIds={pendingArticleData.contentImageIds}
-                                    gameId={pendingArticleData.relatedGames[0]}
-                                    getImageUrl={getImageUrl}
-                                    isPreview={true}
-                                />
-                                <ButtonContainer>
-                                    <Button
-                                        $variant="primary"
-                                        onClick={() => {
-                                            if (pendingArticleData) {
-                                                handleCreateArticle({
-                                                    coverImageId: pendingArticleData.coverImageId,
-                                                    articleImages: pendingArticleData.contentImageIds
-                                                });
-                                            }
-                                        }}
-                                        disabled={isSubmitting || !pendingArticleData}
-                                    >
-                                        {isSubmitting ? 'Creando...' : 'Crear artículo'}
-                                    </Button>
-                                    <Button
-                                        $variant="dark"
-                                        onClick={() => setCurrentStep('images')}
-                                        disabled={isSubmitting}
-                                    >
-                                        Volver
-                                    </Button>
-                                </ButtonContainer>
-                            </>
-                        )
+                        currentStep === 'preview' && pendingArticleData && renderPreview()
                     )}
                     {error && <ErrorMessage>{error}</ErrorMessage>}
                 </ContentContainer>
