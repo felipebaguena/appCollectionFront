@@ -22,6 +22,7 @@ export interface Article {
   content: string;
   createdAt: string;
   publishedAt: string | null;
+  updatedAt: string | null;
   published: boolean;
   scheduledPublishAt: string | null;
   coverImageId?: number;

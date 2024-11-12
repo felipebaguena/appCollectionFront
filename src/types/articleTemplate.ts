@@ -34,4 +34,5 @@ export interface TemplateProps {
   published?: boolean;
   publishedAt?: string | null;
   scheduledPublishAt?: string | null;
+  updatedAt?: string | null;
 }

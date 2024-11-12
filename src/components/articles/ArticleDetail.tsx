@@ -31,6 +31,7 @@ const ArticleDetail: React.FC<ArticleDetailProps> = ({ id }) => {
         isPreview: !article.published,
         published: article.published,
         publishedAt: article.publishedAt,
+        updatedAt: article.updatedAt,
         scheduledPublishAt: article.scheduledPublishAt
     };
 

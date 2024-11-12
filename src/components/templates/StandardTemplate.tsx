@@ -12,7 +12,7 @@ import {
     CoverImage,
     PreviewBanner
 } from './TemplateElements';
-import { splitContentIntoParagraphs, renderContentWithImages, formatPublishDate, getPublishStatus } from './templateUtils';
+import { splitContentIntoParagraphs, renderContentWithImages } from './templateUtils';
 import { TemplateProps } from '@/types/articleTemplate';
 
 const StandardTemplate: React.FC<TemplateProps> = ({
@@ -28,7 +28,8 @@ const StandardTemplate: React.FC<TemplateProps> = ({
     isPreview = false,
     published = false,
     publishedAt = null,
-    scheduledPublishAt = null
+    scheduledPublishAt = null,
+    updatedAt = null
 }) => {
     const {
         gameArticleImages,
@@ -72,7 +73,8 @@ const StandardTemplate: React.FC<TemplateProps> = ({
         imagePositions: [0, 2],
         published,
         publishedAt,
-        scheduledPublishAt
+        scheduledPublishAt,
+        updatedAt
     });
 
     return (

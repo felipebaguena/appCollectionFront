@@ -13,6 +13,7 @@ interface ContentProps {
   published?: boolean;
   publishedAt?: string | null;
   scheduledPublishAt?: string | null;
+  updatedAt?: string | null;
 }
 
 export const splitContentIntoParagraphs = (content: string): string[] => {
@@ -29,14 +30,21 @@ export const renderContentWithImages = ({
   imagePositions = [0, 2],
   published = false,
   publishedAt = null,
-  scheduledPublishAt = null
+  scheduledPublishAt = null,
+  updatedAt = null
 }: ContentProps): JSX.Element[] => {
   const allElements: JSX.Element[] = [];
+
+  // Log para verificar los valores de entrada
+  console.log('Published:', published);
+  console.log('PublishedAt:', publishedAt);
+  console.log('ScheduledPublishAt:', scheduledPublishAt);
+  console.log('UpdatedAt:', updatedAt);
 
   // Añadir primero la información de publicación
   allElements.push(
     <PublishInfo key="publish-info">
-      {getPublishStatus(published, publishedAt, scheduledPublishAt)}
+      {getPublishStatus(published, publishedAt, scheduledPublishAt, updatedAt)}
     </PublishInfo>
   );
 
@@ -72,8 +80,20 @@ export const formatPublishDate = (date: string): string => {
   });
 };
 
-export const getPublishStatus = (published: boolean, publishedAt: string | null, scheduledPublishAt: string | null): string => {
+export const getPublishStatus = (
+  published: boolean,
+  publishedAt: string | null,
+  scheduledPublishAt: string | null,
+  updatedAt: string | null
+): string => {
   if (published && publishedAt) {
+    const publishedDate = new Date(publishedAt);
+    const updatedDate = updatedAt ? new Date(updatedAt) : null;
+
+    if (updatedDate && updatedDate > publishedDate) {
+      return `Editado en ${formatPublishDate(updatedAt!)}`;
+    }
+
     return `${formatPublishDate(publishedAt)}`;
   }
   if (scheduledPublishAt) {
