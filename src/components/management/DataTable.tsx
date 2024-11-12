@@ -2,15 +2,12 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useDataTable } from '@/hooks/useDataTable';
 import { Column, DataTableParams } from '@/types/dataTable';
 import {
-    Table,
     Th,
     StyledTd,
     ActionsTd,
     CellContent,
     CoverThumbnail,
-    PaginationContainer,
     ButtonDataTable,
-    TableContainer,
     TableTitle,
     TitleContainer,
     RefreshButton,
@@ -20,7 +17,6 @@ import {
     DeleteButtonDataTable,
     GalleryButtonDataTable,
     CreateButtonDataTable,
-    DataTableButtonsContainer,
     SortIconComponent,
     ThContent,
     DataTableContainer,
@@ -32,40 +28,57 @@ import {
     FiltersSection,
     ButtonsSection,
     FilterButton,
-    FilterGroup,
     FilterLabel,
     CompactFilterGroup,
     ScheduleButtonDataTable,
     PublishButtonDataTable,
     UnpublishButtonDataTable,
 } from './DataTableElements';
-import { getImageUrl } from '@/services/api';
+
+// Next imports
+import { useRouter } from 'next/navigation';
+
+// Types
 import { Game } from '@/types/game';
+import { Article } from '@/types/article';
+import { BaseFilter, FilterPackage } from '@/types/filters';
+
+// Services
+import { getImageUrl } from '@/services/api';
+
+// Hooks
+import { useGame } from '@/hooks/useGame';
+import { useGames } from '@/hooks/useGames';
+import { usePlatforms } from '@/hooks/usePlatforms';
+import { usePlatform } from '@/hooks/usePlatform';
+import { useGenre } from '@/hooks/useGenre';
+import { useDeveloper } from '@/hooks/useDeveloper';
+import { useArticle } from '@/hooks/useArticle';
+
+// UI Components
 import CoverImageModal from '@/components/ui/CoverImageModal';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
-import { useGame } from '@/hooks/useGame';
 
-// Importaciones dinámicas para los componentes de juegos
+// Game Components
 import ViewGameForm from '@/components/games/ViewGameForm';
 import EditGameForm from '@/components/games/EditGameForm';
 import GameGalleryModal from '@/components/games/GameGalleryModal';
 import CreateGameForm from '@/components/games/CreateGameForm';
+
+// Platform Components
 import CreatePlatformForm from '@/components/platforms/CreatePlatformForm';
-import { useGames } from '@/hooks/useGames';
-import { usePlatforms } from '@/hooks/usePlatforms';
-import { BaseFilter, FilterPackage } from '@/types/filters';
-import { usePlatform } from '@/hooks/usePlatform';
 import EditPlatformForm from '@/components/platforms/EditPlatformForm';
+
+// Genre Components
 import EditGenreForm from '@/components/genres/EditGenreForm';
 import CreateGenreForm from '@/components/genres/CreateGenreForm';
-import { useGenre } from '@/hooks/useGenre';
+
+// Developer Components
 import EditDeveloperForm from '@/components/developers/EditDeveloperForm';
 import CreateDeveloperForm from '@/components/developers/CreateDeveloperForm';
-import { useDeveloper } from '@/hooks/useDeveloper';
-import { Article } from '@/types/article';
-import { useArticle } from '@/hooks/useArticle';
+
+// Article Components
 import CreateArticleForm from '@/components/articles/CreateArticleForm';
-import { useRouter } from 'next/navigation';
 import ArticleGalleryModal from '@/components/articles/ArticleGalleryModal';
 import CoverArticleModal from '@/components/articles/CoverArticleModal';
 import EditArticleForm from '@/components/articles/EditArticleForm';
@@ -149,8 +162,6 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
 
     const {
         data,
-        loading,
-        error,
         totalItems,
         totalPages,
         handlePageChange,
