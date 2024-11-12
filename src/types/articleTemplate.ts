@@ -19,3 +19,19 @@ export interface ArticleTemplate {
   isActive: boolean;
   imageCount: number;
 }
+
+export interface TemplateProps {
+  title: string;
+  subtitle: string;
+  content: string;
+  coverImageId?: number | null;
+  coverImagePath?: string;
+  contentImageIds?: number[];
+  contentImagePaths?: string[];
+  gameId?: number;
+  getImageUrl: (path: string) => string;
+  isPreview?: boolean;
+  published?: boolean;
+  publishedAt?: string | null;
+  scheduledPublishAt?: string | null;
+}

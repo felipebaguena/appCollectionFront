@@ -126,3 +126,12 @@ export const PreviewBanner = styled.div`
   font-size: 1.2rem;
   font-weight: bold;
 `;
+
+export const PublishInfo = styled.div`
+  color: var(--dark-grey);
+  font-size: 0.9rem;
+  font-style: italic;
+  opacity: 0.8;
+  max-width: 45rem;
+  margin-bottom: 2rem;
+`;

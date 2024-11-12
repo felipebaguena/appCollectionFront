@@ -20,17 +20,19 @@ export interface Article {
   title: string;
   subtitle: string;
   content: string;
-  published: boolean;
-  publishedAt: string | null;
   createdAt: string;
-  updatedAt: string;
-  template: ArticleTemplate;
-  relatedGames: Game[];
-  relatedPlatforms: Platform[];
-  relatedGenres: Genre[];
-  relatedDevelopers: Developer[];
-  coverImage: ArticleImage | null;
+  publishedAt: string | null;
+  published: boolean;
+  scheduledPublishAt: string | null;
+  coverImageId?: number;
+  templateId: number;
+  coverImage?: ArticleImage;
   contentImages: ArticleImage[];
+  template: ArticleTemplate;
+  relatedGames?: Game[];
+  relatedPlatforms?: Platform[];
+  relatedDevelopers?: Developer[];
+  relatedGenres?: Genre[];
 }
 
 export interface ArticleDateRange {

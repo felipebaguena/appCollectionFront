@@ -12,22 +12,10 @@ import {
     CoverImage,
     PreviewBanner
 } from './TemplateElements';
-import { splitContentIntoParagraphs, renderContentWithImages } from './templateUtils';
+import { splitContentIntoParagraphs, renderContentWithImages, formatPublishDate, getPublishStatus } from './templateUtils';
+import { TemplateProps } from '@/types/articleTemplate';
 
-interface StandardTemplate {
-    title: string;
-    subtitle: string;
-    content: string;
-    coverImageId?: number | null;
-    coverImagePath?: string;
-    contentImageIds?: number[];
-    contentImagePaths?: string[];
-    gameId?: number;
-    getImageUrl: (path: string) => string;
-    isPreview?: boolean;
-}
-
-const StandardTemplate: React.FC<StandardTemplate> = ({
+const StandardTemplate: React.FC<TemplateProps> = ({
     title,
     subtitle,
     content,
@@ -37,7 +25,10 @@ const StandardTemplate: React.FC<StandardTemplate> = ({
     contentImagePaths,
     gameId,
     getImageUrl,
-    isPreview = false
+    isPreview = false,
+    published = false,
+    publishedAt = null,
+    scheduledPublishAt = null
 }) => {
     const {
         gameArticleImages,
@@ -78,8 +69,13 @@ const StandardTemplate: React.FC<StandardTemplate> = ({
         paragraphs,
         contentImages,
         getImageUrl,
-        imagePositions: [0, 2]
+        imagePositions: [0, 2],
+        published,
+        publishedAt,
+        scheduledPublishAt
     });
+
+    console.log('Template props:', { published, publishedAt, scheduledPublishAt });
 
     return (
         <>

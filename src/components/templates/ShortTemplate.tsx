@@ -12,23 +12,10 @@ import {
     CoverImage,
     PreviewBanner
 } from './TemplateElements';
-import { splitContentIntoParagraphs, renderContentWithImages } from './templateUtils';
+import { splitContentIntoParagraphs, renderContentWithImages, getPublishStatus } from './templateUtils';
+import { TemplateProps } from '@/types/articleTemplate';
 
-// Podemos reutilizar la misma interfaz
-interface ShortTemplateProps {
-    title: string;
-    subtitle: string;
-    content: string;
-    coverImageId?: number | null;
-    coverImagePath?: string;
-    contentImageIds?: number[];
-    contentImagePaths?: string[];
-    gameId?: number;
-    getImageUrl: (path: string) => string;
-    isPreview?: boolean;
-}
-
-const ShortTemplate: React.FC<ShortTemplateProps> = ({
+const ShortTemplate: React.FC<TemplateProps> = ({
     title,
     subtitle,
     content,
@@ -38,7 +25,10 @@ const ShortTemplate: React.FC<ShortTemplateProps> = ({
     contentImagePaths,
     gameId,
     getImageUrl,
-    isPreview = false
+    isPreview = false,
+    published = false,
+    publishedAt = null,
+    scheduledPublishAt = null
 }) => {
     const {
         gameArticleImages,
@@ -81,7 +71,10 @@ const ShortTemplate: React.FC<ShortTemplateProps> = ({
         paragraphs,
         contentImages,
         getImageUrl,
-        imagePositions: [1]
+        imagePositions: [1],
+        published,
+        publishedAt,
+        scheduledPublishAt
     });
 
     return (

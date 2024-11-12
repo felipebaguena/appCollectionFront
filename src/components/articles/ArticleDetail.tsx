@@ -19,10 +19,14 @@ const ArticleDetail: React.FC<ArticleDetailProps> = ({ id }) => {
     if (error) return <div>Error: {error}</div>;
     if (!article) return <div>No se encontró el artículo</div>;
 
-    // Obtener el componente del template basado en el código
+    console.log('Article data:', {
+        published: article.published,
+        publishedAt: article.publishedAt,
+        scheduledPublishAt: article.scheduledPublishAt
+    });
+
     const TemplateComponent = templateComponents[article.template.code as TemplateCode] || templateComponents[TemplateCode.STANDARD_TEMPLATE];
 
-    // Props comunes para todos los templates
     const commonProps = {
         title: article.title,
         subtitle: article.subtitle,
@@ -30,8 +34,13 @@ const ArticleDetail: React.FC<ArticleDetailProps> = ({ id }) => {
         coverImagePath: article.coverImage?.path,
         contentImagePaths: article.contentImages.map(img => img.path),
         getImageUrl: getImageUrl,
-        isPreview: !article.published
+        isPreview: !article.published,
+        published: article.published,
+        publishedAt: article.publishedAt,
+        scheduledPublishAt: article.scheduledPublishAt
     };
+
+    console.log('Common props:', commonProps);
 
     return <TemplateComponent {...commonProps} />;
 };
