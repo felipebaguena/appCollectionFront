@@ -14,7 +14,8 @@ import {
 } from './TemplateElements';
 import { splitContentIntoParagraphs, renderContentWithImages } from './templateUtils';
 
-interface StandardTemplate {
+// Podemos reutilizar la misma interfaz
+interface ShortTemplateProps {
     title: string;
     subtitle: string;
     content: string;
@@ -27,7 +28,7 @@ interface StandardTemplate {
     isPreview?: boolean;
 }
 
-const StandardTemplate: React.FC<StandardTemplate> = ({
+const ShortTemplate: React.FC<ShortTemplateProps> = ({
     title,
     subtitle,
     content,
@@ -65,10 +66,12 @@ const StandardTemplate: React.FC<StandardTemplate> = ({
         coverImageUrl = coverImage ? getImageUrl(coverImage.path) : '';
     }
 
+    // Solo tomamos la primera imagen del contenido
     if (contentImagePaths) {
-        contentImages = contentImagePaths.map(path => ({ path }));
+        contentImages = contentImagePaths.slice(0, 1).map(path => ({ path }));
     } else if (gameArticleImages.length > 0 && contentImageIds) {
         contentImages = contentImageIds
+            .slice(0, 1)
             .map(id => gameArticleImages.find(img => img.id === id))
             .filter(img => img !== undefined) as { path: string }[];
     }
@@ -78,7 +81,7 @@ const StandardTemplate: React.FC<StandardTemplate> = ({
         paragraphs,
         contentImages,
         getImageUrl,
-        imagePositions: [0, 2]
+        imagePositions: [1]
     });
 
     return (
@@ -106,4 +109,4 @@ const StandardTemplate: React.FC<StandardTemplate> = ({
     );
 };
 
-export default StandardTemplate; 
+export default ShortTemplate; 
