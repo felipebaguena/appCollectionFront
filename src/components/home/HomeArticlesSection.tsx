@@ -28,6 +28,14 @@ const CoverArticleContainer = styled.div`
   cursor: pointer;
   margin: 0 auto;
   
+  @media (max-width: 768px) {
+    height: 30rem;
+  }
+
+  @media (max-width: 480px) {
+    height: 24rem;
+  }
+  
   &::after {
     content: '';
     position: absolute;
@@ -79,11 +87,27 @@ const ArticleTitle = styled.h2`
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
   font-weight: bold;
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.6rem;
+  }
 `;
 
 const ArticleSubtitle = styled.h3`
   font-size: 1.2rem;
   opacity: 0.9;
+
+    @media (max-width: 768px) {
+    font-size: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.9rem;
+  }
 `;
 
 // Top Articles Styles
@@ -92,6 +116,31 @@ const TopArticlesGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 1.5rem;
   width: 100%;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "full full"
+      "half1 half2";
+    
+    & > :nth-child(1) {
+      grid-area: full;
+    }
+    & > :nth-child(2) {
+      grid-area: half1;
+    }
+    & > :nth-child(3) {
+      grid-area: half2;
+    }
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "full"
+      "half1"
+      "half2";
+  }
 `;
 
 const TopArticleCard = styled.div`
@@ -134,7 +183,15 @@ const HomeArticleCard = styled.div`
   overflow: hidden;
   cursor: pointer;
   display: flex;
-  background: var(--dark-grey);
+  background: var(--background);
+  
+  @media (max-width: 768px) {
+    height: 160px;
+  }
+
+  @media (max-width: 480px) {
+    height: 120px;
+  }
   
   &:hover {
     transform: scale(1.01);
@@ -148,6 +205,41 @@ const HomeArticleImage = styled.div<{ $imageUrl: string }>`
   background-image: url(${props => props.$imageUrl});
   background-size: cover;
   background-position: center;
+
+  @media (max-width: 768px) {
+    width: 160px;
+    height: 160px;
+  }
+
+  @media (max-width: 480px) {
+    width: 120px;
+    height: 120px;
+  }
+`;
+
+const HomeArticleTitle = styled.h3`
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--dark-grey);
+
+  @media (max-width: 768px) {
+    font-size: 1.2rem;
+    margin-bottom: 0.3rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+  }
+`;
+
+const HomeArticleSubtitle = styled.p`
+  font-size: 1rem;
+  color: var(--mid-grey);
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const HomeArticleContent = styled.div`
@@ -156,17 +248,49 @@ const HomeArticleContent = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.8rem;
+  }
 `;
 
-const HomeArticleTitle = styled.h3`
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: var(--text-primary);
+const SectionWrapper = styled.div`
+  width: 100%;
+  background-color: var(--mid-grey);
+  padding-bottom: 2rem;
 `;
 
-const HomeArticleSubtitle = styled.p`
-  font-size: 1rem;
-  color: var(--text-secondary);
+const SectionDivider = styled.div`
+  width: 100%;
+  margin: 1rem 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--clear-grey);
+    white-space: nowrap;
+    line-height: 1;
+    margin-bottom: -2px;
+  }
+
+  &::after {
+    content: '';
+    height: 1px;
+    background-color: var(--clear-grey);
+    flex-grow: 1;
+  }
+
+    @media (max-width: 1200px) {
+    padding-left: 1rem;
+    padding-right: 0rem;
+  }
 `;
 
 export default function HomeArticlesSection() {
@@ -192,48 +316,54 @@ export default function HomeArticlesSection() {
     if (!homeArticles) return null;
 
     return (
-        <ArticlesContainer>
-            {/* Cover Article */}
-            {homeArticles.coverArticle && (
-                <CoverArticleContainer onClick={() => handleArticleClick(homeArticles.coverArticle.id)}>
-                    <BannerBackground
-                        imageUrl={getArticleImageUrl(homeArticles.coverArticle)}
-                        oldTvEffect="vibrant"
-                    />
-                    <CRTScanlines />
-                    <ArticleContent>
-                        <ArticleTitle>{homeArticles.coverArticle.title}</ArticleTitle>
-                        <ArticleSubtitle>{homeArticles.coverArticle.subtitle}</ArticleSubtitle>
-                    </ArticleContent>
-                </CoverArticleContainer>
-            )}
+        <SectionWrapper>
+            <ArticlesContainer>
+                {/* Cover Article */}
+                {homeArticles.coverArticle && (
+                    <CoverArticleContainer onClick={() => handleArticleClick(homeArticles.coverArticle.id)}>
+                        <BannerBackground
+                            imageUrl={getArticleImageUrl(homeArticles.coverArticle)}
+                            oldTvEffect="vibrant"
+                        />
+                        <CRTScanlines />
+                        <ArticleContent>
+                            <ArticleTitle>{homeArticles.coverArticle.title}</ArticleTitle>
+                            <ArticleSubtitle>{homeArticles.coverArticle.subtitle}</ArticleSubtitle>
+                        </ArticleContent>
+                    </CoverArticleContainer>
+                )}
 
-            {/* Top Articles */}
-            <TopArticlesGrid>
-                {homeArticles.topArticles.map((article) => (
-                    <TopArticleCard key={article.id} onClick={() => handleArticleClick(article.id)}>
-                        <CoverImage $imageUrl={getArticleImageUrl(article)}>
-                            <ArticleContent>
-                                <ArticleTitle>{article.title}</ArticleTitle>
-                                <ArticleSubtitle>{article.subtitle}</ArticleSubtitle>
-                            </ArticleContent>
-                        </CoverImage>
-                    </TopArticleCard>
-                ))}
-            </TopArticlesGrid>
+                {/* Top Articles */}
+                <TopArticlesGrid>
+                    {homeArticles.topArticles.map((article) => (
+                        <TopArticleCard key={article.id} onClick={() => handleArticleClick(article.id)}>
+                            <CoverImage $imageUrl={getArticleImageUrl(article)}>
+                                <ArticleContent>
+                                    <ArticleTitle>{article.title}</ArticleTitle>
+                                    <ArticleSubtitle>{article.subtitle}</ArticleSubtitle>
+                                </ArticleContent>
+                            </CoverImage>
+                        </TopArticleCard>
+                    ))}
+                </TopArticlesGrid>
 
-            {/* Home Articles */}
-            <HomeArticlesList>
-                {homeArticles.homeArticles.map((article) => (
-                    <HomeArticleCard key={article.id} onClick={() => handleArticleClick(article.id)}>
-                        <HomeArticleImage $imageUrl={getArticleImageUrl(article)} />
-                        <HomeArticleContent>
-                            <HomeArticleTitle>{article.title}</HomeArticleTitle>
-                            <HomeArticleSubtitle>{article.subtitle}</HomeArticleSubtitle>
-                        </HomeArticleContent>
-                    </HomeArticleCard>
-                ))}
-            </HomeArticlesList>
-        </ArticlesContainer>
+                <SectionDivider>
+                    <h2>Lo último</h2>
+                </SectionDivider>
+
+                {/* Home Articles */}
+                <HomeArticlesList>
+                    {homeArticles.homeArticles.map((article) => (
+                        <HomeArticleCard key={article.id} onClick={() => handleArticleClick(article.id)}>
+                            <HomeArticleImage $imageUrl={getArticleImageUrl(article)} />
+                            <HomeArticleContent>
+                                <HomeArticleTitle>{article.title}</HomeArticleTitle>
+                                <HomeArticleSubtitle>{article.subtitle}</HomeArticleSubtitle>
+                            </HomeArticleContent>
+                        </HomeArticleCard>
+                    ))}
+                </HomeArticlesList>
+            </ArticlesContainer>
+        </SectionWrapper>
     );
 } 
