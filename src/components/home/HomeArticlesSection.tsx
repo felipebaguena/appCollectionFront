@@ -247,7 +247,7 @@ const HomeArticleContent = styled.div`
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  position: relative;
 
   @media (max-width: 768px) {
     padding: 1rem;
@@ -255,6 +255,26 @@ const HomeArticleContent = styled.div`
 
   @media (max-width: 480px) {
     padding: 0.8rem;
+  }
+`;
+
+const HomeArticleTitleWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const HomeArticleMeta = styled.p`
+  font-size: 0.8rem;
+  color: var(--grey);
+  position: absolute;
+  bottom: 1rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
@@ -357,8 +377,18 @@ export default function HomeArticlesSection() {
                         <HomeArticleCard key={article.id} onClick={() => handleArticleClick(article.id)}>
                             <HomeArticleImage $imageUrl={getArticleImageUrl(article)} />
                             <HomeArticleContent>
-                                <HomeArticleTitle>{article.title}</HomeArticleTitle>
-                                <HomeArticleSubtitle>{article.subtitle}</HomeArticleSubtitle>
+                                <HomeArticleTitleWrapper>
+                                    <HomeArticleTitle>{article.title}</HomeArticleTitle>
+                                    <HomeArticleSubtitle>{article.subtitle}</HomeArticleSubtitle>
+                                </HomeArticleTitleWrapper>
+                                <HomeArticleMeta>
+                                    {[
+                                        article.relatedGames?.[0]?.title,
+                                        article.relatedPlatforms?.map(p => p.name).join(', '),
+                                        article.relatedDevelopers?.map(d => d.name).join(', '),
+                                        article.relatedGenres?.map(g => g.name).join(', ')
+                                    ].filter(Boolean).join(' - ')}
+                                </HomeArticleMeta>
                             </HomeArticleContent>
                         </HomeArticleCard>
                     ))}
