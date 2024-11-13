@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { useArticle } from '@/hooks/useArticle';
 import { getImageUrl } from '@/services/api';
 import { TemplateCode, templateComponents } from '@/types/articleTemplate';
+import ArticleTags from '@/components/articles/ArticleTags';
 
 interface ArticleDetailProps {
     id: string;
@@ -35,7 +36,17 @@ const ArticleDetail: React.FC<ArticleDetailProps> = ({ id }) => {
         scheduledPublishAt: article.scheduledPublishAt
     };
 
-    return <TemplateComponent {...commonProps} />;
+    return (
+        <>
+            <TemplateComponent {...commonProps} />
+            <ArticleTags
+                relatedGames={article.relatedGames}
+                relatedPlatforms={article.relatedPlatforms}
+                relatedDevelopers={article.relatedDevelopers}
+                relatedGenres={article.relatedGenres}
+            />
+        </>
+    );
 };
 
 export default ArticleDetail; 

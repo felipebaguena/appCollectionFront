@@ -4,9 +4,8 @@ import { NAVBAR_HEIGHT } from "../layout/NavbarElements";
 export const TemplateContainer = styled.article<{ backgroundImage: string }>`
   position: relative;
   max-width: 1200px;
-  margin: 2rem auto;
+  margin: 0rem auto;
   z-index: 1;
-  padding-bottom: 4rem;
   margin-top: 4rem;
 
   @media (max-width: 768px) {
@@ -22,7 +21,6 @@ export const MainContent = styled.div`
   background: white;
   position: relative;
   z-index: 2;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
 export const PageBackground = styled.div<{ backgroundImage: string }>`
@@ -108,7 +106,7 @@ export const Subtitle = styled.h2`
 export const ContentContainer = styled.div`
   display: flex;
   justify-content: center;
-  padding: 0 2rem 4rem;
+  padding: 0 2rem 0rem;
 
   @media (max-width: 768px) {
     padding: 0 1.5rem 3rem;
