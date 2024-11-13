@@ -67,23 +67,39 @@ const ContentSection = styled.div`
 `;
 
 const Title = styled.h2`
-  font-size: 24px;
+  font-size: 2rem;
   color: white;
   margin-bottom: 10px;
 
+  @media (max-width: 900px) {
+    font-size: 1.5rem;
+  }
+
   @media (max-width: 768px) {
-    font-size: 20px;
+    font-size: 2rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.3rem;
   }
 `;
 
 const Description = styled.p`
-  font-size: 16px;
+  font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.9);
   margin-bottom: 20px;
 
+  @media (max-width: 900px) {
+    font-size: 1.1rem;
+  }
+
   @media (max-width: 768px) {
-    font-size: 14px;
+    font-size: 1.2rem;
     margin-bottom: 15px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1rem;
   }
 `;
 

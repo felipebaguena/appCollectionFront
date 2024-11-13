@@ -16,7 +16,7 @@ import HomeArticlesSection from '@/components/home/HomeArticlesSection';
 import CollectionBanner from '@/components/home/CollectionBanner';
 
 const BANNER_HOME_IMAGE = "http://localhost:3000/uploads/front/9012830ed42a379256f01ed070157d7f.jpg"
-const INFO_CARD_IMAGE = "http://localhost:3000/uploads/front/garou.jpg"
+const INFO_CARD_IMAGE = "http://localhost:3000/uploads/front/md_collection.jpg"
 
 export default function HomePage() {
   return (

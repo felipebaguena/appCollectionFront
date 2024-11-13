@@ -147,7 +147,6 @@ export const InfoCardWrapper = styled.div`
 export const InfoCardContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
 
   @media (max-width: 1200px) {
     padding: 0 1rem;
