@@ -13,7 +13,7 @@ const ArticlesContainer = styled.div`
   max-width: 1200px;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
   margin: 0 auto;
 `;
 
@@ -21,7 +21,7 @@ const ArticlesContainer = styled.div`
 const CoverArticleContainer = styled.div`
   width: 100%;
   max-width: 1200px;
-  height: 500px;
+  height: 35rem;
   position: relative;
   overflow: hidden;
   background-color: var(--grey);
@@ -33,7 +33,7 @@ const CoverArticleContainer = styled.div`
   }
 
   @media (max-width: 480px) {
-    height: 24rem;
+    height: 20rem;
   }
   
   &::after {
@@ -114,8 +114,12 @@ const ArticleSubtitle = styled.h3`
 const TopArticlesGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 1rem;
   width: 100%;
+
+  @media (max-width: 1200px) {
+    padding: 0 1rem;
+  }
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr 1fr;
@@ -175,6 +179,10 @@ const HomeArticlesList = styled.div`
   flex-direction: column;
   gap: 1.5rem;
   width: 100%;
+
+  @media (max-width: 1200px) {
+    padding: 0 1rem;
+  }
 `;
 
 const HomeArticleCard = styled.div`
@@ -315,7 +323,7 @@ const SectionDivider = styled.div`
 
     @media (max-width: 1200px) {
     padding-left: 1rem;
-    padding-right: 0rem;
+    padding-right: 1rem;
   }
 `;
 

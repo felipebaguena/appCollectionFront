@@ -127,6 +127,10 @@ export const HomeContent = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 0rem;
+
+  @media (max-width: 1200px) {
+    padding: 1rem 1rem;
+  }
 `;
 
 export const HomeTitle = styled.h1`
