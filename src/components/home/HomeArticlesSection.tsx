@@ -281,7 +281,7 @@ const HomeArticleMeta = styled.p`
 const SectionWrapper = styled.div`
   width: 100%;
   background-color: var(--mid-grey);
-  padding-bottom: 2rem;
+  padding-bottom: 4rem;
 `;
 
 const SectionDivider = styled.div`

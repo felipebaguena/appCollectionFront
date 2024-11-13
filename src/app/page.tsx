@@ -11,6 +11,7 @@ import GameGrid from '@/components/home/GameGrid';
 import InfoCard from '@/components/home/InfoCard';
 import CRTScanlines from '@/components/ui/CRTScanlines';
 import HomeArticlesSection from '@/components/home/HomeArticlesSection';
+import CollectionBanner from '@/components/home/CollectionBanner';
 
 const BANNER_HOME_IMAGE = "http://localhost:3000/uploads/front/9012830ed42a379256f01ed070157d7f.jpg"
 const INFO_CARD_IMAGE = "http://localhost:3000/uploads/front/garou.jpg"
@@ -26,6 +27,7 @@ export default function HomePage() {
         />
       </BannerContainer> */}
       <HomeArticlesSection />
+      <CollectionBanner />
       <HomeContent>
         <HomeSection>
           <GameGrid />
