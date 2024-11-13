@@ -151,4 +151,8 @@ export const InfoCardContainer = styled.div`
   @media (max-width: 1200px) {
     padding: 0 1rem;
   }
+
+  @media (max-width: 480px) {
+    padding: 0;
+  }
 `;

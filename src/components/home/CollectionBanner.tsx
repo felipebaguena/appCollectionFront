@@ -11,27 +11,46 @@ import CreateUserForm from '@/components/user/CreateUserForm';
 const BannerWrapper = styled.div`
   width: 100%;
   background-color: var(--app-yellow);
-  padding: 1.5rem 0;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
 `;
 
 const BannerContent = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
   display: flex;
+  padding: 1rem;
   justify-content: space-between;
   align-items: center;
   gap: 2rem;
 
   @media (max-width: 768px) {
     flex-direction: column;
-    text-align: center;
-    padding: 0 1rem;
+    padding: 0.5rem;
   }
 `;
 
 const BannerText = styled.div`
   flex: 1;
+  padding: 0 5rem 0 0;
+
+  @media (max-width: 1200px) {
+    padding: 0 3rem 0 0;
+  }
+
+  @media (max-width: 900px) {
+    padding: 0 2rem 0 0;
+  }
+
+  @media (max-width: 768px) {
+    padding: 0 1rem 0 0;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0 0 0 0;
+  }
 `;
 
 const BannerTitle = styled.h2`
@@ -41,22 +60,30 @@ const BannerTitle = styled.h2`
 `;
 
 const BannerDescription = styled.p`
-  color: var(--dark-grey);
-  font-size: 1rem;
+  color: var(--mid-grey);
+  font-size: 1.2rem;
 `;
 
 const BannerButton = styled.button`
   background-color: var(--dark-grey);
-  min-width: 20rem;
+  min-width: 28rem;
+  font-size: 1rem;
   color: white;
-  padding: 0.8rem 1.5rem;
+  padding: 1.2rem 1.5rem;
   border: none;
   cursor: pointer;
-  font-weight: bold;
   transition: all 0.3s ease;
 
+  @media (max-width: 900px) {
+    min-width: 24rem;
+  }
+
+  @media (max-width: 768px) {
+    min-width: 18rem;
+    width: 100%
+  }
+
   &:hover {
-    color: var(--app-yellow);
     transform: scale(1.05);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
