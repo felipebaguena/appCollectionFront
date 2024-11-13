@@ -5,7 +5,9 @@ import {
   BannerContainer,
   BannerBackground,
   HomeContent,
-  HomeSection
+  HomeSection,
+  InfoCardWrapper,
+  InfoCardContainer
 } from '@/components/home/HomeElements';
 import GameGrid from '@/components/home/GameGrid';
 import InfoCard from '@/components/home/InfoCard';
@@ -29,17 +31,19 @@ export default function HomePage() {
       <HomeArticlesSection />
       <CollectionBanner />
       <HomeContent>
-        <HomeSection>
-          <GameGrid />
-        </HomeSection>
-        <HomeSection>
-          <InfoCard
-            imageUrl={INFO_CARD_IMAGE}
-            title="Descubre nuestra colección"
-            description="Explora nuestra amplia selección de juegos retro y revive la magia de las épocas doradas del gaming. Desde clásicos arcade hasta joyas de consolas, tenemos algo para cada tipo de jugador nostálgico."
-          />
-        </HomeSection>
+        <GameGrid />
       </HomeContent>
+      <HomeSection>
+        <InfoCardWrapper>
+          <InfoCardContainer>
+            <InfoCard
+              imageUrl={INFO_CARD_IMAGE}
+              title="Descubre nuestra colección"
+              description="Explora nuestra amplia selección de juegos retro y revive la magia de las épocas doradas del gaming. Desde clásicos arcade hasta joyas de consolas, tenemos algo para cada tipo de jugador nostálgico."
+            />
+          </InfoCardContainer>
+        </InfoCardWrapper>
+      </HomeSection>
     </>
   );
 }

@@ -222,6 +222,10 @@ const HomeArticleTitle = styled.h3`
   margin-bottom: 0.5rem;
   color: var(--dark-grey);
 
+  @media (max-width: 900px) {
+    font-size: 1.2rem;
+  }
+
   @media (max-width: 768px) {
     font-size: 1.2rem;
     margin-bottom: 0.3rem;
@@ -237,6 +241,10 @@ const HomeArticleSubtitle = styled.p`
   font-size: 1rem;
   color: var(--mid-grey);
 
+  @media (max-width: 900px) {
+    font-size: 0.8rem;
+  }
+
   @media (max-width: 768px) {
     display: none;
   }
@@ -247,10 +255,12 @@ const HomeArticleContent = styled.div`
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  position: relative;
+  justify-content: space-between;
+  height: 100%;
 
   @media (max-width: 768px) {
     padding: 1rem;
+    justify-content: center;
   }
 
   @media (max-width: 480px) {
@@ -259,19 +269,15 @@ const HomeArticleContent = styled.div`
 `;
 
 const HomeArticleTitleWrapper = styled.div`
-  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 0.5rem;
 `;
 
 const HomeArticleMeta = styled.p`
   font-size: 0.8rem;
   color: var(--grey);
-  position: absolute;
-  bottom: 1rem;
-  left: 1.5rem;
-  right: 1.5rem;
+  padding-bottom: 0.5rem;
   
   @media (max-width: 768px) {
     display: none;
