@@ -360,13 +360,28 @@ const MainContent = styled.div`
   gap: 1rem;
 `;
 
-const SideContent = styled.div`
-  width: 22rem;
-  background-color: var(--foreground);
+const SideContentWrapper = styled.div`
   margin-top: 4.4rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
+
+  @media (max-width: 900px) {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const SideContent = styled.div<{ $hasTopMargin?: boolean }>`
+  width: 22rem;
+  padding: 1rem;
+  background-color: var(--foreground);
   margin-left: 1rem;
+  ${props => props.$hasTopMargin && `margin-top: 1.5rem;`}
 
   @media (max-width: 1200px) {
     width: 20rem;
@@ -379,9 +394,14 @@ const SideContent = styled.div`
   }
 
   @media (max-width: 900px) {
-    padding-left: 1rem;
     width: 100%;
-    margin-top: 2rem;
+    margin: ${props => props.$hasTopMargin ? '0 0 0 0' : '0'};
+    padding: 0;
+    background-color: transparent;
+  }
+
+  @media (max-width: 480px) {
+    margin: ${props => props.$hasTopMargin ? '1rem 0 0 0' : '0'};
   }
 `;
 
@@ -469,10 +489,14 @@ export default function HomeArticlesSection() {
                         </HomeArticlesList>
                     </MainContent>
 
-                    <SideContent>
-                        <GenresList />
-                        <TopRatedGames />
-                    </SideContent>
+                    <SideContentWrapper>
+                        <SideContent>
+                            <GenresList />
+                        </SideContent>
+                        <SideContent $hasTopMargin>
+                            <TopRatedGames />
+                        </SideContent>
+                    </SideContentWrapper>
                 </ContentWrapper>
             </ArticlesContainer>
         </SectionWrapper>

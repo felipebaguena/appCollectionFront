@@ -10,31 +10,44 @@ const TopRatedContainer = styled.div`
   flex-direction: column;
   gap: 1rem;
   width: 100%;
-  margin-top: 2rem;
+
+  @media (max-width: 900px) {
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 480px) {
+    margin-top: 0;
+  }
 `;
 
 const TopRatedTitle = styled.h3`
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: bold;
-  color: var(--clear-grey);
+  color: var(--dark-grey);
   white-space: nowrap;
   line-height: 1;
-  margin-bottom: 1rem;
   display: flex;
   align-items: flex-end;
   gap: 1rem;
 
-  &::after {
-    content: '';
-    height: 1px;
-    background-color: var(--clear-grey);
-    flex-grow: 1;
+  @media (max-width: 900px) {
+    color: var(--clear-grey);
   }
+
+  @media (max-width: 480px) {
+    &::after {
+        content: '';
+        height: 1px;
+        background-color: var(--clear-grey);
+        flex-grow: 1;
+    }
+  }
+
 `;
 
 const GameCard = styled.div`
   position: relative;
-  height: 120px;
+  height: 6.45rem;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -54,8 +67,12 @@ const GameCard = styled.div`
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.4));
+    background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.3));
     transition: background 0.2s ease;
+
+    @media (max-width: 900px) {
+      background: linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.2));
+    }
   }
 `;
 
@@ -84,17 +101,32 @@ const GameTitle = styled.h4`
   color: var(--white);
   margin: 0;
   line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+
+  @media (max-width: 900px) {
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  }
 `;
 
 const RatingWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+
+  @media (max-width: 900px) {
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+  }
 `;
 
 const RatingCount = styled.span`
   font-size: 0.8rem;
   color: var(--app-yellow);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+
+  @media (max-width: 900px) {
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  }
 `;
 
 const TopRatedGames = () => {

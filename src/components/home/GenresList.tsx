@@ -7,24 +7,44 @@ const GenresWrapper = styled.div`
   flex-direction: column;
   gap: 1rem;
   width: 100%;
+
+  @media (max-width: 900px) {
+    margin-top: 2rem;
+  }
+
+  @media (max-width: 480px) {
+    margin-top: 1rem;
+  }
 `;
 
 const GenresTitle = styled.h3`
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: bold;
   color: var(--dark-grey);
   white-space: nowrap;
   line-height: 1;
-  margin-top: 1rem;
   display: flex;
   align-items: flex-end;
   gap: 1rem;
+
+  @media (max-width: 900px) {
+    color: var(--clear-grey);
+  }
+    
+  @media (max-width: 480px) {
+    &::after {
+        content: '';
+        height: 1px;
+        background-color: var(--clear-grey);
+        flex-grow: 1;
+    }
+  }
 `;
 
 const GenresContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
   width: 100%;
 `;
 
@@ -32,6 +52,7 @@ const GenreItem = styled.div`
   background-color: var(--dark-grey);
   color: var(--white);
   padding: 1rem;
+  height: 6.45rem;
   cursor: pointer;
   transition: all 0.2s ease;
   
