@@ -2,6 +2,25 @@ import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
 import { useGenres } from '@/hooks/useGenres';
 
+const GenresWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+`;
+
+const GenresTitle = styled.h3`
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--dark-grey);
+  white-space: nowrap;
+  line-height: 1;
+  margin-top: 1rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+`;
+
 const GenresContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -43,16 +62,19 @@ const GenresList = () => {
     );
 
     return (
-        <GenresContainer>
-            {featuredGenres.map((genre) => (
-                <GenreItem
-                    key={genre.id}
-                    onClick={() => handleGenreClick(genre.id)}
-                >
-                    {genre.name}
-                </GenreItem>
-            ))}
-        </GenresContainer>
+        <GenresWrapper>
+            <GenresTitle>Géneros más populares</GenresTitle>
+            <GenresContainer>
+                {featuredGenres.map((genre) => (
+                    <GenreItem
+                        key={genre.id}
+                        onClick={() => handleGenreClick(genre.id)}
+                    >
+                        {genre.name}
+                    </GenreItem>
+                ))}
+            </GenresContainer>
+        </GenresWrapper>
     );
 };
 

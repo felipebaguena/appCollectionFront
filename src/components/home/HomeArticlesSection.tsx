@@ -8,6 +8,7 @@ import { getImageUrl } from '@/services/api';
 import CRTScanlines from '@/components/ui/CRTScanlines';
 import { BannerBackground } from '@/components/home/HomeElements';
 import GenresList from '@/components/home/GenresList';
+import TopRatedGames from '@/components/home/TopRatedGames';
 
 const ArticlesContainer = styled.div`
   width: 100%;
@@ -215,6 +216,11 @@ const HomeArticleImage = styled.div<{ $imageUrl: string }>`
   background-size: cover;
   background-position: center;
 
+  @media (max-width: 1200px) {
+    width: 200px;
+    height: 200px;
+  }
+
   @media (max-width: 768px) {
     width: 160px;
     height: 160px;
@@ -230,6 +236,10 @@ const HomeArticleTitle = styled.h3`
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
   color: var(--dark-grey);
+
+  @media (max-width: 1200px) {
+    font-size: 1.3rem;
+  }
 
   @media (max-width: 900px) {
     font-size: 1.2rem;
@@ -249,10 +259,6 @@ const HomeArticleTitle = styled.h3`
 const HomeArticleSubtitle = styled.p`
   font-size: 1rem;
   color: var(--mid-grey);
-
-  @media (max-width: 900px) {
-    font-size: 0.8rem;
-  }
 
   @media (max-width: 768px) {
     display: none;
@@ -287,6 +293,14 @@ const HomeArticleMeta = styled.p`
   font-size: 0.8rem;
   color: var(--grey);
   padding-bottom: 0.5rem;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    display: flex;
+  }
   
   @media (max-width: 768px) {
     display: none;
@@ -347,13 +361,21 @@ const MainContent = styled.div`
 `;
 
 const SideContent = styled.div`
-  width: 15rem;
-  margin-top: 4.5rem;
+  width: 22rem;
+  background-color: var(--foreground);
+  margin-top: 4.4rem;
   padding-left: 1rem;
+  padding-right: 1rem;
+  margin-left: 1rem;
 
   @media (max-width: 1200px) {
-    padding-right: 1rem;
-    padding-left: 0;
+    width: 20rem;
+    margin-right: 1rem;
+    margin-left: 0;
+  }
+
+  @media (max-width: 1024px) {
+    width: 18rem;
   }
 
   @media (max-width: 900px) {
@@ -449,6 +471,7 @@ export default function HomeArticlesSection() {
 
                     <SideContent>
                         <GenresList />
+                        <TopRatedGames />
                     </SideContent>
                 </ContentWrapper>
             </ArticlesContainer>
