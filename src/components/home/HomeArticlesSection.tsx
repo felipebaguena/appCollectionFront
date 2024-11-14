@@ -234,13 +234,9 @@ const HomeArticleImage = styled.div<{ $imageUrl: string }>`
 `;
 
 const HomeArticleTitle = styled.h3`
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   margin-bottom: 0.5rem;
   color: var(--dark-grey);
-
-  @media (max-width: 1200px) {
-    font-size: 1.3rem;
-  }
 
   @media (max-width: 900px) {
     font-size: 1.2rem;
@@ -295,7 +291,7 @@ const HomeArticleMeta = styled.p`
   color: var(--grey);
   padding-bottom: 0.5rem;
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1200px) {
     display: none;
   }
 
