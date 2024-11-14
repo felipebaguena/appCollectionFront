@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { IoFilter, IoClose, IoCloseCircleOutline, IoGrid, IoSquare } from 'react-icons/io5';
 import { Platform } from '@/types/platform';
 import { Developer, Genre } from "@/types/game";
 import { SortType } from '@/hooks/useCollectionGames';
 import { useAuth } from '@/contexts/AuthContext';
 import styled from 'styled-components';
+import { useSearchParams } from 'next/navigation';
+import { useGenres } from '@/hooks/useGenres';
 
 import CollectionPlatformFilter from "@/components/collection/CollectionPlatformFilter";
 import CollectionGenreFilter from "@/components/collection/CollectionGenreFilter";
@@ -81,6 +83,8 @@ export default function CollectionPage() {
   const [collectionStatus, setCollectionStatus] = useState<'ALL' | 'IN_COLLECTION' | 'NOT_IN_COLLECTION'>('ALL');
   const [isCompactView, setIsCompactView] = useState(false);
   const { isAuthenticated } = useAuth();
+  const searchParams = useSearchParams();
+  const { genres } = useGenres();
 
   const sortOptions = [
     { value: 'TITLE_ASC', label: 'Título (A-Z)' },
@@ -152,6 +156,17 @@ export default function CollectionPage() {
     setSearchTerm('');
     setCollectionStatus('ALL');
   };
+
+  useEffect(() => {
+    const genreParam = searchParams?.get('genre');
+    if (genreParam && genres.length > 0) {
+      const genreId = parseInt(genreParam);
+      const foundGenre = genres.find(g => g.id === genreId);
+      if (foundGenre) {
+        setSelectedGenres([foundGenre]);
+      }
+    }
+  }, [searchParams, genres]);
 
   return (
     <PageContainer>

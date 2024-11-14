@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { getImageUrl } from '@/services/api';
 import CRTScanlines from '@/components/ui/CRTScanlines';
 import { BannerBackground } from '@/components/home/HomeElements';
+import GenresList from '@/components/home/GenresList';
 
 const ArticlesContainer = styled.div`
   width: 100%;
@@ -327,6 +328,41 @@ const SectionDivider = styled.div`
   }
 `;
 
+const ContentWrapper = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+  }
+`;
+
+const MainContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+const SideContent = styled.div`
+  width: 15rem;
+  margin-top: 4.5rem;
+  padding-left: 1rem;
+
+  @media (max-width: 1200px) {
+    padding-right: 1rem;
+    padding-left: 0;
+  }
+
+  @media (max-width: 900px) {
+    padding-left: 1rem;
+    width: 100%;
+    margin-top: 2rem;
+  }
+`;
+
 export default function HomeArticlesSection() {
     const { homeArticles, loading, error, fetchHomeArticles } = useArticles();
     const router = useRouter();
@@ -381,32 +417,40 @@ export default function HomeArticlesSection() {
                     ))}
                 </TopArticlesGrid>
 
-                <SectionDivider>
-                    <h2>Lo último</h2>
-                </SectionDivider>
+                <ContentWrapper>
+                    <MainContent>
+                        <SectionDivider>
+                            <h2>Lo último</h2>
+                        </SectionDivider>
 
-                {/* Home Articles */}
-                <HomeArticlesList>
-                    {homeArticles.homeArticles.map((article) => (
-                        <HomeArticleCard key={article.id} onClick={() => handleArticleClick(article.id)}>
-                            <HomeArticleImage $imageUrl={getArticleImageUrl(article)} />
-                            <HomeArticleContent>
-                                <HomeArticleTitleWrapper>
-                                    <HomeArticleTitle>{article.title}</HomeArticleTitle>
-                                    <HomeArticleSubtitle>{article.subtitle}</HomeArticleSubtitle>
-                                </HomeArticleTitleWrapper>
-                                <HomeArticleMeta>
-                                    {[
-                                        article.relatedGames?.[0]?.title,
-                                        article.relatedPlatforms?.map(p => p.name).join(', '),
-                                        article.relatedDevelopers?.map(d => d.name).join(', '),
-                                        article.relatedGenres?.map(g => g.name).join(', ')
-                                    ].filter(Boolean).join(' - ')}
-                                </HomeArticleMeta>
-                            </HomeArticleContent>
-                        </HomeArticleCard>
-                    ))}
-                </HomeArticlesList>
+                        {/* Home Articles */}
+                        <HomeArticlesList>
+                            {homeArticles.homeArticles.map((article) => (
+                                <HomeArticleCard key={article.id} onClick={() => handleArticleClick(article.id)}>
+                                    <HomeArticleImage $imageUrl={getArticleImageUrl(article)} />
+                                    <HomeArticleContent>
+                                        <HomeArticleTitleWrapper>
+                                            <HomeArticleTitle>{article.title}</HomeArticleTitle>
+                                            <HomeArticleSubtitle>{article.subtitle}</HomeArticleSubtitle>
+                                        </HomeArticleTitleWrapper>
+                                        <HomeArticleMeta>
+                                            {[
+                                                article.relatedGames?.[0]?.title,
+                                                article.relatedPlatforms?.map(p => p.name).join(', '),
+                                                article.relatedDevelopers?.map(d => d.name).join(', '),
+                                                article.relatedGenres?.map(g => g.name).join(', ')
+                                            ].filter(Boolean).join(' - ')}
+                                        </HomeArticleMeta>
+                                    </HomeArticleContent>
+                                </HomeArticleCard>
+                            ))}
+                        </HomeArticlesList>
+                    </MainContent>
+
+                    <SideContent>
+                        <GenresList />
+                    </SideContent>
+                </ContentWrapper>
             </ArticlesContainer>
         </SectionWrapper>
     );
