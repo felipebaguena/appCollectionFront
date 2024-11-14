@@ -102,8 +102,9 @@ const ArticleTitle = styled.h2`
 const ArticleSubtitle = styled.h3`
   font-size: 1.2rem;
   opacity: 0.9;
+  color: var(--clear-grey);
 
-    @media (max-width: 768px) {
+  @media (max-width: 768px) {
     font-size: 1rem;
   }
 
@@ -433,11 +434,11 @@ export default function HomeArticlesSection() {
                 {/* Cover Article */}
                 {homeArticles.coverArticle && (
                     <CoverArticleContainer onClick={() => handleArticleClick(homeArticles.coverArticle.id)}>
+                        <CRTScanlines />
                         <BannerBackground
                             imageUrl={getArticleImageUrl(homeArticles.coverArticle)}
                             oldTvEffect="vibrant"
                         />
-                        <CRTScanlines />
                         <ArticleContent>
                             <ArticleTitle>{homeArticles.coverArticle.title}</ArticleTitle>
                             <ArticleSubtitle>{homeArticles.coverArticle.subtitle}</ArticleSubtitle>

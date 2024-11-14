@@ -63,15 +63,15 @@ const CurvatureEffect = styled.div<{ curvature: number }>`
       ),
       linear-gradient(
         to bottom,
-        rgba(16, 16, 16, 0.8) 0%,
-        rgba(16, 16, 16, 0.8) ${(props) => props.curvature * 8}%,
-        transparent ${(props) => props.curvature * 15}%
+        rgba(16, 16, 16, 0.95) 0%,
+        rgba(16, 16, 16, 0.95) ${(props) => props.curvature * 12}%,
+        transparent ${(props) => props.curvature * 25}%
       ),
       linear-gradient(
         to top,
-        rgba(16, 16, 16, 0.8) 0%,
-        rgba(16, 16, 16, 0.8) ${(props) => props.curvature * 8}%,
-        transparent ${(props) => props.curvature * 15}%
+        rgba(16, 16, 16, 0.95) 0%,
+        rgba(16, 16, 16, 0.95) ${(props) => props.curvature * 12}%,
+        transparent ${(props) => props.curvature * 25}%
       );
   }
 
