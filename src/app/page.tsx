@@ -39,7 +39,7 @@ export default function HomePage() {
             <InfoCard
               imageUrl={INFO_CARD_IMAGE}
               title="Descubre nuestra colección"
-              description="Explora nuestra amplia selección de juegos retro y revive la magia de las épocas doradas del gaming. Desde clásicos arcade hasta joyas de consolas, tenemos algo para cada tipo de jugador nostálgico."
+              description="Explora nuestra amplia selección de juegos retro y revive la magia de las épocas doradas del gaming. Desde clásicos arcade hasta joyas de consolas, tenemos algo para cada tipo de jugador."
             />
           </InfoCardContainer>
         </InfoCardWrapper>

@@ -42,38 +42,6 @@ const TopRatedTitle = styled.h3`
         flex-grow: 1;
     }
   }
-
-`;
-
-const GameCard = styled.div`
-  position: relative;
-  height: 6.45rem;
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  
-  &:hover {
-    transform: translateX(5px);
-    
-    &::after {
-      background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5));
-    }
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.3));
-    transition: background 0.2s ease;
-
-    @media (max-width: 900px) {
-      background: linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.2));
-    }
-  }
 `;
 
 const GameImage = styled.div<{ $imageUrl: string }>`
@@ -97,11 +65,12 @@ const GameInfo = styled.div`
 `;
 
 const GameTitle = styled.h4`
-  font-size: 0.9rem;
-  color: var(--white);
+  font-size: 1rem;
+  color: white;
   margin: 0;
   line-height: 1.2;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
 
   @media (max-width: 900px) {
     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
@@ -113,6 +82,7 @@ const RatingWrapper = styled.div`
   align-items: center;
   gap: 0.5rem;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+  transition: all 0.2s ease;
 
   @media (max-width: 900px) {
     filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
@@ -123,9 +93,66 @@ const RatingCount = styled.span`
   font-size: 0.8rem;
   color: var(--app-yellow);
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
 
   @media (max-width: 900px) {
     text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  }
+`;
+
+const GameCard = styled.div`
+  position: relative;
+  height: 6.45rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateX(5px);
+    
+    &::after {
+      background: linear-gradient(to top, 
+        rgba(255, 215, 0, 0.8), 
+        rgba(255, 215, 0, 0.4)
+      );
+    }
+
+    ${GameTitle} {
+      color: var(--dark-grey);
+      text-shadow: 0 2px 4px var(--app-yellow);
+    }
+
+    ${RatingCount} {
+      color: var(--dark-grey);
+      text-shadow: 0 2px 4px var(--app-yellow);
+    }
+
+    ${RatingWrapper} {
+      filter: drop-shadow(0 2px 4px var(--app-yellow));
+    }
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.3));
+    transition: all 0.2s ease;
+
+    @media (max-width: 900px) {
+      background: linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.2));
+    }
+  }
+`;
+
+const StarContainer = styled.div`
+  --star-color: var(--app-yellow);
+  
+  ${GameCard}:hover & {
+    --star-color: var(--dark-grey);
   }
 `;
 
@@ -158,11 +185,13 @@ const TopRatedGames = () => {
                     <GameInfo>
                         <GameTitle>{game.title}</GameTitle>
                         <RatingWrapper>
-                            <StarRating
-                                value={game.averageRating}
-                                readOnly
-                                size={14}
-                            />
+                            <StarContainer>
+                                <StarRating
+                                    value={game.averageRating}
+                                    readOnly
+                                    size={14}
+                                />
+                            </StarContainer>
                             <RatingCount>({game.totalRatings})</RatingCount>
                         </RatingWrapper>
                     </GameInfo>

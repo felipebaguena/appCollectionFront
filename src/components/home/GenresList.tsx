@@ -48,6 +48,19 @@ const GenresContainer = styled.div`
   width: 100%;
 `;
 
+const GenreName = styled.h4`
+  font-size: 1rem;
+  color: white;
+  margin: 0;
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+
+  @media (max-width: 900px) {
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  }
+`;
+
 const GenreItem = styled.div<{ $code: string }>`
   position: relative;
   height: 6.45rem;
@@ -59,7 +72,15 @@ const GenreItem = styled.div<{ $code: string }>`
     transform: translateX(5px);
     
     &::after {
-      background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5));
+      background: linear-gradient(to top, 
+        rgba(255, 215, 0, 0.8), 
+        rgba(255, 215, 0, 0.4)
+      );
+    }
+
+    ${GenreName} {
+      color: var(--dark-grey);
+      text-shadow: 0 2px 4px var(--app-yellow);
     }
   }
 
@@ -71,7 +92,7 @@ const GenreItem = styled.div<{ $code: string }>`
     right: 0;
     bottom: 0;
     background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.3));
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
 
     @media (max-width: 900px) {
       background: linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.2));
@@ -96,17 +117,7 @@ const GenreInfo = styled.div`
   z-index: 1;
 `;
 
-const GenreName = styled.h4`
-  font-size: 0.9rem;
-  color: var(--white);
-  margin: 0;
-  line-height: 1.2;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 
-  @media (max-width: 900px) {
-    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
-  }
-`;
 
 // Lista de códigos de los géneros que queremos mostrar
 const FEATURED_GENRE_CODES = ["ACTION", "FIGHTING", "PLATFORMER", "SURVIVAL_HORROR", "SPORTS"];

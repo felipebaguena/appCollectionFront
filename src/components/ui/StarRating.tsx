@@ -50,7 +50,7 @@ const HalfStarContainer = styled.div`
 `;
 
 const Star = styled.div<{ $filled: boolean; $readOnly: boolean }>`
-  color: ${({ $filled }) => ($filled ? 'var(--app-yellow)' : '#ccc')};
+  color: ${({ $filled }) => ($filled ? 'var(--star-color, var(--app-yellow))' : '#ccc')};
   transition: color 0.3s ease;
 
   &:hover {
