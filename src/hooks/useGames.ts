@@ -26,11 +26,23 @@ interface Developer {
   name: string;
 }
 
+interface TopRatedGame {
+  id: number;
+  title: string;
+  averageRating: number;
+  totalRatings: number;
+  coverImage: {
+    id: number;
+    path: string;
+  };
+}
+
 export const useGames = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [genres, setGenres] = useState<Genre[]>([]);
   const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [developers, setDevelopers] = useState<Developer[]>([]);
+  const [topRatedGames, setTopRatedGames] = useState<TopRatedGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,18 +55,34 @@ export const useGames = () => {
     }
   }, []);
 
+  const fetchTopRatedGames = useCallback(async () => {
+    try {
+      const topRatedData = await api.get<TopRatedGame[]>(
+        ENDPOINTS.GET_TOP_RATED_GAMES
+      );
+      setTopRatedGames(topRatedData);
+    } catch (error) {
+      setError("Error al cargar los juegos mejor valorados");
+    }
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const gamesData = await api.get<Game[]>(ENDPOINTS.GET_GAMES_HOME);
-        const genresData = await api.get<Genre[]>(ENDPOINTS.GET_GENRES);
-        const platformsData = await api.get<Platform[]>(
-          ENDPOINTS.GET_PLATFORMS
-        );
-        const developersData = await api.get<Developer[]>(
-          ENDPOINTS.GET_DEVELOPERS
-        );
+        const [
+          gamesData,
+          genresData,
+          platformsData,
+          developersData,
+          topRatedData,
+        ] = await Promise.all([
+          api.get<Game[]>(ENDPOINTS.GET_GAMES_HOME),
+          api.get<Genre[]>(ENDPOINTS.GET_GENRES),
+          api.get<Platform[]>(ENDPOINTS.GET_PLATFORMS),
+          api.get<Developer[]>(ENDPOINTS.GET_DEVELOPERS),
+          api.get<TopRatedGame[]>(ENDPOINTS.GET_TOP_RATED_GAMES),
+        ]);
 
         setGames(gamesData);
         setGenres(genresData.map((g) => ({ ...g, code: g.id.toString() })));
@@ -64,6 +92,7 @@ export const useGames = () => {
         setDevelopers(
           developersData.map((d) => ({ ...d, code: d.id.toString() }))
         );
+        setTopRatedGames(topRatedData);
       } catch (error) {
         setError("Error al cargar los datos");
       } finally {
@@ -102,10 +131,11 @@ export const useGames = () => {
     genres,
     platforms,
     developers,
+    topRatedGames,
     loading,
     error,
     createGame,
     searchGames,
-    // ... (otras funciones que puedas tener)
+    fetchTopRatedGames,
   };
 };

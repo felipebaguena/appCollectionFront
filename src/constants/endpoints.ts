@@ -65,4 +65,5 @@ export const ENDPOINTS = {
   PUBLISH_ARTICLE: (id: string) => `/articles/${id}/publish`,
   UNPUBLISH_ARTICLE: (id: string) => `/articles/${id}/unpublish`,
   GET_ARTICLES_HOME: "/articles/home",
+  GET_TOP_RATED_GAMES: "/games/top-rated",
 };
