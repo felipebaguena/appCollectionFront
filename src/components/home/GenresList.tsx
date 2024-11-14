@@ -48,18 +48,63 @@ const GenresContainer = styled.div`
   width: 100%;
 `;
 
-const GenreItem = styled.div`
-  background-color: var(--dark-grey);
-  color: var(--white);
-  padding: 1rem;
+const GenreItem = styled.div<{ $code: string }>`
+  position: relative;
   height: 6.45rem;
+  overflow: hidden;
   cursor: pointer;
   transition: all 0.2s ease;
   
   &:hover {
-    background-color: var(--app-yellow);
-    color: var(--dark-grey);
     transform: translateX(5px);
+    
+    &::after {
+      background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.5));
+    }
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.3));
+    transition: background 0.2s ease;
+
+    @media (max-width: 900px) {
+      background: linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.2));
+    }
+  }
+`;
+
+const GenreImage = styled.div<{ $code: string }>`
+  width: 100%;
+  height: 100%;
+  background-image: url(http://localhost:3000/uploads/buttons/${props => props.$code}.png);
+  background-size: cover;
+  background-position: center;
+`;
+
+const GenreInfo = styled.div`
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.8rem;
+  z-index: 1;
+`;
+
+const GenreName = styled.h4`
+  font-size: 0.9rem;
+  color: var(--white);
+  margin: 0;
+  line-height: 1.2;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+
+  @media (max-width: 900px) {
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
   }
 `;
 
@@ -89,9 +134,13 @@ const GenresList = () => {
                 {featuredGenres.map((genre) => (
                     <GenreItem
                         key={genre.id}
+                        $code={genre.code}
                         onClick={() => handleGenreClick(genre.id)}
                     >
-                        {genre.name}
+                        <GenreImage $code={genre.code} />
+                        <GenreInfo>
+                            <GenreName>{genre.name}</GenreName>
+                        </GenreInfo>
                     </GenreItem>
                 ))}
             </GenresContainer>
