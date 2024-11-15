@@ -17,6 +17,15 @@ interface ContentProps {
 }
 
 export const splitContentIntoParagraphs = (content: string): string[] => {
+  if (content.includes('</')) {
+    // Dividimos primero por saltos de línea dobles
+    return content
+      .split(/\n\s*\n/)  // Dividimos por uno o más saltos de línea
+      .filter(paragraph => paragraph.trim()) // Eliminamos párrafos vacíos
+      .map(paragraph => paragraph.trim()); // Limpiamos espacios
+  }
+
+  // Mantener el comportamiento original para texto sin HTML
   return content
     .replace(/\\n\\n/g, "\n\n")
     .split("\n\n")
@@ -35,24 +44,25 @@ export const renderContentWithImages = ({
 }: ContentProps): JSX.Element[] => {
   const allElements: JSX.Element[] = [];
 
-  // Log para verificar los valores de entrada
-  console.log('Published:', published);
-  console.log('PublishedAt:', publishedAt);
-  console.log('ScheduledPublishAt:', scheduledPublishAt);
-  console.log('UpdatedAt:', updatedAt);
-
-  // Añadir primero la información de publicación
+  // Añadir la información de publicación
   allElements.push(
     <PublishInfo key="publish-info">
       {getPublishStatus(published, publishedAt, scheduledPublishAt, updatedAt)}
     </PublishInfo>
   );
 
-  // Luego añadimos los párrafos y las imágenes
+  // Procesar párrafos e imágenes
   paragraphs.forEach((paragraph, index) => {
     if (paragraph) {
-      allElements.push(<Paragraph key={`p-${index}`}>{paragraph}</Paragraph>);
+      // Añadir el párrafo con su HTML
+      allElements.push(
+        <Paragraph
+          key={`p-${index}`}
+          dangerouslySetInnerHTML={{ __html: paragraph }}
+        />
+      );
 
+      // Añadir imagen si corresponde
       if (imagePositions.includes(index) && contentImages[imagePositions.indexOf(index)]) {
         const imageIndex = imagePositions.indexOf(index);
         allElements.push(

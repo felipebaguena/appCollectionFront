@@ -117,11 +117,36 @@ export const ContentContainer = styled.div`
   }
 `;
 
-export const Paragraph = styled.p`
+export const Paragraph = styled.div`
   max-width: 45rem;
   padding-bottom: 1.5rem;
   padding-top: 1.5rem;
   margin: 0 auto;
+
+  /* Estilos para el contenido HTML */
+  b,
+  strong {
+    font-weight: bold;
+  }
+
+  i,
+  em {
+    font-style: italic;
+  }
+
+  u {
+    text-decoration: underline;
+  }
+
+  h1 {
+    font-size: 2em;
+    margin: 0.67em 0;
+  }
+
+  h2 {
+    font-size: 1.5em;
+    margin: 0.75em 0;
+  }
 
   @media (max-width: 480px) {
     padding-bottom: 1rem;

@@ -26,6 +26,7 @@ import { useArticleImages } from '@/hooks/useArticleImages';
 
 import { ArticleTemplate, TemplateCode, templateComponents } from '@/types/articleTemplate';
 import ImageSelectionStep from './ImageSelectionStep';
+import CustomEditor from '@/components/ui/CustomEditor';
 
 interface Option {
     id: number;
@@ -171,9 +172,23 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
         fetchTemplates();
     }, [fetchTemplates]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+    const handleChange = (
+        input: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | string,
+        isEditor = false
+    ) => {
+        if (isEditor) {
+            setFormData(prev => ({
+                ...prev,
+                content: input as string
+            }));
+        } else {
+            const event = input as React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>;
+            const { name, value } = event.target;
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
     };
 
     const handleGameChange = async (value: string) => {
@@ -392,12 +407,9 @@ const CreateArticleForm: React.FC<CreateArticleFormProps> = ({
 
                             <InputGroup>
                                 <RequiredArticleLabel htmlFor="content">Contenido</RequiredArticleLabel>
-                                <TextArea
-                                    id="content"
-                                    name="content"
+                                <CustomEditor
                                     value={formData.content}
-                                    onChange={handleChange}
-                                    required
+                                    onChange={(newContent) => handleChange(newContent, true)}
                                 />
                             </InputGroup>
 
