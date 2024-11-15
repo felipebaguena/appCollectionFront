@@ -34,6 +34,7 @@ export interface Article {
   relatedPlatforms?: Platform[];
   relatedDevelopers?: Developer[];
   relatedGenres?: Genre[];
+  metadata?: string;
 }
 
 export interface ArticleDateRange {
@@ -49,4 +50,21 @@ export interface ArticleFilters {
   creationDateRange?: ArticleDateRange;
   publishedDateRange?: ArticleDateRange;
   publishedStatus?: PublishedStatus;
+}
+
+export interface CoverImage {
+  id: number;
+  path: string;
+}
+
+export interface ArchivedArticlesData {
+  data: Article[];
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+}
+
+export interface AllArticlesResponse {
+  topArticles: Article[];
+  archivedArticles: ArchivedArticlesData;
 }

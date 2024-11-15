@@ -3,19 +3,12 @@
 import { useState, useCallback } from "react";
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
-import { Article } from "@/types/article";
+import { Article, AllArticlesResponse } from "@/types/article";
 
 interface HomeArticlesResponse {
   coverArticle: Article;
   topArticles: Article[];
   homeArticles: Article[];
-}
-
-interface AllArticlesResponse {
-  articles: Article[];
-  totalPages: number;
-  currentPage: number;
-  totalItems: number;
 }
 
 export const useArticles = () => {
@@ -45,25 +38,22 @@ export const useArticles = () => {
     }
   }, []);
 
-  const fetchAllArticles = useCallback(
-    async (page: number = 1, limit: number = 12) => {
-      setLoading(true);
-      try {
-        const data = await api.get<AllArticlesResponse>(
-          ENDPOINTS.GET_ALL_ARTICLES(page, limit)
-        );
-        setAllArticles(data);
-        setError(null);
-        return data;
-      } catch (error) {
-        setError("Error al cargar todos los artículos");
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+  const fetchAllArticles = useCallback(async (page: number = 1) => {
+    setLoading(true);
+    try {
+      const data = await api.get<AllArticlesResponse>(
+        ENDPOINTS.GET_ALL_ARTICLES(page, 12)
+      );
+      setAllArticles(data);
+      setError(null);
+      return data;
+    } catch (error) {
+      setError("Error al cargar los artículos");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return {
     homeArticles,

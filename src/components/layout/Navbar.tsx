@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FiLogOut, FiChevronDown, FiUser, FiBook, FiBookmark, FiSettings } from 'react-icons/fi';
+import { FiLogOut, FiChevronDown, FiUser, FiBook, FiBookmark, FiSettings, FiFileText } from 'react-icons/fi';
 import CreateUserForm from '@/components/user/CreateUserForm';
 import LoginForm from '@/components/auth/LoginForm';
 import UserProfileModal from '@/components/user/UserProfileModal';
@@ -133,6 +133,10 @@ const Navbar = () => {
               <NavLink href="/collection">
                 <span className="nav-text">Catálogo</span>
                 <FiBook className="nav-icon" size={20} />
+              </NavLink>
+              <NavLink href="/articles/articles-home">
+                <span className="nav-text">Artículos</span>
+                <FiFileText className="nav-icon" size={20} />
               </NavLink>
               {isAuthenticated && (
                 <NavLink href="/my-collection">
