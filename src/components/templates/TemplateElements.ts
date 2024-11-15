@@ -122,6 +122,7 @@ export const Paragraph = styled.div`
   padding-bottom: 1.5rem;
   padding-top: 1.5rem;
   margin: 0 auto;
+  width: 100%; // Aseguramos que ocupe todo el ancho disponible
 
   /* Estilos para el contenido HTML */
   b,
@@ -146,6 +147,18 @@ export const Paragraph = styled.div`
   h2 {
     font-size: 1.5em;
     margin: 0.75em 0;
+  }
+
+  /* Estilos para el contenedor de vídeo */
+  .video-container {
+    width: 100%;
+    margin: 1.5rem 0;
+  }
+
+  /* Aseguramos que el iframe ocupe todo el ancho */
+  .video-container iframe {
+    width: 100%;
+    border: none;
   }
 
   @media (max-width: 480px) {

@@ -1,5 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
+import { BsCameraVideo } from 'react-icons/bs';
+import Modal from './Modal';
+import Button from './Button';
+
 
 interface EditorProps {
     value: string;
@@ -143,11 +147,56 @@ const EditorContent = styled.div`
   [style*="text-align: right"] {
     text-align: right;
   }
+
+  /* Estilos para el contenedor de vídeo */
+  .video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* Ratio 16:9 */
+    height: 0;
+    overflow: hidden;
+    margin: 1em 0;
+  }
+
+  .video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+`;
+
+const VideoModalContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid var(--dark-grey);
+    border-radius: 4px;
+    color: var(--dark-grey);
+    font-size: 1rem;
+
+    &::placeholder {
+      color: var(--mid-grey);
+    }
+  }
+
+  .buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
 `;
 
 const CustomEditor: React.FC<EditorProps> = ({ value, onChange }) => {
     const editorRef = useRef<HTMLDivElement>(null);
     const [selection, setSelection] = useState<Range | null>(null);
+    const [showVideoModal, setShowVideoModal] = useState(false);
+    const [videoUrl, setVideoUrl] = useState('');
 
     useEffect(() => {
         if (editorRef.current && !editorRef.current.innerHTML) {
@@ -220,6 +269,49 @@ const CustomEditor: React.FC<EditorProps> = ({ value, onChange }) => {
             return false; // Los headings no necesitan estado activo
         }
         return document.queryCommandState(command);
+    };
+
+    const handleVideoInsert = () => {
+        setShowVideoModal(true);
+    };
+
+    const handleVideoSubmit = () => {
+        try {
+            const videoId = extractYouTubeId(videoUrl);
+            if (!videoId) {
+                alert('URL de YouTube no válida');
+                return;
+            }
+
+            // Modificamos el código del iframe para que use las proporciones correctas
+            const embedCode = `<div class="video-container"><iframe 
+                src="https://www.youtube.com/embed/${videoId}?rel=0" 
+                title="YouTube video player" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen></iframe></div>`;
+
+            if (editorRef.current) {
+                editorRef.current.focus();
+                if (selection) {
+                    restoreSelection();
+                }
+                document.execCommand('insertHTML', false, embedCode);
+                onChange(editorRef.current.innerHTML);
+                saveSelection();
+            }
+
+            setShowVideoModal(false);
+            setVideoUrl('');
+        } catch (error) {
+            alert('Error al insertar el vídeo');
+        }
+    };
+
+    const extractYouTubeId = (url: string): string | null => {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
     };
 
     return (
@@ -363,6 +455,16 @@ const CustomEditor: React.FC<EditorProps> = ({ value, onChange }) => {
                         ↪
                     </ToolbarButton>
                 </ToolbarGroup>
+
+                <ToolbarGroup>
+                    <ToolbarButton
+                        type="button"
+                        onClick={handleVideoInsert}
+                        title="Insertar vídeo"
+                    >
+                        <BsCameraVideo />
+                    </ToolbarButton>
+                </ToolbarGroup>
             </Toolbar>
             <EditorContent
                 ref={editorRef}
@@ -379,6 +481,36 @@ const CustomEditor: React.FC<EditorProps> = ({ value, onChange }) => {
                 onBlur={saveSelection}
                 suppressContentEditableWarning
             />
+
+            <Modal
+                isOpen={showVideoModal}
+                onClose={() => setShowVideoModal(false)}
+                title="Insertar vídeo de YouTube"
+                maxWidth="500px"
+            >
+                <VideoModalContent>
+                    <input
+                        type="text"
+                        value={videoUrl}
+                        onChange={(e) => setVideoUrl(e.target.value)}
+                        placeholder="Introduce la URL del vídeo de YouTube"
+                    />
+                    <div className="buttons">
+                        <Button
+                            $variant="cancel"
+                            onClick={() => setShowVideoModal(false)}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            $variant="primary"
+                            onClick={handleVideoSubmit}
+                        >
+                            Insertar
+                        </Button>
+                    </div>
+                </VideoModalContent>
+            </Modal>
         </EditorContainer>
     );
 };
