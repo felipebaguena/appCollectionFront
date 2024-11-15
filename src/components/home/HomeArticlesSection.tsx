@@ -18,7 +18,13 @@ import {
     ArticleContent,
     HomeArticlesList,
     HomeArticleCard,
-    HomeSectionDivider
+    HomeSectionDivider,
+    ArticleImage,
+    ArticleCardContent,
+    ArticleTitleWrapper,
+    ArticleCardTitle,
+    ArticleCardSubtitle,
+    ArticleMetadata
 } from '@/components/articles/ArticlesElements';
 import styled from 'styled-components';
 
@@ -84,100 +90,6 @@ const TopArticleCard = styled.div`
   }
 `;
 
-const HomeArticleImage = styled.div<{ $imageUrl: string }>`
-  width: 300px;
-  height: 100%;
-  background-image: url(${props => props.$imageUrl});
-  background-size: cover;
-  background-position: center;
-
-  @media (max-width: 1200px) {
-    width: 200px;
-    height: 200px;
-  }
-
-  @media (max-width: 768px) {
-    width: 160px;
-    height: 160px;
-  }
-
-  @media (max-width: 480px) {
-    width: 120px;
-    height: 120px;
-  }
-`;
-
-const HomeArticleContent = styled.div`
-  flex: 1;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-    justify-content: center;
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.8rem;
-  }
-`;
-
-const HomeArticleTitleWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const HomeArticleTitle = styled.h3`
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
-  color: var(--dark-grey);
-
-  @media (max-width: 900px) {
-    font-size: 1.2rem;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 1.2rem;
-    margin-bottom: 0.3rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1rem;
-    margin-bottom: 0.2rem;
-  }
-`;
-
-const HomeArticleSubtitle = styled.p`
-  font-size: 1rem;
-  color: var(--mid-grey);
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const HomeArticleMeta = styled.p`
-  font-size: 0.8rem;
-  color: var(--grey);
-  padding-bottom: 0.5rem;
-
-  @media (max-width: 1200px) {
-    display: none;
-  }
-
-  @media (max-width: 900px) {
-    display: flex;
-  }
-  
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
 const SectionWrapper = styled.div`
   width: 100%;
   background-color: var(--mid-grey);
@@ -210,7 +122,6 @@ const SideContentWrapper = styled.div`
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
-    padding: 0 1rem;
   }
 
   @media (max-width: 480px) {
@@ -228,7 +139,7 @@ const SideContent = styled.div<{ $hasTopMargin?: boolean }>`
   @media (max-width: 1200px) {
     width: 20rem;
     margin-right: 1rem;
-    margin-left: 0;
+    margin-left: 1rem;
   }
 
   @media (max-width: 1024px) {
@@ -305,25 +216,24 @@ export default function HomeArticlesSection() {
                             <h2>Lo último</h2>
                         </HomeSectionDivider>
 
-                        {/* Home Articles */}
                         <HomeArticlesList>
                             {homeArticles.homeArticles.map((article) => (
                                 <HomeArticleCard key={article.id} onClick={() => handleArticleClick(article.id)}>
-                                    <HomeArticleImage $imageUrl={getArticleImageUrl(article)} />
-                                    <HomeArticleContent>
-                                        <HomeArticleTitleWrapper>
-                                            <HomeArticleTitle>{article.title}</HomeArticleTitle>
-                                            <HomeArticleSubtitle>{article.subtitle}</HomeArticleSubtitle>
-                                        </HomeArticleTitleWrapper>
-                                        <HomeArticleMeta>
+                                    <ArticleImage $imageUrl={getArticleImageUrl(article)} />
+                                    <ArticleCardContent>
+                                        <ArticleTitleWrapper>
+                                            <ArticleCardTitle>{article.title}</ArticleCardTitle>
+                                            <ArticleCardSubtitle>{article.subtitle}</ArticleCardSubtitle>
+                                        </ArticleTitleWrapper>
+                                        <ArticleMetadata>
                                             {[
                                                 article.relatedGames?.[0]?.title,
                                                 article.relatedPlatforms?.map(p => p.name).join(', '),
                                                 article.relatedDevelopers?.map(d => d.name).join(', '),
                                                 article.relatedGenres?.map(g => g.name).join(', ')
                                             ].filter(Boolean).join(' - ')}
-                                        </HomeArticleMeta>
-                                    </HomeArticleContent>
+                                        </ArticleMetadata>
+                                    </ArticleCardContent>
                                 </HomeArticleCard>
                             ))}
                         </HomeArticlesList>

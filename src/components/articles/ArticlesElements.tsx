@@ -247,3 +247,97 @@ export const HomeCoverArticleSubtitle = styled.h3`
     font-size: 0.9rem;
   }
 `;
+
+// Elementos compartidos para artículos
+export const ArticleImage = styled.div<{ $imageUrl: string }>`
+  width: 300px;
+  height: 100%;
+  background-image: url(${props => props.$imageUrl});
+  background-size: cover;
+  background-position: center;
+
+  @media (max-width: 1200px) {
+    width: 200px;
+    height: 200px;
+  }
+
+  @media (max-width: 768px) {
+    width: 160px;
+    height: 160px;
+  }
+
+  @media (max-width: 480px) {
+    width: 120px;
+    height: 120px;
+  }
+`;
+
+export const ArticleCardContent = styled.div`
+  flex: 1;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.8rem;
+  }
+`;
+
+export const ArticleTitleWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const ArticleCardTitle = styled.h3<{ $xl?: boolean }>`
+  font-size: ${props => props.$xl ? '1.5rem' : '1.3rem'};
+  margin-bottom: ${props => props.$xl ? '0.7rem' : '0.5rem'};
+  color: var(--dark-grey);
+
+  @media (max-width: 1000px) {
+    font-size: ${props => props.$xl ? '1.4rem' : '1.2rem'};
+  }
+
+  @media (max-width: 768px) {
+    font-size: ${props => props.$xl ? '1.3rem' : '1.2rem'};
+    margin-bottom: 0.3rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: ${props => props.$xl ? '1.1rem' : '1rem'};
+    margin-bottom: 0.2rem;
+  }
+`;
+
+export const ArticleCardSubtitle = styled.p<{ $xl?: boolean }>`
+  font-size: ${props => props.$xl ? '1.1rem' : '1rem'};
+  color: var(--mid-grey);
+
+  @media (max-width: 1000px) {
+    font-size: ${props => props.$xl ? '1rem' : '0.9rem'};
+  }
+
+  @media (max-width: 768px) {
+    display: none
+  }
+`;
+
+export const ArticleMetadata = styled.p<{ $xl?: boolean }>`
+  font-size: ${props => props.$xl ? '0.9rem' : '0.8rem'};
+  color: var(--grey);
+  margin-top: auto;
+
+  @media (max-width: 1200px) {
+    display: ${props => props.$xl ? 'block' : 'none'};
+    font-size: ${props => props.$xl ? '0.8rem' : '0.7rem'};
+  }
+
+  @media (max-width: 768px) {
+    display: none
+  }
+`;

@@ -14,7 +14,15 @@ import {
     SectionDivider,
     ArticleDivider,
     PaginationContainer,
-    PaginationButton
+    PaginationButton,
+    CoverImage,
+    ArticleContent,
+    ArticleImage,
+    ArticleCardContent,
+    ArticleTitleWrapper,
+    ArticleCardTitle,
+    ArticleCardSubtitle,
+    ArticleMetadata
 } from '@/components/articles/ArticlesElements';
 
 const TopArticlesGrid = styled.div`
@@ -79,36 +87,19 @@ const TopArticleCard = styled.div<{ $isFirst?: boolean }>`
   }
 `;
 
-const CoverImage = styled.div<{ $imageUrl: string }>`
+const ArchivedSection = styled.div`
   width: 100%;
-  height: 100%;
-  background-image: url(${props => props.$imageUrl});
-  background-size: cover;
-  background-position: center;
-  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: var(--background);
+  padding: 2rem;
 
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 70%;
-    background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.7) 60%, transparent);
+  @media (max-width: 768px) {
+    padding: 1rem;
   }
 `;
 
-const ArticleContent = styled.div`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 1rem;
-  color: white;
-  z-index: 2;
-`;
-
-const ArticleTitle = styled.h2<{ $isFirst?: boolean }>`
+const TopArticleTitle = styled.h2<{ $isFirst?: boolean }>`
   font-size: ${props => props.$isFirst ? '1.5rem' : '1.2rem'};
   margin-bottom: 0.3rem;
   font-weight: bold;
@@ -124,113 +115,13 @@ const ArticleTitle = styled.h2<{ $isFirst?: boolean }>`
   }
 `;
 
-const ArticleSubtitle = styled.h3`
+const TopArticleSubtitle = styled.h3`
   font-size: 0.9rem;
   opacity: 0.9;
   color: var(--clear-grey);
 
   @media (max-width: 900px) {
     display: none;
-  }
-`;
-
-const HomeArticleImage = styled.div<{ $imageUrl: string }>`
-  width: 300px;
-  height: 100%;
-  background-image: url(${props => props.$imageUrl});
-  background-size: cover;
-  background-position: center;
-
-  @media (max-width: 1200px) {
-    width: 200px;
-    height: 200px;
-  }
-
-  @media (max-width: 768px) {
-    width: 160px;
-    height: 160px;
-  }
-
-  @media (max-width: 480px) {
-    width: 120px;
-    height: 120px;
-  }
-`;
-
-const HomeArticleContent = styled.div`
-  flex: 1;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
-  }
-
-  @media (max-width: 480px) {
-    padding: 0.8rem;
-  }
-`;
-
-const HomeArticleTitleWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-`;
-
-const HomeArticleTitle = styled.h3`
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
-  color: var(--dark-grey);
-
-  @media (max-width: 900px) {
-    font-size: 1.2rem;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 1.2rem;
-    margin-bottom: 0.3rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1rem;
-    margin-bottom: 0.2rem;
-  }
-`;
-
-const HomeArticleSubtitle = styled.p`
-  font-size: 1rem;
-  color: var(--mid-grey);
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const HomeArticleMetadata = styled.p`
-  font-size: 0.8rem;
-  color: var(--grey);
-  margin-top: auto;
-  
-  @media (max-width: 768px) {
-    font-size: 0.7rem;
-  }
-
-  @media (max-width: 480px) {
-    display: none;
-  }
-`;
-
-const ArchivedSection = styled.div`
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  background-color: var(--background);
-  padding: 2rem;
-
-  @media (max-width: 768px) {
-    padding: 1rem;
   }
 `;
 
@@ -276,10 +167,10 @@ export default function ArticlesArchiveView() {
                         >
                             <CoverImage $imageUrl={getArticleImageUrl(article)}>
                                 <ArticleContent>
-                                    <ArticleTitle $isFirst={index === 0}>
+                                    <TopArticleTitle $isFirst={index === 0}>
                                         {article.title}
-                                    </ArticleTitle>
-                                    <ArticleSubtitle>{article.subtitle}</ArticleSubtitle>
+                                    </TopArticleTitle>
+                                    <TopArticleSubtitle>{article.subtitle}</TopArticleSubtitle>
                                 </ArticleContent>
                             </CoverImage>
                         </TopArticleCard>
@@ -295,14 +186,14 @@ export default function ArticlesArchiveView() {
                         {archivedArticles.data.map((article: Article, index: number) => (
                             <>
                                 <HomeArticleCard key={article.id} onClick={() => handleArticleClick(article.id)}>
-                                    <HomeArticleImage $imageUrl={getArticleImageUrl(article)} />
-                                    <HomeArticleContent>
-                                        <HomeArticleTitleWrapper>
-                                            <HomeArticleTitle>{article.title}</HomeArticleTitle>
-                                            <HomeArticleSubtitle>{article.subtitle}</HomeArticleSubtitle>
-                                        </HomeArticleTitleWrapper>
-                                        <HomeArticleMetadata>{article.metadata}</HomeArticleMetadata>
-                                    </HomeArticleContent>
+                                    <ArticleImage $imageUrl={getArticleImageUrl(article)} />
+                                    <ArticleCardContent>
+                                        <ArticleTitleWrapper>
+                                            <ArticleCardTitle $xl>{article.title}</ArticleCardTitle>
+                                            <ArticleCardSubtitle $xl>{article.subtitle}</ArticleCardSubtitle>
+                                        </ArticleTitleWrapper>
+                                        <ArticleMetadata $xl>{article.metadata}</ArticleMetadata>
+                                    </ArticleCardContent>
                                 </HomeArticleCard>
                                 {index < archivedArticles.data.length - 1 && <ArticleDivider />}
                             </>
