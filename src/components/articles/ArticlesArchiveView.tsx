@@ -137,7 +137,7 @@ const ArticleSubtitle = styled.h3`
 const HomeArticlesList = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
   width: 100%;
 `;
 
@@ -279,6 +279,62 @@ const PaginationButton = styled.button<{ $variant?: 'home' }>`
   }
 `;
 
+const SectionDivider = styled.div`
+  width: 100%;
+  margin: 0 0 2rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--dark-grey);
+    white-space: nowrap;
+    line-height: 1;
+    margin-bottom: -2px;
+  }
+
+  &::after {
+    content: '';
+    height: 1px;
+    background-color: var(--grey);
+    flex-grow: 1;
+  }
+`;
+
+const ArticleDivider = styled.div`
+  width: 100%;
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+
+  &::after {
+    content: '';
+    height: 1px;
+    background-color: var(--grey);
+    flex-grow: 1;
+  }
+`;
+
+const PageWrapper = styled.div`
+  width: 100%;
+  background-color: var(--mid-grey);
+  min-height: 100vh;
+`;
+
+const ArchivedSection = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: var(--background);
+  padding: 2rem;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`;
+
 export default function ArticlesArchiveView() {
     const { allArticles, loading, error, fetchAllArticles } = useArticles();
     const router = useRouter();
@@ -310,62 +366,73 @@ export default function ArticlesArchiveView() {
     const totalPages = archivedArticles.totalPages || 1;
 
     return (
-        <ArticlesContainer>
-            <TopArticlesGrid>
-                {topArticles.map((article: Article, index: number) => (
-                    <TopArticleCard
-                        key={article.id}
-                        onClick={() => handleArticleClick(article.id)}
-                        $isFirst={index === 0}
-                    >
-                        <CoverImage $imageUrl={getArticleImageUrl(article)}>
-                            <ArticleContent>
-                                <ArticleTitle $isFirst={index === 0}>
-                                    {article.title}
-                                </ArticleTitle>
-                                <ArticleSubtitle>{article.subtitle}</ArticleSubtitle>
-                            </ArticleContent>
-                        </CoverImage>
-                    </TopArticleCard>
-                ))}
-            </TopArticlesGrid>
+        <PageWrapper>
+            <ArticlesContainer>
+                <TopArticlesGrid>
+                    {topArticles.map((article: Article, index: number) => (
+                        <TopArticleCard
+                            key={article.id}
+                            onClick={() => handleArticleClick(article.id)}
+                            $isFirst={index === 0}
+                        >
+                            <CoverImage $imageUrl={getArticleImageUrl(article)}>
+                                <ArticleContent>
+                                    <ArticleTitle $isFirst={index === 0}>
+                                        {article.title}
+                                    </ArticleTitle>
+                                    <ArticleSubtitle>{article.subtitle}</ArticleSubtitle>
+                                </ArticleContent>
+                            </CoverImage>
+                        </TopArticleCard>
+                    ))}
+                </TopArticlesGrid>
 
-            <HomeArticlesList>
-                {archivedArticles.data.map((article: Article) => (
-                    <HomeArticleCard key={article.id} onClick={() => handleArticleClick(article.id)}>
-                        <HomeArticleImage $imageUrl={getArticleImageUrl(article)} />
-                        <HomeArticleContent>
-                            <HomeArticleTitleWrapper>
-                                <HomeArticleTitle>{article.title}</HomeArticleTitle>
-                                <HomeArticleSubtitle>{article.subtitle}</HomeArticleSubtitle>
-                            </HomeArticleTitleWrapper>
-                            <HomeArticleMetadata>{article.metadata}</HomeArticleMetadata>
-                        </HomeArticleContent>
-                    </HomeArticleCard>
-                ))}
-            </HomeArticlesList>
+                <ArchivedSection>
+                    <SectionDivider>
+                        <h2>{currentPage === 1 ? 'Lo último' : 'Archivo'}</h2>
+                    </SectionDivider>
 
-            <PaginationContainer>
-                <PaginationButton
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                >
-                    Más nuevos
-                </PaginationButton>
-                <PaginationButton
-                    $variant="home"
-                    onClick={() => handlePageChange(1)}
-                    disabled={currentPage === 1}
-                >
-                    Portada
-                </PaginationButton>
-                <PaginationButton
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                >
-                    Más antiguos
-                </PaginationButton>
-            </PaginationContainer>
-        </ArticlesContainer>
+                    <HomeArticlesList>
+                        {archivedArticles.data.map((article: Article, index: number) => (
+                            <>
+                                <HomeArticleCard key={article.id} onClick={() => handleArticleClick(article.id)}>
+                                    <HomeArticleImage $imageUrl={getArticleImageUrl(article)} />
+                                    <HomeArticleContent>
+                                        <HomeArticleTitleWrapper>
+                                            <HomeArticleTitle>{article.title}</HomeArticleTitle>
+                                            <HomeArticleSubtitle>{article.subtitle}</HomeArticleSubtitle>
+                                        </HomeArticleTitleWrapper>
+                                        <HomeArticleMetadata>{article.metadata}</HomeArticleMetadata>
+                                    </HomeArticleContent>
+                                </HomeArticleCard>
+                                {index < archivedArticles.data.length - 1 && <ArticleDivider />}
+                            </>
+                        ))}
+                    </HomeArticlesList>
+
+                    <PaginationContainer>
+                        <PaginationButton
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        >
+                            Más nuevos
+                        </PaginationButton>
+                        <PaginationButton
+                            $variant="home"
+                            onClick={() => handlePageChange(1)}
+                            disabled={currentPage === 1}
+                        >
+                            Portada
+                        </PaginationButton>
+                        <PaginationButton
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        >
+                            Más antiguos
+                        </PaginationButton>
+                    </PaginationContainer>
+                </ArchivedSection>
+            </ArticlesContainer>
+        </PageWrapper>
     );
 } 
