@@ -341,3 +341,95 @@ export const ArticleMetadata = styled.p<{ $xl?: boolean }>`
     display: none
   }
 `;
+
+export const TopArticlesGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 2rem;
+
+  @media (max-width: 1200px) {
+    padding: 0 1rem;
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      "main main"
+      "secondary1 secondary2";
+    gap: 1rem;
+    
+    & > :nth-child(1) {
+      grid-area: main;
+      height: 400px;
+    }
+    
+    & > :nth-child(2) {
+      grid-area: secondary1;
+    }
+    
+    & > :nth-child(3) {
+      grid-area: secondary2;
+    }
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    grid-template-areas: 
+      "main"
+      "secondary1"
+      "secondary2";
+    
+    & > :first-child {
+      height: 300px;
+    }
+  }
+`;
+
+export const TopArticleCard = styled.div<{ $isFirst?: boolean }>`
+  height: 300px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  
+  @media (max-width: 900px) {
+    height: ${props => props.$isFirst ? '400px' : '250px'};
+  }
+  
+  @media (max-width: 480px) {
+    height: ${props => props.$isFirst ? '300px' : '250px'};
+  }
+  
+  &:hover {
+    transform: scale(1.02);
+    transition: transform 0.2s ease-in-out;
+  }
+`;
+
+export const TopArticleTitle = styled.h2<{ $isFirst?: boolean }>`
+  font-size: ${props => props.$isFirst ? '1.5rem' : '1.2rem'};
+  margin-bottom: 0.3rem;
+  font-weight: bold;
+  line-height: 1.3;
+  color: white;
+
+  @media (max-width: 900px) {
+    font-size: ${props => props.$isFirst ? '1.4rem' : '1.1rem'};
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 480px) {
+    font-size: ${props => props.$isFirst ? '1.3rem' : '1rem'};
+  }
+`;
+
+export const TopArticleSubtitle = styled.h3`
+  font-size: 0.9rem;
+  opacity: 0.9;
+  color: var(--clear-grey);
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+`;

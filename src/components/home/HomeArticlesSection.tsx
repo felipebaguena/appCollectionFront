@@ -24,71 +24,13 @@ import {
     ArticleTitleWrapper,
     ArticleCardTitle,
     ArticleCardSubtitle,
-    ArticleMetadata
+    ArticleMetadata,
+    TopArticlesGrid,
+    TopArticleCard,
+    TopArticleTitle,
+    TopArticleSubtitle
 } from '@/components/articles/ArticlesElements';
 import styled from 'styled-components';
-
-const TopArticlesGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  width: 100%;
-
-  @media (max-width: 1200px) {
-    padding: 0 1rem;
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "full full"
-      "half1 half2";
-    
-    & > :nth-child(1) {
-      grid-area: full;
-    }
-    & > :nth-child(2) {
-      grid-area: half1;
-    }
-    & > :nth-child(3) {
-      grid-area: half2;
-    }
-  }
-
-  @media (max-width: 480px) {
-    grid-template-columns: 1fr;
-    grid-template-areas:
-      "full"
-      "half1"
-      "half2";
-  }
-`;
-
-const TopArticleCard = styled.div`
-  height: 300px;
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  
-  ${ArticleContent} {
-    padding: 1rem;
-  }
-
-  ${HomeCoverArticleTitle} {
-    font-size: 1.2rem;
-    margin-bottom: 0.3rem;
-  }
-
-  ${HomeCoverArticleSubtitle} {
-    font-size: 0.9rem;
-    opacity: 0.8;
-  }
-  
-  &:hover {
-    transform: scale(1.02);
-    transition: transform 0.2s ease-in-out;
-  }
-`;
 
 const SectionWrapper = styled.div`
   width: 100%;
@@ -198,12 +140,20 @@ export default function HomeArticlesSection() {
                 )}
 
                 <TopArticlesGrid>
-                    {homeArticles.topArticles.map((article) => (
-                        <TopArticleCard key={article.id} onClick={() => handleArticleClick(article.id)}>
+                    {homeArticles.topArticles.map((article, index) => (
+                        <TopArticleCard
+                            key={article.id}
+                            onClick={() => handleArticleClick(article.id)}
+                            $isFirst={index === 0}
+                        >
                             <CoverImage $imageUrl={getArticleImageUrl(article)}>
                                 <ArticleContent>
-                                    <HomeCoverArticleTitle>{article.title}</HomeCoverArticleTitle>
-                                    <HomeCoverArticleSubtitle>{article.subtitle}</HomeCoverArticleSubtitle>
+                                    <TopArticleTitle $isFirst={index === 0}>
+                                        {article.title}
+                                    </TopArticleTitle>
+                                    <TopArticleSubtitle>
+                                        {article.subtitle}
+                                    </TopArticleSubtitle>
                                 </ArticleContent>
                             </CoverImage>
                         </TopArticleCard>
