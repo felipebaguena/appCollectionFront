@@ -6,16 +6,16 @@ import { useRouter } from 'next/navigation';
 import styled from 'styled-components';
 import { getImageUrl } from '@/services/api';
 import { Article } from '@/types/article';
-
-const ArticlesContainer = styled.div`
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-`;
+import {
+    PageWrapper,
+    ArticlesContainer,
+    HomeArticlesList,
+    HomeArticleCard,
+    SectionDivider,
+    ArticleDivider,
+    PaginationContainer,
+    PaginationButton
+} from '@/components/articles/ArticlesElements';
 
 const TopArticlesGrid = styled.div`
   display: grid;
@@ -134,35 +134,6 @@ const ArticleSubtitle = styled.h3`
   }
 `;
 
-const HomeArticlesList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
-`;
-
-const HomeArticleCard = styled.div`
-  height: 200px;
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-  display: flex;
-  background: var(--background);
-  
-  @media (max-width: 768px) {
-    height: 160px;
-  }
-
-  @media (max-width: 480px) {
-    height: 120px;
-  }
-  
-  &:hover {
-    transform: scale(1.01);
-    transition: transform 0.2s ease-in-out;
-  }
-`;
-
 const HomeArticleImage = styled.div<{ $imageUrl: string }>`
   width: 300px;
   height: 100%;
@@ -249,78 +220,6 @@ const HomeArticleMetadata = styled.p`
   @media (max-width: 480px) {
     display: none;
   }
-`;
-
-const PaginationContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding: 1rem 0;
-`;
-
-const PaginationButton = styled.button<{ $variant?: 'home' }>`
-  padding: 0.5rem 1rem;
-  background: ${props => props.$variant === 'home' ? 'var(--dark-grey)' : 'var(--app-yellow)'};
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  color: ${props => props.$variant === 'home' ? 'white' : 'var(--dark-grey)'};
-  opacity: 0.8;
-  transition: opacity 0.2s;
-
-  &:hover {
-    opacity: 1;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const SectionDivider = styled.div`
-  width: 100%;
-  margin: 0 0 2rem;
-  display: flex;
-  align-items: flex-end;
-  gap: 1rem;
-
-  h2 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--dark-grey);
-    white-space: nowrap;
-    line-height: 1;
-    margin-bottom: -2px;
-  }
-
-  &::after {
-    content: '';
-    height: 1px;
-    background-color: var(--grey);
-    flex-grow: 1;
-  }
-`;
-
-const ArticleDivider = styled.div`
-  width: 100%;
-  margin: 1.5rem 0;
-  display: flex;
-  align-items: center;
-
-  &::after {
-    content: '';
-    height: 1px;
-    background-color: var(--grey);
-    flex-grow: 1;
-  }
-`;
-
-const PageWrapper = styled.div`
-  width: 100%;
-  background-color: var(--mid-grey);
-  min-height: 100vh;
 `;
 
 const ArchivedSection = styled.div`
