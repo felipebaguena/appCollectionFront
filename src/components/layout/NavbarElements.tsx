@@ -45,18 +45,18 @@ export const NavbarSection = styled.div<{ $position: 'left' | 'center' | 'right'
   }};
 `;
 
-export const LogoHighlight = styled.span`
-  color: var(--grey);
+export const LogoHighlight = styled.span<{ $isActive?: boolean }>`
+  color: ${props => props.$isActive ? 'var(--app-yellow)' : 'var(--grey)'};
   transition: color 0.3s ease;
   font-weight: bold;
 `;
 
-export const LogoText = styled.span`
-  color: var(--grey);
+export const LogoText = styled.span<{ $isActive?: boolean }>`
+  color: ${props => props.$isActive ? 'var(--clear-grey)' : 'var(--grey)'};
   transition: color 0.3s ease;
 `;
 
-export const LogoContainer = styled.div`
+export const LogoContainer = styled.div<{ $isActive?: boolean }>`
   display: flex;
   gap: 0.3rem;
   font-size: 1rem;
@@ -77,7 +77,7 @@ export const LogoContainer = styled.div`
     }
     .mobile-text {
       display: block;
-      color: var(--app-yellow);
+      color: ${props => props.$isActive ? 'var(--app-yellow)' : 'var(--grey)'};
     }
   }
 `;
@@ -103,10 +103,10 @@ export const ButtonGroup = styled.div`
   align-items: center;
 `;
 
-export const NavLink = styled(Link)`
+export const NavLink = styled(Link) <{ $isActive?: boolean }>`
   display: flex;
   align-items: center;
-  color: var(--grey);
+  color: ${props => props.$isActive ? 'var(--app-yellow)' : 'var(--grey)'};
   text-decoration: none;
   padding: 0.5rem 1rem;
   transition: color 0.3s ease;
@@ -142,12 +142,17 @@ export const IconNavLink = styled(NavLink)`
   padding: 0.5rem 0.5rem;
 `;
 
-export const DropdownTrigger = styled(NavLink)`
+export const DropdownTrigger = styled(NavLink) <{ $isActive?: boolean }>`
   display: flex;
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
   transition: color 0.3s ease;
+  color: ${props => props.$isActive ? 'var(--app-yellow)' : 'var(--grey)'};
+
+  svg {
+    color: ${props => props.$isActive ? 'var(--app-yellow)' : 'var(--grey)'};
+  }
 
   .chevron-icon {
     @media (max-width: 768px) {
@@ -328,9 +333,9 @@ export const SpinnerContainer = styled.div`
   padding: 0 1rem;
 `;
 
-export const MobileLogoText = styled.span`
+export const MobileLogoText = styled.span<{ $isActive?: boolean }>`
   display: none;
-  color: var(--app-yellow);
+  color: ${props => props.$isActive ? 'var(--app-yellow)' : 'var(--grey)'};
   font-size: 1.2rem;
   font-weight: bold;
 

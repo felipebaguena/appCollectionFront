@@ -27,6 +27,7 @@ import {
   MobileLogoText,
 } from '@/components/layout/NavbarElements';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePathname } from 'next/navigation';
 
 const Navbar = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -36,6 +37,7 @@ const Navbar = () => {
   const [showManagementMenu, setShowManagementMenu] = useState(false);
 
   const { isAuthenticated, userRole, logout, login, loading } = useAuth();
+  const pathname = usePathname() || '';
 
   const managementOptions = [
     { name: "Juegos", route: "/management/manage-games" },
@@ -44,6 +46,9 @@ const Navbar = () => {
     { name: "Desarrolladores", route: "/management/manage-developers" },
     { name: "Artículos", route: "/management/manage-articles" }
   ];
+
+  const isManagementRoute = pathname.includes('/management');
+  const isHome = pathname === '/';
 
   const renderAuthButtons = () => {
     if (isAuthenticated) {
@@ -111,13 +116,13 @@ const Navbar = () => {
       <NavbarContent>
         <NavbarSection $position='left'>
           <LogoLink href="/">
-            <LogoContainer>
+            <LogoContainer $isActive={isHome}>
               <div className="full-text">
-                <LogoText>MY </LogoText>
-                <LogoHighlight>VIDEOGAME </LogoHighlight>
-                <LogoText>COLLECTION</LogoText>
+                <LogoText $isActive={isHome}>MY </LogoText>
+                <LogoHighlight $isActive={isHome}>VIDEOGAME </LogoHighlight>
+                <LogoText $isActive={isHome}>COLLECTION</LogoText>
               </div>
-              <MobileLogoText className="mobile-text">
+              <MobileLogoText className="mobile-text" $isActive={isHome}>
                 MVC
               </MobileLogoText>
             </LogoContainer>
@@ -130,16 +135,25 @@ const Navbar = () => {
             </SpinnerContainer>
           ) : (
             <>
-              <NavLink href="/collection">
+              <NavLink
+                href="/collection"
+                $isActive={pathname === '/collection'}
+              >
                 <span className="nav-text">Catálogo</span>
                 <FiBook className="nav-icon" size={20} />
               </NavLink>
-              <NavLink href="/articles/articles-home">
+              <NavLink
+                href="/articles/articles-home"
+                $isActive={pathname.includes('/articles')}
+              >
                 <span className="nav-text">Artículos</span>
                 <FiFileText className="nav-icon" size={20} />
               </NavLink>
               {isAuthenticated && (
-                <NavLink href="/my-collection">
+                <NavLink
+                  href="/my-collection"
+                  $isActive={pathname === '/my-collection'}
+                >
                   <span className="nav-text">Mi colección</span>
                   <FiBookmark className="nav-icon" size={20} />
                 </NavLink>
@@ -150,7 +164,10 @@ const Navbar = () => {
                   onMouseEnter={() => setShowManagementMenu(true)}
                   onMouseLeave={() => setShowManagementMenu(false)}
                 >
-                  <DropdownTrigger href="#">
+                  <DropdownTrigger
+                    href="#"
+                    $isActive={isManagementRoute}
+                  >
                     <span className="nav-text">Gestión</span>
                     <FiSettings className="nav-icon" size={20} />
                     <FiChevronDown />
@@ -161,6 +178,7 @@ const Navbar = () => {
                         key={option.name}
                         href={option.route}
                         onClick={() => setShowManagementMenu(false)}
+                        $isActive={pathname === option.route}
                       >
                         {option.name}
                       </DropdownItem>
