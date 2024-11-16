@@ -38,22 +38,25 @@ export const useArticles = () => {
     }
   }, []);
 
-  const fetchAllArticles = useCallback(async (page: number = 1) => {
-    setLoading(true);
-    try {
-      const data = await api.get<AllArticlesResponse>(
-        ENDPOINTS.GET_ALL_ARTICLES(page, 12)
-      );
-      setAllArticles(data);
-      setError(null);
-      return data;
-    } catch (error) {
-      setError("Error al cargar los artículos");
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchAllArticles = useCallback(
+    async (page: number = 1, gameId?: number) => {
+      setLoading(true);
+      try {
+        const data = await api.get<AllArticlesResponse>(
+          ENDPOINTS.GET_ALL_ARTICLES(page, 12, gameId)
+        );
+        setAllArticles(data);
+        setError(null);
+        return data;
+      } catch (error) {
+        setError("Error al cargar los artículos");
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   return {
     homeArticles,

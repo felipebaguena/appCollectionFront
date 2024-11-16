@@ -343,7 +343,6 @@ export const TopArticlesGrid = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   width: 100%;
-  margin-bottom: 2rem;
 
   @media (max-width: 900px) {
     grid-template-columns: repeat(2, 1fr);
