@@ -28,6 +28,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { GameWithArticles } from '@/types/game';
 import { Article } from '@/types/article';
+import RelatedArticlesBanner from '@/components/articles/RelatedArticlesBanner';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -658,6 +659,11 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
                 </HomeArticleCard>
               ))}
             </HomeArticlesList>
+
+            <RelatedArticlesBanner
+              gameId={game.id.toString()}
+              gameTitle={game.title}
+            />
           </RelatedArticlesSection>
         )}
       </PageContainer>
