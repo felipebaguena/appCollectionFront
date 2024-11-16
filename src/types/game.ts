@@ -1,3 +1,5 @@
+import { Article } from "./article";
+
 export interface Platform {
   id: number;
   name: string;
@@ -35,6 +37,10 @@ export interface Game {
   developers: Developer[];
   images: Image[];
   inCollection?: boolean;
+}
+
+export interface GameWithArticles extends Game {
+  articles: Article[];
 }
 
 export interface GameResponse {

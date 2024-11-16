@@ -14,6 +14,20 @@ import Modal from '@/components/ui/Modal';
 import AddToCollectionForm from '../collection/AddToCollectionForm';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  HomeArticlesList,
+  HomeArticleCard,
+  SectionDivider,
+  ArticleImage,
+  ArticleCardContent,
+  ArticleTitleWrapper,
+  ArticleCardTitle,
+  ArticleCardSubtitle,
+  ArticleMetadata
+} from '@/components/articles/ArticlesElements';
+import { useRouter } from 'next/navigation';
+import { GameWithArticles } from '@/types/game';
+import { Article } from '@/types/article';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -276,14 +290,32 @@ const IndicatorButton = styled(BaseButton)`
   cursor: default;
 `;
 
+const RelatedArticlesSection = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--background);
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`;
+
 const GameDetails: React.FC<{ id: string }> = ({ id }) => {
-  const { game, loading, error, fetchGame } = useGame(id);
+  const { game, loading, error, fetchGame } = useGame(id) as {
+    game: GameWithArticles | null;
+    loading: boolean;
+    error: string | null;
+    fetchGame: () => Promise<void>;
+  };
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [hoveredHalf, setHoveredHalf] = useState<'left' | 'right' | null>(null);
   const [showAddToCollectionModal, setShowAddToCollectionModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
   const { addGameToCollection, isLoading: isAddingGame } = useUserGames();
   const {
@@ -489,6 +521,10 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
     }
   };
 
+  const handleArticleClick = (id: number) => {
+    router.push(`/articles/${id}`);
+  };
+
   return (
     <>
       <PageContainer>
@@ -586,6 +622,43 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
               </NavigationButton>
             </LightboxContent>
           </LightboxOverlay>
+        )}
+
+        {game.articles && game.articles.length > 0 && (
+          <RelatedArticlesSection>
+            <SectionDivider>
+              <h2>Artículos relacionados</h2>
+            </SectionDivider>
+
+            <HomeArticlesList>
+              {game.articles.map((article: Article, index: number) => (
+                <HomeArticleCard
+                  key={article.id}
+                  onClick={() => handleArticleClick(article.id)}
+                >
+                  <ArticleImage
+                    $imageUrl={article.coverImage?.path
+                      ? getImageUrl(article.coverImage.path)
+                      : '/uploads/resources/no-image.jpg'
+                    }
+                  />
+                  <ArticleCardContent>
+                    <ArticleTitleWrapper>
+                      <ArticleCardTitle $xl>{article.title}</ArticleCardTitle>
+                      <ArticleCardSubtitle $xl>{article.subtitle}</ArticleCardSubtitle>
+                    </ArticleTitleWrapper>
+                    <ArticleMetadata $xl>
+                      {article.publishedAt && new Date(article.publishedAt).toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </ArticleMetadata>
+                  </ArticleCardContent>
+                </HomeArticleCard>
+              ))}
+            </HomeArticlesList>
+          </RelatedArticlesSection>
         )}
       </PageContainer>
 
