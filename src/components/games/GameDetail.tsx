@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useGame } from '@/hooks/useGame';
-import { useGameImages } from '@/hooks/useGameImages';
 import { getImageUrl } from '@/services/api';
 import { FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
 import { NAVBAR_HEIGHT } from '../layout/NavbarElements';
@@ -279,7 +278,6 @@ const IndicatorButton = styled(BaseButton)`
 
 const GameDetails: React.FC<{ id: string }> = ({ id }) => {
   const { game, loading, error, fetchGame } = useGame(id);
-  const { gameImages, loading: imagesLoading, fetchGameImages } = useGameImages(Number(id));
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [hoveredHalf, setHoveredHalf] = useState<'left' | 'right' | null>(null);
   const [showAddToCollectionModal, setShowAddToCollectionModal] = useState(false);
@@ -299,8 +297,7 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
 
   useEffect(() => {
     fetchGame();
-    fetchGameImages();
-  }, [fetchGame, fetchGameImages]);
+  }, [fetchGame]);
 
   useEffect(() => {
     if (isEditing && showAddToCollectionModal) {
@@ -325,13 +322,13 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
 
   const handlePrevImage = () => {
     setSelectedImageIndex(prev =>
-      prev !== null ? (prev > 0 ? prev - 1 : gameImages.length - 1) : null
+      prev !== null ? (prev > 0 ? prev - 1 : game.images.length - 1) : null
     );
   };
 
   const handleNextImage = () => {
     setSelectedImageIndex(prev =>
-      prev !== null ? (prev < gameImages.length - 1 ? prev + 1 : 0) : null
+      prev !== null ? (prev < game.images.length - 1 ? prev + 1 : 0) : null
     );
   };
 
@@ -363,7 +360,7 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
     setHoveredHalf(null);
   };
 
-  const nonCoverImages = gameImages.filter(img => !img.isCover);
+  const nonCoverImages = game.images.filter(img => !img.isCover);
   const firstGalleryImage = nonCoverImages[0];
 
   const formatDescription = (text: string) => {
@@ -547,7 +544,7 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
 
         <GallerySection>
           <GalleryGrid>
-            {gameImages.map((image, index) => (
+            {game.images.map((image, index) => (
               <GalleryImage
                 key={image.id}
                 src={getImageUrl(image.path)}
@@ -572,8 +569,8 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
               onMouseLeave={handleMouseLeave}
             >
               <LightboxImage
-                src={getImageUrl(gameImages[selectedImageIndex].path)}
-                alt={gameImages[selectedImageIndex].filename}
+                src={getImageUrl(game.images[selectedImageIndex].path)}
+                alt={game.images[selectedImageIndex].filename}
               />
               <NavigationButton
                 position="left"
