@@ -169,10 +169,6 @@ export const HomeSectionDivider = styled.div`
     flex-grow: 1;
   }
 
-  @media (max-width: 1200px) {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
 `;
 
 export const CoverArticleContainer = styled.div`
@@ -348,10 +344,6 @@ export const TopArticlesGrid = styled.div`
   gap: 1rem;
   width: 100%;
   margin-bottom: 2rem;
-
-  @media (max-width: 1200px) {
-    padding: 0 1rem;
-  }
 
   @media (max-width: 900px) {
     grid-template-columns: repeat(2, 1fr);
