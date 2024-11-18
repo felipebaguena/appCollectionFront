@@ -20,8 +20,6 @@ import {
   GameCardWrapper,
   GameCard,
   ImageContainer,
-  ImageWrapper,
-  ExpandedImageWrapper,
   GameImage,
   GameContent,
   GameTitle,
@@ -37,15 +35,13 @@ import {
   CollectionIcon,
   MobileLoginBanner,
   AddIcon,
-  CompactIconsContainer,
-  CompactIcon,
   WishlistIcon,
   CompactWishlistIcon
 } from './CollectionGridElements';
 import { CollectionGridProps } from '@/types/collection';
 import PaginationGrid from '../ui/PaginationGrid';
 
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 40;
 
 const CollectionGrid: React.FC<CollectionGridProps> = ({
   selectedPlatformIds,
@@ -303,7 +299,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
           <MobileLoginBanner onClick={() => setShowLoginModal(true)}>
             Inicia sesión para gestionar tu colección
           </MobileLoginBanner>
-          <GridContainer>
+          <GridContainer $isCompact={effectiveCompactView}>
             {games.map((game) => (
               <GameCardWrapper
                 key={game.id}
@@ -404,63 +400,55 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                         )}
                       </>
                     )}
-                    <ImageWrapper className="image-wrapper">
-                      <GameImage
-                        src={getGameImageUrl(game)}
-                        alt={game.title}
-                      />
-                    </ImageWrapper>
-                    <ExpandedImageWrapper className="expanded-wrapper">
-                      <GameImage
-                        src={getGameImageUrl(game)}
-                        alt={game.title}
-                      />
-                      {!localStorage.getItem('access_token') ? (
-                        <AddToCollectionLabel
-                          className="add-collection-label"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setShowLoginModal(true);
-                          }}
-                        >
-                          Inicia sesión para gestionar tu colección
-                        </AddToCollectionLabel>
-                      ) : (
-                        <>
-                          {!game.owned && !game.wished && (
-                            <InfoLabel
-                              className="info-label"
-                              onClick={(e) => handleToggleWishlist(e, game)}
-                            >
-                              Añadir a deseados
-                            </InfoLabel>
-                          )}
-                          {game.wished && (
-                            <InfoLabel
-                              className="info-label"
-                              onClick={(e) => handleToggleWishlist(e, game)}
-                            >
-                              Eliminar de deseados
-                            </InfoLabel>
-                          )}
-                          {game.owned ? (
-                            <AddToCollectionLabel
-                              className="add-collection-label"
-                              onClick={(e) => handleEditCollection(e, game)}
-                            >
-                              Editar juego de colección
-                            </AddToCollectionLabel>
-                          ) : (
-                            <AddToCollectionLabel
-                              className="add-collection-label"
-                              onClick={(e) => handleAddToCollection(e, game)}
-                            >
-                              Añadir a la colección
-                            </AddToCollectionLabel>
-                          )}
-                        </>
-                      )}
-                    </ExpandedImageWrapper>
+                    <GameImage
+                      src={getGameImageUrl(game)}
+                      alt={game.title}
+                    />
+                    {!localStorage.getItem('access_token') ? (
+                      <AddToCollectionLabel
+                        className="add-collection-label"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShowLoginModal(true);
+                        }}
+                      >
+                        Inicia sesión para gestionar tu colección
+                      </AddToCollectionLabel>
+                    ) : (
+                      <>
+                        {!game.owned && !game.wished && (
+                          <InfoLabel
+                            className="info-label"
+                            onClick={(e) => handleToggleWishlist(e, game)}
+                          >
+                            Añadir a deseados
+                          </InfoLabel>
+                        )}
+                        {game.wished && (
+                          <InfoLabel
+                            className="info-label"
+                            onClick={(e) => handleToggleWishlist(e, game)}
+                          >
+                            Eliminar de deseados
+                          </InfoLabel>
+                        )}
+                        {game.owned ? (
+                          <AddToCollectionLabel
+                            className="add-collection-label"
+                            onClick={(e) => handleEditCollection(e, game)}
+                          >
+                            Editar juego de colección
+                          </AddToCollectionLabel>
+                        ) : (
+                          <AddToCollectionLabel
+                            className="add-collection-label"
+                            onClick={(e) => handleAddToCollection(e, game)}
+                          >
+                            Añadir a la colección
+                          </AddToCollectionLabel>
+                        )}
+                      </>
+                    )}
                   </ImageContainer>
                   <GameContent $isCompact={effectiveCompactView}>
                     <GameTitle $isCompact={effectiveCompactView}>{game.title}</GameTitle>

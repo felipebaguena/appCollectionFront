@@ -1,39 +1,31 @@
 import styled from "styled-components";
 import Link from "next/link";
 
-export const GridContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
+export const GridContainer = styled.div<{ $isCompact?: boolean }>`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
-  padding: 0 1rem;
+  padding: 0.7rem;
   width: 100%;
-  justify-content: flex-start;
-  max-width: 1600px;
   margin: 0 auto;
 
   @media (max-width: 768px) {
-    justify-content: center;
+    grid-template-columns: ${(props) =>
+      props.$isCompact
+        ? "repeat(auto-fill, minmax(150px, 1fr))"
+        : "repeat(1, 1fr)"};
+    gap: ${(props) => (props.$isCompact ? "10px" : "20px")};
   }
 `;
 
 export const GameCardWrapper = styled(Link)<{ $isCompact?: boolean }>`
-  flex: 0 0 auto;
-  width: calc(33.333% - 14px);
-  max-width: 400px;
-  min-width: 300px;
-  margin: 0;
   text-decoration: none;
   position: relative;
-
-  @media (max-width: 1200px) {
-    width: calc(50% - 10px);
-    max-width: 400px;
-  }
+  width: 100%;
 
   @media (max-width: 768px) {
-    width: ${(props) => (props.$isCompact ? "calc(50% - 10px)" : "100%")};
-    max-width: ${(props) => (props.$isCompact ? "180px" : "400px")};
-    min-width: ${(props) => (props.$isCompact ? "150px" : "250px")};
+    max-width: ${(props) => (props.$isCompact ? "none" : "400px")};
+    margin: ${(props) => (props.$isCompact ? "0" : "0 auto")};
   }
 
   &:hover {
@@ -74,34 +66,6 @@ export const ImageContainer = styled.div`
   overflow: hidden;
 `;
 
-export const ImageWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  padding: 2rem;
-  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-
-  @media (max-width: 768px) {
-    opacity: 0;
-  }
-`;
-
-export const ExpandedImageWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-
-  @media (max-width: 768px) {
-    opacity: 1;
-  }
-`;
-
 export const GameImage = styled.img`
   width: 100%;
   height: 100%;
@@ -109,7 +73,7 @@ export const GameImage = styled.img`
 `;
 
 export const GameContent = styled.div<{ $isCompact?: boolean }>`
-  padding: ${(props) => (props.$isCompact ? "5px 5px" : "10px 10px")};
+  padding: ${(props) => (props.$isCompact ? "5px 5px" : "8px 8px")};
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
@@ -117,7 +81,7 @@ export const GameContent = styled.div<{ $isCompact?: boolean }>`
 
 export const GameTitle = styled.h3<{ $isCompact?: boolean }>`
   margin: 0;
-  font-size: ${(props) => (props.$isCompact ? "14px" : "18px")};
+  font-size: ${(props) => (props.$isCompact ? "14px" : "16px")};
   color: var(--dark-grey);
   font-weight: bold;
 `;
