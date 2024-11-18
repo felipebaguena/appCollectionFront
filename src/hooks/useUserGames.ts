@@ -8,6 +8,9 @@ interface AddGameToCollectionParams {
   status?: number;
   complete?: boolean;
   notes?: string;
+  platformIds?: number[];
+  owned?: boolean;
+  wished?: boolean;
 }
 
 export const useUserGames = () => {
@@ -43,8 +46,52 @@ export const useUserGames = () => {
     }
   };
 
+  const toggleWishlist = async (gameId: number) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        throw new Error("No se encontró el token de acceso");
+      }
+
+      await api.post(
+        ENDPOINTS.ADD_GAME_TO_COLLECTION,
+        {
+          gameId,
+          rating: null,
+          status: null,
+          complete: false,
+          notes: null,
+          platformIds: [],
+          owned: false,
+          wished: true,
+        },
+        false,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setIsLoading(false);
+      return true;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Error al gestionar la lista de deseados";
+      setError(errorMessage);
+      setIsLoading(false);
+      return false;
+    }
+  };
+
   return {
     addGameToCollection,
+    toggleWishlist,
     isLoading,
     error,
   };

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useCollectionGames, CollectionGame } from '@/hooks/useCollectionGames';
 import { API_BASE_URL } from '@/services/api';
 import { useRouter } from 'next/navigation';
-import { MdLibraryAddCheck, MdDelete, MdEdit, MdAdd } from 'react-icons/md';
+import { MdLibraryAddCheck, MdDelete, MdEdit, MdAdd, MdFavorite, MdFavoriteBorder } from 'react-icons/md';
 import { useUserGames } from '@/hooks/useUserGames';
 import { useUserGame } from '@/hooks/useUserGame';
 import { useAuth } from '@/contexts/AuthContext';
@@ -38,7 +38,9 @@ import {
   MobileLoginBanner,
   AddIcon,
   CompactIconsContainer,
-  CompactIcon
+  CompactIcon,
+  WishlistIcon,
+  CompactWishlistIcon
 } from './CollectionGridElements';
 import { CollectionGridProps } from '@/types/collection';
 import PaginationGrid from '../ui/PaginationGrid';
@@ -193,7 +195,9 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
       } else {
         const result = await addGameToCollection({
           gameId: selectedGameId,
-          ...formData
+          ...formData,
+          owned: true,
+          wished: false
         });
 
         if (result) {
@@ -259,6 +263,35 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
     setShowLoginModal(true);
   };
 
+  const handleToggleWishlist = async (e: React.MouseEvent<HTMLDivElement>, game: CollectionGame) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    try {
+      if (game.wished) {
+        // Si ya está en deseados, mostramos el modal de confirmación
+        setGameToDelete(game);
+        setShowDeleteModal(true);
+      } else {
+        // Si no está en deseados, lo añadimos
+        await addGameToCollection({
+          gameId: game.id,
+          owned: false,
+          wished: true
+        });
+
+        // Recargar el grid con los filtros actuales
+        await fetchCollectionGames({
+          page: currentPage,
+          limit: ITEMS_PER_PAGE,
+          sortType
+        }, getCurrentFilter());
+      }
+    } catch (error) {
+      console.error('Error al gestionar la lista de deseados:', error);
+    }
+  };
+
   if (loading) return <p>Cargando colección...</p>;
   if (error) return <p>Error: {error}</p>;
   if (!games || games.length === 0) return <p>No hay juegos disponibles</p>;
@@ -284,35 +317,10 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                   <ImageContainer>
                     {localStorage.getItem('access_token') && (
                       <>
-                        {effectiveCompactView ? (
-                          <CompactIconsContainer>
-                            {game.inCollection ? (
-                              <>
-                                <CompactIcon
-                                  variant="edit"
-                                  onClick={(e) => handleEditCollection(e, game)}
-                                >
-                                  <MdEdit />
-                                </CompactIcon>
-                                <CompactIcon
-                                  variant="delete"
-                                  onClick={(e) => handleDeleteClick(e, game)}
-                                >
-                                  <MdDelete />
-                                </CompactIcon>
-                              </>
-                            ) : (
-                              <CompactIcon
-                                variant="add"
-                                onClick={(e) => handleAddToCollection(e, game)}
-                              >
-                                <MdAdd />
-                              </CompactIcon>
-                            )}
-                          </CompactIconsContainer>
-                        ) : (
+                        {!isMobile ? (
+                          // Vista normal en desktop
                           <>
-                            {!effectiveCompactView && game.inCollection && (
+                            {game.owned && (
                               <>
                                 <EditIcon onClick={(e) => handleEditCollection(e, game)}>
                                   <MdEdit />
@@ -329,12 +337,66 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                                 </CollectionIcon>
                               </>
                             )}
-                            <AddIcon
-                              onClick={(e) => handleAddToCollection(e, game)}
-                              inCollection={game.inCollection}
-                            >
-                              <MdAdd />
-                            </AddIcon>
+                            {!game.owned && (
+                              <>
+                                <AddIcon
+                                  onClick={(e) => handleAddToCollection(e, game)}
+                                  inCollection={false}
+                                >
+                                  <MdAdd />
+                                </AddIcon>
+                                {game.wished && (
+                                  <WishlistIcon
+                                    onClick={(e) => handleDeleteClick(e, game)}
+                                    onMouseEnter={() => setHoveredGameId(game.id)}
+                                    onMouseLeave={() => setHoveredGameId(null)}
+                                  >
+                                    {hoveredGameId === game.id ? <MdDelete /> : <MdFavorite />}
+                                  </WishlistIcon>
+                                )}
+                              </>
+                            )}
+                          </>
+                        ) : (
+                          // Vista móvil (tanto compacta como normal)
+                          <>
+                            {game.owned ? (
+                              <>
+                                <EditIcon onClick={(e) => handleEditCollection(e, game)}>
+                                  <MdEdit />
+                                </EditIcon>
+                                <DeleteIcon onClick={(e) => handleDeleteClick(e, game)}>
+                                  <MdDelete />
+                                </DeleteIcon>
+                                <CollectionIcon>
+                                  <MdLibraryAddCheck />
+                                </CollectionIcon>
+                              </>
+                            ) : (
+                              <>
+                                <AddIcon
+                                  onClick={(e) => handleAddToCollection(e, game)}
+                                  inCollection={false}
+                                >
+                                  <MdAdd />
+                                </AddIcon>
+                                {game.wished ? (
+                                  <CompactWishlistIcon
+                                    onClick={(e) => handleDeleteClick(e, game)}
+                                  >
+                                    <MdFavorite />
+                                  </CompactWishlistIcon>
+                                ) : (
+                                  !game.owned && (
+                                    <CompactWishlistIcon
+                                      onClick={(e) => handleToggleWishlist(e, game)}
+                                    >
+                                      <MdFavoriteBorder />
+                                    </CompactWishlistIcon>
+                                  )
+                                )}
+                              </>
+                            )}
                           </>
                         )}
                       </>
@@ -361,23 +423,40 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                           Inicia sesión para gestionar tu colección
                         </AddToCollectionLabel>
                       ) : (
-                        game.inCollection ? (
-                          <AddToCollectionLabel
-                            className="add-collection-label"
-                            onClick={(e) => handleEditCollection(e, game)}
-                          >
-                            Editar juego de colección
-                          </AddToCollectionLabel>
-                        ) : (
-                          <AddToCollectionLabel
-                            className="add-collection-label"
-                            onClick={(e) => handleAddToCollection(e, game)}
-                          >
-                            Añadir a la colección
-                          </AddToCollectionLabel>
-                        )
+                        <>
+                          {!game.owned && !game.wished && (
+                            <InfoLabel
+                              className="info-label"
+                              onClick={(e) => handleToggleWishlist(e, game)}
+                            >
+                              Añadir a deseados
+                            </InfoLabel>
+                          )}
+                          {game.wished && (
+                            <InfoLabel
+                              className="info-label"
+                              onClick={(e) => handleToggleWishlist(e, game)}
+                            >
+                              Eliminar de deseados
+                            </InfoLabel>
+                          )}
+                          {game.owned ? (
+                            <AddToCollectionLabel
+                              className="add-collection-label"
+                              onClick={(e) => handleEditCollection(e, game)}
+                            >
+                              Editar juego de colección
+                            </AddToCollectionLabel>
+                          ) : (
+                            <AddToCollectionLabel
+                              className="add-collection-label"
+                              onClick={(e) => handleAddToCollection(e, game)}
+                            >
+                              Añadir a la colección
+                            </AddToCollectionLabel>
+                          )}
+                        </>
                       )}
-                      <InfoLabel className="info-label">Más información</InfoLabel>
                     </ExpandedImageWrapper>
                   </ImageContainer>
                   <GameContent $isCompact={effectiveCompactView}>

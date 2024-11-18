@@ -135,7 +135,7 @@ export const GamePlatforms = styled.span``;
 
 export const InfoLabel = styled.div`
   position: absolute;
-  bottom: 0;
+  bottom: 40px;
   left: 0;
   right: 0;
   background-color: var(--app-yellow);
@@ -154,7 +154,7 @@ export const InfoLabel = styled.div`
 
 export const AddToCollectionLabel = styled.div`
   position: absolute;
-  bottom: 40px;
+  bottom: 0;
   left: 0;
   right: 0;
   background-color: var(--grey);
@@ -413,5 +413,60 @@ export const CompactIcon = styled.div<CompactIconProps>`
     font-size: 1.2rem;
     color: ${(props) =>
       props.variant === "edit" ? "var(--dark-grey)" : "white"};
+  }
+`;
+
+export const WishlistIcon = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  cursor: pointer;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ff4081;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+
+  &:hover {
+    transform: scale(1.1);
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`;
+
+export const CompactWishlistIcon = styled.div`
+  position: absolute;
+  top: 1rem;
+  right: 4rem;
+  background-color: var(--grey);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    display: flex;
+  }
+
+  svg {
+    color: #ff4081;
+    font-size: 1.5rem;
+  }
+
+  &:hover {
+    background-color: var(--dark-grey);
   }
 `;

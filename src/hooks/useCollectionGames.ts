@@ -41,6 +41,8 @@ export interface CollectionGame {
   } | null;
   platforms: Platform[];
   inCollection: boolean;
+  owned: boolean;
+  wished: boolean;
 }
 
 interface CollectionResponse {
