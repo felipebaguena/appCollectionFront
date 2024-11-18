@@ -59,6 +59,11 @@ export interface CollectionGridProps {
   searchTerm: string;
   yearRange: { start: number | null; end: number | null } | null;
   sortType: SortType;
-  collectionStatus: "ALL" | "IN_COLLECTION" | "NOT_IN_COLLECTION";
+  collectionStatus:
+    | "ALL"
+    | "IN_COLLECTION_ALL"
+    | "IN_COLLECTION_OWNED"
+    | "IN_COLLECTION_WISHED"
+    | "NOT_IN_COLLECTION";
   isCompactView?: boolean;
 }
