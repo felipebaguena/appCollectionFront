@@ -35,7 +35,6 @@ import styled from 'styled-components';
 const SectionWrapper = styled.div`
   width: 100%;
   background-color: var(--mid-grey);
-  padding-bottom: 4rem;
 `;
 
 const ContentWrapper = styled.div`

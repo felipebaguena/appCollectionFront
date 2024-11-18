@@ -1,12 +1,18 @@
-import React from 'react';
+'use client'
+
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
+import Modal from '@/components/ui/Modal';
+import LoginForm from '@/components/auth/LoginForm';
+import CreateUserForm from '@/components/user/CreateUserForm';
 
 const CardContainer = styled.div`
   position: relative;
   width: 100%;
   height: 400px;
-  margin: 1rem 0;
   overflow: hidden;
 
   @media (max-width: 768px) {
@@ -14,7 +20,7 @@ const CardContainer = styled.div`
   }
 `;
 
-const ImageSection = styled.div<{ imageUrl: string }>`
+const ImageSection = styled.div<{ imageUrl: string; contentLeft?: boolean }>`
   position: absolute;
   top: 0;
   left: 0;
@@ -32,11 +38,10 @@ const ImageSection = styled.div<{ imageUrl: string }>`
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-      to left,
-      rgba(0, 0, 0, 0.8) 50%,
-      rgba(0, 0, 0, 0) 100%
-    );
+    background: ${props => props.contentLeft
+    ? 'linear-gradient(to right, rgba(0, 0, 0, 0.8) 50%, rgba(0, 0, 0, 0) 100%)'
+    : 'linear-gradient(to left, rgba(0, 0, 0, 0.8) 50%, rgba(0, 0, 0, 0) 100%)'
+  };
 
     @media (max-width: 768px) {
       background: rgba(0, 0, 0, 0.6);
@@ -44,10 +49,17 @@ const ImageSection = styled.div<{ imageUrl: string }>`
   }
 `;
 
-const ContentSection = styled.div`
+const ContentWrapper = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  height: 100%;
+  position: relative;
+`;
+
+const ContentSection = styled.div<{ contentLeft?: boolean }>`
   position: absolute;
   top: 0;
-  right: 0;
+  ${props => props.contentLeft ? 'left: 0;' : 'right: 0;'}
   width: 50%;
   height: 100%;
   padding: 2rem;
@@ -61,6 +73,7 @@ const ContentSection = styled.div`
     width: 100%;
     top: auto;
     bottom: 0;
+    left: 0;
     background: none;
     padding: 1.5rem;
   }
@@ -139,24 +152,92 @@ interface InfoCardProps {
   imageUrl: string;
   title: string;
   description: string;
+  contentLeft?: boolean;
+  bannerCollection?: boolean;
 }
 
-const InfoCardComponent: React.FC<InfoCardProps> = ({ imageUrl, title, description }) => {
+const InfoCardComponent: React.FC<InfoCardProps> = ({
+  imageUrl,
+  title,
+  description,
+  contentLeft = false,
+  bannerCollection = false
+}) => {
+  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
+  const { isAuthenticated, login } = useAuth();
+  const router = useRouter();
+
+  const handleButtonClick = () => {
+    if (bannerCollection) {
+      if (isAuthenticated) {
+        router.push('/my-collection');
+      } else {
+        setShowLoginForm(true);
+      }
+    }
+  };
+
+  const handleLoginSuccess = (access_token: string) => {
+    login(access_token);
+    setShowLoginForm(false);
+    router.push('/my-collection');
+  };
+
+  const handleRegisterClick = () => {
+    setShowLoginForm(false);
+    setShowRegisterForm(true);
+  };
+
   return (
-    <CardContainer>
-      <ImageSection imageUrl={imageUrl} />
-      <ContentSection>
-        <div>
-          <Title>{title}</Title>
-          <Description>{description}</Description>
-        </div>
-        <StyledLink href="/collection">
-          <InfoLabel>
-            Más información
-          </InfoLabel>
-        </StyledLink>
-      </ContentSection>
-    </CardContainer>
+    <>
+      <CardContainer>
+        <ImageSection imageUrl={imageUrl} contentLeft={contentLeft} />
+        <ContentWrapper>
+          <ContentSection contentLeft={contentLeft}>
+            <div>
+              <Title>{title}</Title>
+              <Description>{description}</Description>
+            </div>
+            {bannerCollection ? (
+              <InfoLabel onClick={handleButtonClick}>
+                Comenzar ahora
+              </InfoLabel>
+            ) : (
+              <StyledLink href="/collection">
+                <InfoLabel>
+                  Más información
+                </InfoLabel>
+              </StyledLink>
+            )}
+          </ContentSection>
+        </ContentWrapper>
+      </CardContainer>
+
+      {bannerCollection && (
+        <>
+          <Modal
+            isOpen={showLoginForm}
+            onClose={() => setShowLoginForm(false)}
+            title="Iniciar Sesión"
+          >
+            <LoginForm
+              onClose={() => setShowLoginForm(false)}
+              onLoginSuccess={handleLoginSuccess}
+              onRegisterClick={handleRegisterClick}
+            />
+          </Modal>
+
+          <Modal
+            isOpen={showRegisterForm}
+            onClose={() => setShowRegisterForm(false)}
+            title="Crear Usuario"
+          >
+            <CreateUserForm onClose={() => setShowRegisterForm(false)} />
+          </Modal>
+        </>
+      )}
+    </>
   );
 };
 

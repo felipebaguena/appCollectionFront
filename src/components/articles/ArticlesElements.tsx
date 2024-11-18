@@ -14,7 +14,7 @@ export const ArticlesContainer = styled.div`
   flex-direction: column;
   gap: 1rem;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1rem 1rem;
 `;
 
 // Elementos de artículos
