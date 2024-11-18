@@ -7,7 +7,7 @@ import { getImageUrl } from '@/services/api';
 import { FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
 import { NAVBAR_HEIGHT } from '../layout/NavbarElements';
 import { FOOTER_HEIGHT } from '../layout/FooterElements';
-import { MdLibraryAddCheck, MdDelete, MdEdit, MdAdd } from 'react-icons/md';
+import { MdLibraryAddCheck, MdDelete, MdEdit, MdAdd, MdFavorite, MdFavoriteBorder } from 'react-icons/md';
 import { useUserGame } from '@/hooks/useUserGame';
 import { useUserGames } from '@/hooks/useUserGames';
 import Modal from '@/components/ui/Modal';
@@ -303,6 +303,19 @@ const RelatedArticlesSection = styled.div`
   }
 `;
 
+const WishlistButton = styled(BaseButton)`
+  background-color: var(--grey);
+  cursor: pointer;
+
+  svg {
+    color: #ff4081;
+  }
+
+  &:hover {
+    background-color: var(--dark-grey);
+  }
+`;
+
 const GameDetails: React.FC<{ id: string }> = ({ id }) => {
   const { game, loading, error, fetchGame } = useGame(id) as {
     game: GameWithArticles | null;
@@ -318,7 +331,7 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
-  const { addGameToCollection, isLoading: isAddingGame } = useUserGames();
+  const { addGameToCollection, toggleWishlist, isLoading: isAddingGame } = useUserGames();
   const {
     userGame,
     loading: loadingUserGame,
@@ -327,6 +340,8 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
     clearUserGame,
     deleteUserGame
   } = useUserGame(Number(id));
+
+  const [showWishlistDeleteModal, setShowWishlistDeleteModal] = useState(false);
 
   useEffect(() => {
     fetchGame();
@@ -502,7 +517,7 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
         status: formData.status || null,
         complete: formData.complete,
         notes: formData.notes || null,
-        platformIds: formData.platformIds
+        platformIds: formData.platformIds,
       });
 
       if (result) {
@@ -512,7 +527,9 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
     } else {
       const result = await addGameToCollection({
         gameId: Number(id),
-        ...formData
+        ...formData,
+        owned: true,
+        wished: false
       });
 
       if (result) {
@@ -526,13 +543,39 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
     router.push(`/articles/${id}`);
   };
 
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (game?.wished) {
+      setShowWishlistDeleteModal(true);
+    } else {
+      try {
+        await toggleWishlist(Number(id));
+        await fetchGame();
+      } catch (error) {
+        console.error('Error al gestionar la lista de deseados:', error);
+      }
+    }
+  };
+
+  const handleConfirmWishlistDelete = async () => {
+    try {
+      await deleteUserGame();
+      setShowWishlistDeleteModal(false);
+      await fetchGame();
+    } catch (error) {
+      console.error('Error al eliminar el juego de la lista de deseados:', error);
+    }
+  };
+
   return (
     <>
       <PageContainer>
         <HeaderContainer>
           {isAuthenticated && (
             <CollectionControls>
-              {game?.inCollection ? (
+              {game?.owned ? (
                 <>
                   <EditButton onClick={handleEditCollection}>
                     <MdEdit />
@@ -545,9 +588,14 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
                   </IndicatorButton>
                 </>
               ) : (
-                <EditButton onClick={handleAddToCollection}>
-                  <MdAdd />
-                </EditButton>
+                <>
+                  <EditButton onClick={handleAddToCollection}>
+                    <MdAdd />
+                  </EditButton>
+                  <WishlistButton onClick={handleToggleWishlist}>
+                    {game.wished ? <MdFavorite /> : <MdFavoriteBorder />}
+                  </WishlistButton>
+                </>
               )}
             </CollectionControls>
           )}
@@ -703,6 +751,16 @@ const GameDetails: React.FC<{ id: string }> = ({ id }) => {
         onConfirm={handleConfirmDelete}
         title="Eliminar juego de la colección"
         message={`¿Estás seguro de que quieres eliminar ${game?.title} de tu colección?`}
+        confirmText="Eliminar"
+        confirmVariant="danger"
+      />
+
+      <ConfirmationModal
+        isOpen={showWishlistDeleteModal}
+        onClose={() => setShowWishlistDeleteModal(false)}
+        onConfirm={handleConfirmWishlistDelete}
+        title="Eliminar juego de la lista de deseados"
+        message={`¿Estás seguro de que quieres eliminar ${game?.title} de tu lista de deseados?`}
         confirmText="Eliminar"
         confirmVariant="danger"
       />

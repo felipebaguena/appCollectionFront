@@ -41,6 +41,9 @@ export interface Game {
 
 export interface GameWithArticles extends Game {
   articles: Article[];
+  inCollection?: boolean;
+  wished?: boolean;
+  owned?: boolean;
 }
 
 export interface GameResponse {
