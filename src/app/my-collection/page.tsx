@@ -22,6 +22,7 @@ import CollectionCompleteFilter from "@/components/collection/CollectionComplete
 import CollectionRatingFilter from "@/components/collection/CollectionRatingFilter";
 import CollectionStatusGameFilter from "@/components/collection/CollectionStatusGameFilter";
 import CollectionAddedAtRangeFilter from "@/components/collection/CollectionAddedAtRangeFilter";
+import MyCollectionStatusFilter, { MyCollectionStatus } from '@/components/collection/MyCollectionStatusFilter';
 
 import {
   TitleBar,
@@ -48,6 +49,18 @@ import { useUserCollection } from '@/hooks/useUserCollection';
 import { CollectionResponse } from '@/types/collection';
 import MyCollectionGrid from '@/components/collection/MyCollectionGrid';
 
+const mapMyCollectionStatusToCollectionStatus = (status: MyCollectionStatus) => {
+  switch (status) {
+    case 'OWNED':
+      return 'IN_COLLECTION_OWNED';
+    case 'WISHED':
+      return 'IN_COLLECTION_WISHED';
+    case 'ALL':
+    default:
+      return 'ALL';
+  }
+};
+
 export default function MyCollectionPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<Genre[]>([]);
@@ -70,6 +83,7 @@ export default function MyCollectionPage() {
   const itemsPerPage = 12; // Podemos ajustar esto según necesidades
   const [collectionData, setCollectionData] = useState<CollectionResponse | null>(null);
   const [isCompactView, setIsCompactView] = useState(false);
+  const [myCollectionStatus, setMyCollectionStatus] = useState<MyCollectionStatus>('ALL');
 
   const sortOptions = [
     { value: MyCollectionSortType.TITLE_ASC, label: 'Título (A-Z)' },
@@ -105,7 +119,8 @@ export default function MyCollectionPage() {
           complete: completeStatus !== CompleteStatus.ALL ? completeStatus : undefined,
           ratingRange: (ratingRange.start > 0 || ratingRange.end < 5) ? ratingRange : undefined,
           statusRange: (statusRange.start > 0 || statusRange.end < 10) ? statusRange : undefined,
-          addedAtRange: hasValidDateRange(addedAtRange) ? addedAtRange : undefined
+          addedAtRange: hasValidDateRange(addedAtRange) ? addedAtRange : undefined,
+          collectionStatus: myCollectionStatus !== 'ALL' ? myCollectionStatus : undefined
         }
       };
 
@@ -132,6 +147,7 @@ export default function MyCollectionPage() {
     ratingRange,
     statusRange,
     addedAtRange,
+    myCollectionStatus,
     isAuthenticated
   ]);
 
@@ -223,6 +239,7 @@ export default function MyCollectionPage() {
       start: null,
       end: null
     });
+    setMyCollectionStatus('ALL');
   };
 
   const hasActiveFilters = selectedPlatforms.length > 0 ||
@@ -233,7 +250,12 @@ export default function MyCollectionPage() {
     completeStatus !== CompleteStatus.ALL ||
     (ratingRange.start > 0 || ratingRange.end < 5) ||
     (statusRange.start > 0 || statusRange.end < 10) ||
-    hasValidDateRange(addedAtRange);
+    hasValidDateRange(addedAtRange) ||
+    myCollectionStatus !== 'ALL';
+
+  const handleMyCollectionStatusChange = (status: MyCollectionStatus) => {
+    setMyCollectionStatus(status);
+  };
 
   return (
     <PageContainer>
@@ -326,6 +348,16 @@ export default function MyCollectionPage() {
               onRemove={() => setAddedAtRange({ start: null, end: null })}
             />
           )}
+          {myCollectionStatus !== 'ALL' && (
+            <FilterChip
+              label={
+                myCollectionStatus === 'OWNED'
+                  ? "En propiedad"
+                  : "En deseados"
+              }
+              onRemove={() => setMyCollectionStatus('ALL')}
+            />
+          )}
         </ChipsContainer>
       </Controls>
 
@@ -335,6 +367,10 @@ export default function MyCollectionPage() {
             <IoClose size={20} />
           </CloseFiltersButton>
           <CollectionFiltersContainer>
+            <MyCollectionStatusFilter
+              value={myCollectionStatus}
+              onChange={handleMyCollectionStatusChange}
+            />
             <CollectionCompleteFilter
               value={completeStatus}
               onChange={handleCompleteChange}

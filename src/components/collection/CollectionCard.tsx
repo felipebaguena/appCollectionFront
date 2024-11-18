@@ -3,7 +3,7 @@ import { UserGameInCollection } from '@/types/collection';
 import { API_BASE_URL } from '@/services/api';
 import StarRating from '../ui/StarRating';
 import { formatDate } from '@/helpers/dateFormatter';
-import { MdDelete, MdEdit } from 'react-icons/md';
+import { MdDelete, MdEdit, MdFavorite } from 'react-icons/md';
 
 
 const Card = styled.div`
@@ -38,8 +38,19 @@ const IconsContainer = styled.div`
   }
 `;
 
-const ActionButton = styled.button<{ $variant?: 'edit' | 'delete' }>`
-  background-color: ${props => props.$variant === 'edit' ? 'var(--app-yellow)' : 'var(--app-red)'};
+const ActionButton = styled.button<{ $variant?: 'edit' | 'delete' | 'wishlist' }>`
+  background-color: ${props => {
+    switch (props.$variant) {
+      case 'edit':
+        return 'var(--app-yellow)';
+      case 'delete':
+        return 'var(--app-red)';
+      case 'wishlist':
+        return 'var(--app-red)';
+      default:
+        return 'var(--app-red)';
+    }
+  }};
   width: 2rem;
   height: 2rem;
   border: none;
@@ -129,85 +140,128 @@ const PlatformTag = styled.span`
   font-size: 0.8rem;
 `;
 
+const AddToCollectionLabel = styled.div`
+  background: var(--app-yellow);
+  color: var(--dark-grey);
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  margin: 1rem 0;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
 interface CollectionCardProps {
-    game: UserGameInCollection;
-    onEdit?: (e: React.MouseEvent) => void;
-    onDelete?: (e: React.MouseEvent) => void;
+  game: UserGameInCollection;
+  onEdit?: (e: React.MouseEvent) => void;
+  onDelete?: (e: React.MouseEvent) => void;
+  onAddToCollection?: (e: React.MouseEvent) => void;
 }
 
 const CollectionCard: React.FC<CollectionCardProps> = ({
-    game,
-    onEdit,
-    onDelete
+  game,
+  onEdit,
+  onDelete,
+  onAddToCollection
 }) => {
-    const getGameImageUrl = (game: UserGameInCollection) => {
-        return game.game.coverImage
-            ? `${API_BASE_URL}/${game.game.coverImage.path}`
-            : `${API_BASE_URL}/uploads/resources/no-image.jpg`;
-    };
+  const getGameImageUrl = (game: UserGameInCollection) => {
+    return game.game.coverImage
+      ? `${API_BASE_URL}/${game.game.coverImage.path}`
+      : `${API_BASE_URL}/uploads/resources/no-image.jpg`;
+  };
 
-    const rating = typeof game.rating === 'string'
-        ? parseFloat(game.rating)
-        : game.rating || 0;
+  const rating = typeof game.rating === 'string'
+    ? parseFloat(game.rating)
+    : game.rating || 0;
 
-    return (
-        <Card>
-            <IconsContainer className="icons-container">
-                {onEdit && (
-                    <ActionButton
-                        $variant="edit"
-                        onClick={e => {
-                            e.stopPropagation();
-                            onEdit(e);
-                        }}
-                    >
-                        <MdEdit />
-                    </ActionButton>
-                )}
-                {onDelete && (
-                    <ActionButton
-                        $variant="delete"
-                        onClick={e => {
-                            e.stopPropagation();
-                            onDelete(e);
-                        }}
-                    >
-                        <MdDelete />
-                    </ActionButton>
-                )}
-            </IconsContainer>
-            <ImageContainer>
-                <GameImage
-                    src={getGameImageUrl(game)}
-                    alt={game.game.title}
-                />
-            </ImageContainer>
-            <GameInfo>
-                <InfoContent>
-                    <TopContent>
-                        <Title>{game.game.title}</Title>
-                        <StarRating
-                            value={rating}
-                            readOnly
-                            size={16}
-                        />
-                    </TopContent>
-                    <BottomContent>
-                        <Details>
-                            <div>Estado: {game.status}/10</div>
-                            <div>{game.complete ? 'Completo' : 'Incompleto'}</div>
-                            <PlatformList>
-                                {game.platforms.map(platform => (
-                                    <PlatformTag key={platform.id}>{platform.name}</PlatformTag>
-                                ))}
-                            </PlatformList>
-                            <div>Añadido: {formatDate(game.addedAt)}</div>
-                        </Details>
-                    </BottomContent>
-                </InfoContent>
-            </GameInfo>
-        </Card>
-    );
+  const isWishlist = game.wished && !game.owned;
+
+  return (
+    <Card>
+      <IconsContainer className="icons-container">
+        {isWishlist ? (
+          <ActionButton
+            $variant="wishlist"
+            onClick={e => {
+              e.stopPropagation();
+              onDelete?.(e);
+            }}
+          >
+            <MdFavorite />
+          </ActionButton>
+        ) : (
+          <>
+            {onEdit && (
+              <ActionButton
+                $variant="edit"
+                onClick={e => {
+                  e.stopPropagation();
+                  onEdit(e);
+                }}
+              >
+                <MdEdit />
+              </ActionButton>
+            )}
+            {onDelete && (
+              <ActionButton
+                $variant="delete"
+                onClick={e => {
+                  e.stopPropagation();
+                  onDelete(e);
+                }}
+              >
+                <MdDelete />
+              </ActionButton>
+            )}
+          </>
+        )}
+      </IconsContainer>
+      <ImageContainer>
+        <GameImage
+          src={getGameImageUrl(game)}
+          alt={game.game.title}
+        />
+      </ImageContainer>
+      <GameInfo>
+        <InfoContent>
+          <TopContent>
+            <Title>{game.game.title}</Title>
+            {!isWishlist && (
+              <StarRating
+                value={rating}
+                readOnly
+                size={16}
+              />
+            )}
+          </TopContent>
+          <BottomContent>
+            <Details>
+              {!isWishlist ? (
+                <>
+                  <div>Estado: {game.status}/10</div>
+                  <div>{game.complete ? 'Completo' : 'Incompleto'}</div>
+                  <PlatformList>
+                    {game.platforms.map(platform => (
+                      <PlatformTag key={platform.id}>{platform.name}</PlatformTag>
+                    ))}
+                  </PlatformList>
+                </>
+              ) : (
+                <AddToCollectionLabel onClick={(e) => onAddToCollection?.(e)}>
+                  Añadir a la colección
+                </AddToCollectionLabel>
+              )}
+              <div>Añadido: {formatDate(game.addedAt)}</div>
+            </Details>
+          </BottomContent>
+        </InfoContent>
+      </GameInfo>
+    </Card>
+  );
 };
 
 export default CollectionCard; 

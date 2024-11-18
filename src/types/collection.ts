@@ -44,6 +44,8 @@ export interface UserGameInCollection {
   complete: boolean;
   notes: string;
   addedAt: string;
+  owned?: boolean;
+  wished?: boolean;
 }
 
 export interface CollectionResponse {

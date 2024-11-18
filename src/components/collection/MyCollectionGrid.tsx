@@ -12,6 +12,7 @@ import AddToCollectionForm from './AddToCollectionForm';
 import { Platform } from '@/types/game';
 import CompactCollectionCard from './CompactCollectionCard';
 import PaginationGrid from '../ui/PaginationGrid';
+import { useUserGames } from '@/hooks/useUserGames';
 
 const Container = styled.div<{ $isCompact?: boolean }>`
   display: flex;
@@ -114,10 +115,15 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
 }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
+    const [showAddToCollectionModal, setShowAddToCollectionModal] = useState(false);
     const [gameToDelete, setGameToDelete] = useState<UserGameInCollection | null>(null);
     const [gameToEdit, setGameToEdit] = useState<UserGameInCollection | null>(null);
+    const [selectedGame, setSelectedGame] = useState<UserGameInCollection | null>(null);
 
-    const { deleteUserGame, updateUserGame } = useUserGame(gameToEdit?.game.id || 0);
+    const { deleteUserGame, updateUserGame } = useUserGame(
+        gameToDelete?.game.id || gameToEdit?.game.id || 0
+    );
+    const { addGameToCollection } = useUserGames();
 
     const handleDeleteClick = (e: React.MouseEvent, game: UserGameInCollection) => {
         e.preventDefault();
@@ -178,6 +184,42 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
         }
     };
 
+    const handleAddToCollection = async (e: React.MouseEvent<Element, MouseEvent>, game: UserGameInCollection) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setSelectedGame(game);
+        setShowAddToCollectionModal(true);
+    };
+
+    const handleAddToCollectionSubmit = async (formData: {
+        rating?: number;
+        status?: number;
+        complete: boolean;
+        notes?: string;
+        platformIds: number[];
+    }) => {
+        if (selectedGame) {
+            try {
+                const result = await addGameToCollection({
+                    gameId: selectedGame.game.id,
+                    ...formData,
+                    owned: true,
+                    wished: false
+                });
+
+                if (result) {
+                    setShowAddToCollectionModal(false);
+                    setSelectedGame(null);
+                    if (onGameDeleted) {
+                        onGameDeleted();
+                    }
+                }
+            } catch (error) {
+                console.error('Error al añadir el juego:', error);
+            }
+        }
+    };
+
     if (games.length === 0) {
         return <NoGamesMessage>No hay juegos en tu colección</NoGamesMessage>;
     }
@@ -196,6 +238,7 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
                                     game={game}
                                     onEdit={(e) => handleEditClick(e, game)}
                                     onDelete={(e) => handleDeleteClick(e, game)}
+                                    onAddToCollection={(e) => handleAddToCollection(e, game)}
                                 />
                             </CardWrapper>
                         ))}
@@ -211,6 +254,7 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
                                     game={game}
                                     onEdit={(e) => handleEditClick(e, game)}
                                     onDelete={(e) => handleDeleteClick(e, game)}
+                                    onAddToCollection={(e) => handleAddToCollection(e, game)}
                                 />
                             </CardWrapper>
                         ))}
@@ -232,8 +276,9 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
                     setGameToDelete(null);
                 }}
                 onConfirm={handleConfirmDelete}
-                title="Eliminar juego de la colección"
-                message={`¿Estás seguro de que quieres eliminar ${gameToDelete?.game.title} de tu colección?`}
+                title={gameToDelete?.wished ? "Eliminar juego de favoritos" : "Eliminar juego de la colección"}
+                message={`¿Estás seguro de que quieres eliminar ${gameToDelete?.game.title} de ${gameToDelete?.wished ? 'tus favoritos' : 'tu colección'
+                    }?`}
                 confirmText="Eliminar"
                 confirmVariant="danger"
             />
@@ -261,6 +306,25 @@ const MyCollectionGrid: React.FC<MyCollectionGridProps> = ({
                         notes: gameToEdit?.notes || null,
                         platforms: (gameToEdit?.platforms || []) as Platform[]
                     }}
+                />
+            </Modal>
+
+            <Modal
+                isOpen={showAddToCollectionModal}
+                onClose={() => {
+                    setShowAddToCollectionModal(false);
+                    setSelectedGame(null);
+                }}
+                title={`Añadir ${selectedGame?.game.title} a mi colección`}
+            >
+                <AddToCollectionForm
+                    gameId={selectedGame?.game.id || 0}
+                    onSubmit={handleAddToCollectionSubmit}
+                    onCancel={() => {
+                        setShowAddToCollectionModal(false);
+                        setSelectedGame(null);
+                    }}
+                    isEditing={false}
                 />
             </Modal>
         </>
