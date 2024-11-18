@@ -221,13 +221,13 @@ export const PaginationContainer = styled.div`
   width: 100%;
 `;
 
-export const DeleteIcon = styled.div`
+export const DeleteIcon = styled.div<{ $isCompact?: boolean }>`
   position: absolute;
-  top: 1rem;
-  right: 4rem;
+  top: ${(props) => (props.$isCompact ? "0.5rem" : "1rem")};
+  right: ${(props) => (props.$isCompact ? "3rem" : "4rem")};
   background-color: var(--app-red);
-  width: 2.5rem;
-  height: 2.5rem;
+  width: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
+  height: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
   display: none;
   align-items: center;
   justify-content: center;
@@ -242,17 +242,17 @@ export const DeleteIcon = styled.div`
 
   svg {
     color: white;
-    font-size: 1.5rem;
+    font-size: ${(props) => (props.$isCompact ? "1.2rem" : "1.5rem")};
   }
 `;
 
-export const EditIcon = styled.div`
+export const EditIcon = styled.div<{ $isCompact?: boolean }>`
   position: absolute;
-  top: 1rem;
-  right: 7rem;
+  top: ${(props) => (props.$isCompact ? "0.5rem" : "1rem")};
+  right: ${(props) => (props.$isCompact ? "5.5rem" : "7rem")};
   background-color: var(--app-yellow);
-  width: 2.5rem;
-  height: 2.5rem;
+  width: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
+  height: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
   display: none;
   align-items: center;
   justify-content: center;
@@ -274,18 +274,18 @@ export const EditIcon = styled.div`
 
   svg {
     color: var(--dark-grey);
-    font-size: 1.5rem;
+    font-size: ${(props) => (props.$isCompact ? "1.2rem" : "1.5rem")};
     transition: all 0.3s ease;
   }
 `;
 
-export const CollectionIcon = styled.div`
+export const CollectionIcon = styled.div<{ $isCompact?: boolean }>`
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: ${(props) => (props.$isCompact ? "0.5rem" : "1rem")};
+  right: ${(props) => (props.$isCompact ? "0.5rem" : "1rem")};
   background-color: var(--app-yellow);
-  width: 2.5rem;
-  height: 2.5rem;
+  width: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
+  height: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -314,7 +314,7 @@ export const CollectionIcon = styled.div`
 
   svg {
     color: var(--dark-grey);
-    font-size: 1.5rem;
+    font-size: ${(props) => (props.$isCompact ? "1.2rem" : "1.5rem")};
     transition: all 0.3s ease;
   }
 `;
@@ -339,13 +339,16 @@ export const MobileLoginBanner = styled.div`
   }
 `;
 
-export const AddIcon = styled.div<{ inCollection?: boolean }>`
+export const AddIcon = styled.div<{
+  inCollection?: boolean;
+  $isCompact?: boolean;
+}>`
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: ${(props) => (props.$isCompact ? "0.5rem" : "1rem")};
+  right: ${(props) => (props.$isCompact ? "0.5rem" : "1rem")};
   background-color: var(--grey);
-  width: 2.5rem;
-  height: 2.5rem;
+  width: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
+  height: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
   display: none;
   align-items: center;
   justify-content: center;
@@ -360,7 +363,7 @@ export const AddIcon = styled.div<{ inCollection?: boolean }>`
 
   svg {
     color: white;
-    font-size: 1.5rem;
+    font-size: ${(props) => (props.$isCompact ? "1.2rem" : "1.5rem")};
   }
 `;
 
@@ -416,39 +419,43 @@ export const CompactIcon = styled.div<CompactIconProps>`
   }
 `;
 
-export const WishlistIcon = styled.div`
+export const WishlistIcon = styled.div<{ $isCompact?: boolean }>`
   position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-  cursor: pointer;
-  background-color: rgba(0, 0, 0, 0.7);
-  padding: 8px 12px;
+  top: ${(props) => (props.$isCompact ? "0.5rem" : "1rem")};
+  right: ${(props) => (props.$isCompact ? "0.5rem" : "1rem")};
+  background-color: var(--grey);
+  width: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
+  height: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ff4081;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
   transition: all 0.3s ease;
-  border-radius: 4px;
 
   &:hover {
-    transform: scale(1.1);
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: var(--dark-grey);
   }
 
   svg {
-    width: 20px;
-    height: 20px;
+    color: #ff4081;
+    font-size: ${(props) => (props.$isCompact ? "1.2rem" : "1.5rem")};
+    transition: all 0.3s ease;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;
 
-export const CompactWishlistIcon = styled.div`
+export const CompactWishlistIcon = styled.div<{ $isCompact?: boolean }>`
   position: absolute;
-  top: 1rem;
-  right: 4rem;
+  top: ${(props) => (props.$isCompact ? "0.5rem" : "1rem")};
+  right: ${(props) => (props.$isCompact ? "3rem" : "4rem")};
   background-color: var(--grey);
-  width: 2.5rem;
-  height: 2.5rem;
+  width: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
+  height: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
   display: none;
   align-items: center;
   justify-content: center;
@@ -463,7 +470,7 @@ export const CompactWishlistIcon = styled.div`
 
   svg {
     color: #ff4081;
-    font-size: 1.5rem;
+    font-size: ${(props) => (props.$isCompact ? "1.2rem" : "1.5rem")};
   }
 
   &:hover {

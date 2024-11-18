@@ -362,19 +362,20 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                           <>
                             {game.owned ? (
                               <>
-                                <EditIcon onClick={(e) => handleEditCollection(e, game)}>
+                                <EditIcon $isCompact={true} onClick={(e) => handleEditCollection(e, game)}>
                                   <MdEdit />
                                 </EditIcon>
-                                <DeleteIcon onClick={(e) => handleDeleteClick(e, game)}>
+                                <DeleteIcon $isCompact={true} onClick={(e) => handleDeleteClick(e, game)}>
                                   <MdDelete />
                                 </DeleteIcon>
-                                <CollectionIcon>
+                                <CollectionIcon $isCompact={true}>
                                   <MdLibraryAddCheck />
                                 </CollectionIcon>
                               </>
                             ) : (
                               <>
                                 <AddIcon
+                                  $isCompact={true}
                                   onClick={(e) => handleAddToCollection(e, game)}
                                   inCollection={false}
                                 >
@@ -382,6 +383,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                                 </AddIcon>
                                 {game.wished ? (
                                   <CompactWishlistIcon
+                                    $isCompact={true}
                                     onClick={(e) => handleDeleteClick(e, game)}
                                   >
                                     <MdFavorite />
@@ -389,6 +391,7 @@ const CollectionGrid: React.FC<CollectionGridProps> = ({
                                 ) : (
                                   !game.owned && (
                                     <CompactWishlistIcon
+                                      $isCompact={true}
                                       onClick={(e) => handleToggleWishlist(e, game)}
                                     >
                                       <MdFavoriteBorder />
