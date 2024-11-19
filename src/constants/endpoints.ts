@@ -4,6 +4,7 @@ export const ENDPOINTS = {
   GET_USER_STATS: "/users/me/stats",
   UPDATE_USER_ME: "/users/me",
   UPDATE_USER: (id: string) => `/users/${id}`,
+  UPDATE_USER_AVATAR: "/users/me/avatar",
   DELETE_USER: (id: string) => `/users/${id}`,
   LOGIN: "/auth/login",
   GET_GAMES_HOME: "/games/home",

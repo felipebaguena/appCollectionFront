@@ -157,6 +157,28 @@ export const useUserActions = () => {
     }
   };
 
+  const updateAvatar = async (file: File) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const response = await api.postFormData<{
+        id: number;
+        avatarPath: string;
+      }>(ENDPOINTS.UPDATE_USER_AVATAR, formData);
+
+      setIsLoading(false);
+      return response;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
   return {
     createUser,
     getUser,
@@ -164,6 +186,7 @@ export const useUserActions = () => {
     deleteUser,
     login,
     getUserStats,
+    updateAvatar,
     isLoading,
     error,
   };
