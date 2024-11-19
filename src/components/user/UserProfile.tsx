@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
-import { useUserActions } from '@/hooks/useUserActions';
 import { FiEdit } from 'react-icons/fi';
 import Modal from '@/components/ui/Modal';
 import UserProfileModal from '@/components/user/UserProfileModal';
-import Button from '@/components/ui/Button';
 import { getImageUrl } from '@/services/api';
-import Link from 'next/link';
+import { useUserActions } from '@/hooks/useUserActions';
+import FullPageSpinner from '@/components/ui/FullPageSpinner';
 import {
     SectionHeader,
     ProfileContainer,
@@ -24,57 +22,14 @@ import {
     StatValue,
     StatLabel,
     HiddenFileInput,
+    StyledLink,
+    GameCard,
+    GameImage,
+    GameTitle,
+    EditButtonText,
+    EditButtonWrapper,
+    UserData,
 } from './UserProfileElements';
-import FullPageSpinner from '@/components/ui/FullPageSpinner';
-
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
-`;
-
-const GameCard = styled.div`
-  background: white;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  transition: transform 0.2s;
-  cursor: pointer;
-
-  &:hover {
-    transform: translateY(-5px);
-  }
-`;
-
-const GameImage = styled.img`
-  width: 100%;
-  aspect-ratio: 3/4;
-  object-fit: cover;
-  display: block;
-`;
-
-const GameTitle = styled.div`
-  padding: 0.75rem;
-  font-size: 0.9rem;
-  text-align: center;
-  color: var(--dark-grey);
-  font-weight: 600;
-  background-color: var(--app-yellow);
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  height: 2.8rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  white-space: normal;
-`;
-
-interface UserData {
-    nik: string;
-    name: string;
-    email: string;
-    avatarPath?: string;
-}
 
 const UserProfile = () => {
     const [showEditModal, setShowEditModal] = useState(false);
@@ -137,14 +92,13 @@ const UserProfile = () => {
     if (error) return <div>Error: {error}</div>;
 
     const editButton = (
-        <Button
+        <EditButtonWrapper
             $variant="primary"
             onClick={() => setShowEditModal(true)}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
         >
             <FiEdit size={18} />
-            Editar Perfil
-        </Button>
+            <EditButtonText>Editar Perfil</EditButtonText>
+        </EditButtonWrapper>
     );
 
     return (

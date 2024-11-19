@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 import { FiEdit } from 'react-icons/fi';
+import Button from '../ui/Button';
+import Link from 'next/link';
 
 export const ProfileContainer = styled.div`
   max-width: 1200px;
@@ -64,7 +66,7 @@ export const HeaderAvatar = styled.img`
 
 export const HeaderNik = styled.h2`
   font-size: 1.5rem;
-  color: white;
+  color: var(--app-yellow);
   margin-left: 7rem;
 `;
 
@@ -78,33 +80,6 @@ export const ProfileInfo = styled.div`
 export const InfoItem = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
-`;
-
-export const AvatarSection = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-`;
-
-export const AvatarImage = styled.img`
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid var(--app-yellow);
-`;
-
-export const NikName = styled.div`
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--dark-grey);
-`;
-
-export const UserInfoSection = styled.div`
-  display: flex;
-  flex-direction: column;
   gap: 1rem;
 `;
 
@@ -152,21 +127,11 @@ export const GamesList = styled.div`
     gap: 1rem;
     padding: 1.5rem;
     
-    & > *:nth-child(1) { 
-      grid-area: game1; 
-    }
-    & > *:nth-child(2) { 
-      grid-area: game2; 
-    }
-    & > *:nth-child(3) { 
-      grid-area: game3; 
-    }
-    & > *:nth-child(4) { 
-      grid-area: game4; 
-    }
-    & > *:nth-child(5) { 
-      grid-area: game5; 
-    }
+    & > *:nth-child(1) { grid-area: game1; }
+    & > *:nth-child(2) { grid-area: game2; }
+    & > *:nth-child(3) { grid-area: game3; }
+    & > *:nth-child(4) { grid-area: game4; }
+    & > *:nth-child(5) { grid-area: game5; }
   }
 
   @media (max-width: 480px) {
@@ -200,7 +165,7 @@ export const StatLabel = styled.div`
 `;
 
 export const Title = styled.h2`
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   color: white;
   margin: 0;
 `;
@@ -249,3 +214,69 @@ export const EditIcon = styled(FiEdit)`
 export const HiddenFileInput = styled.input`
   display: none;
 `;
+
+export const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
+
+export const GameCard = styled.div`
+  background: white;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+`;
+
+export const GameImage = styled.img`
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  display: block;
+`;
+
+export const GameTitle = styled.div`
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  text-align: center;
+  color: var(--dark-grey);
+  font-weight: 600;
+  background-color: var(--app-yellow);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 2.8rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
+`;
+
+export const EditButtonText = styled.span`
+  @media (max-width: 480px) {
+    display: none;
+  }
+`;
+
+export const EditButtonWrapper = styled(Button)`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  @media (max-width: 480px) {
+    padding: 0.5rem;
+    min-width: auto;
+  }
+`;
+
+export interface UserData {
+    nik: string;
+    name: string;
+    email: string;
+    avatarPath?: string;
+}
