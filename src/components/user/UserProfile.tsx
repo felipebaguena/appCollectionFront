@@ -60,6 +60,7 @@ const GameTitle = styled.div`
 `;
 
 interface UserData {
+    nik: string;
     name: string;
     email: string;
 }
@@ -113,6 +114,10 @@ const UserProfile = () => {
             />
 
             <ProfileInfo>
+                <InfoItem>
+                    <Label>Nik:</Label>
+                    <Value>{userData?.nik || 'No disponible'}</Value>
+                </InfoItem>
                 <InfoItem>
                     <Label>Nombre:</Label>
                     <Value>{userData?.name || 'No disponible'}</Value>

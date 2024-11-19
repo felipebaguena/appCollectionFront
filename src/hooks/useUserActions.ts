@@ -3,9 +3,10 @@ import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
 
 interface User {
+  nik: string;
   name: string;
   email: string;
-  password: string;
+  password?: string;
 }
 
 interface LoginResponse {
@@ -78,7 +79,7 @@ export const useUserActions = () => {
     }
   };
 
-  const updateUser = async (userData: { name: string }) => {
+  const updateUser = async (userData: { name: string; nik: string }) => {
     setIsLoading(true);
     setError(null);
 

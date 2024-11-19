@@ -17,6 +17,7 @@ interface UserProfileModalProps {
 }
 
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) => {
+    const [nik, setNik] = useState('');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const hasOpenedRef = useRef(false);
@@ -25,6 +26,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
     const fetchUserProfile = useCallback(async () => {
         const user = await getUser();
         if (user) {
+            setNik(user.nik);
             setName(user.name);
             setEmail(user.email);
         }
@@ -49,7 +51,7 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const success = await updateUser({ name });
+        const success = await updateUser({ name, nik });
         if (success) {
             onClose();
         }
@@ -58,6 +60,16 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
     return (
         <div>
             <StyledForm onSubmit={handleSubmit}>
+                <InputGroup>
+                    <Label htmlFor="nik">Nik:</Label>
+                    <Input
+                        type="text"
+                        id="nik"
+                        value={nik}
+                        onChange={(e) => setNik(e.target.value)}
+                        required
+                    />
+                </InputGroup>
                 <InputGroup>
                     <Label htmlFor="name">Nombre:</Label>
                     <Input
