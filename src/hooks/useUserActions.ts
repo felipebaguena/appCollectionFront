@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
-import { API_BASE_URL } from "@/services/api";
 
 interface User {
   name: string;
@@ -58,23 +57,16 @@ export const useUserActions = () => {
   };
 
   const updateUser = async (userData: { name: string }) => {
+    setIsLoading(true);
+    setError(null);
+
     try {
-      const response = await fetch("http://localhost:3000/users/me", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-        body: JSON.stringify(userData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update user");
-      }
-
+      await api.put<User>(ENDPOINTS.UPDATE_USER_ME, "", userData);
+      setIsLoading(false);
       return true;
     } catch (error) {
-      console.error("Error updating user:", error);
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
       return false;
     }
   };

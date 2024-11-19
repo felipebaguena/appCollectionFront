@@ -8,7 +8,6 @@ import {
     InputGroup,
     Label,
     Input,
-    Message,
     ButtonContainer
 } from '@/components/ui/FormElements';
 
@@ -20,20 +19,16 @@ interface UserProfileModalProps {
 const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [message, setMessage] = useState('');
     const hasOpenedRef = useRef(false);
-    const { getUser, updateUser, isLoading, error } = useUserActions();
-    const [isEditing, setIsEditing] = useState(false);
+    const { getUser, updateUser, isLoading } = useUserActions();
 
     const fetchUserProfile = useCallback(async () => {
         const user = await getUser();
         if (user) {
             setName(user.name);
             setEmail(user.email);
-        } else {
-            setMessage(error || 'No se pudo obtener el perfil del usuario');
         }
-    }, [getUser, error]);
+    }, [getUser]);
 
     useEffect(() => {
         if (isOpen && !hasOpenedRef.current) {
@@ -46,43 +41,17 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
 
     if (!isOpen) return null;
 
-    const handleEditClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsEditing(true);
-    }, []);
-
-    const handleCloseClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsEditing(false);
-        onClose()
-    }, []);
-
     const handleCancelEdit = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         e.stopPropagation();
-        setIsEditing(false);
-        fetchUserProfile();
-    }, []);
+        onClose();
+    }, [onClose]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setMessage('');
-
-        try {
-            const success = await updateUser({ name });
-
-            if (success) {
-                setMessage('Perfil actualizado con éxito');
-                setIsEditing(false);
-                setTimeout(() => setMessage(''), 2000);
-            } else {
-                setMessage(error || 'No se pudo actualizar el perfil');
-            }
-        } catch (err) {
-            console.error('Error al actualizar el perfil:', err);
-            setMessage('Ocurrió un error al actualizar el perfil');
+        const success = await updateUser({ name });
+        if (success) {
+            onClose();
         }
     };
 
@@ -97,7 +66,6 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         required
-                        disabled={!isEditing}
                     />
                 </InputGroup>
                 <InputGroup>
@@ -110,21 +78,24 @@ const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onClose }) 
                         disabled
                     />
                 </InputGroup>
-                {isEditing ? (
-                    <ButtonContainer>
-                        <Button type="button" $variant="cancel" onClick={handleCancelEdit} disabled={isLoading}>Cancelar</Button>
-                        <Button type="submit" $variant="primary" disabled={isLoading}>
-                            {isLoading ? 'Actualizando...' : 'Actualizar Perfil'}
-                        </Button>
-                    </ButtonContainer>
-                ) : (
-                    <ButtonContainer>
-                        <Button type="button" $variant="cancel" onClick={handleCloseClick}>Cerrar</Button>
-                        <Button type="button" $variant="primary" onClick={handleEditClick}>Editar</Button>
-                    </ButtonContainer>
-                )}
+                <ButtonContainer>
+                    <Button
+                        type="button"
+                        $variant="cancel"
+                        onClick={handleCancelEdit}
+                        disabled={isLoading}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        type="submit"
+                        $variant="primary"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Actualizando...' : 'Actualizar Perfil'}
+                    </Button>
+                </ButtonContainer>
             </StyledForm>
-            {message && <Message error={!!error}>{message}</Message>}
         </div>
     );
 };

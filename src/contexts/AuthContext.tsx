@@ -3,10 +3,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { jwtDecode } from "jwt-decode";
 
+interface User {
+    name: string;
+    email: string;
+}
+
 interface AuthContextType {
     isAuthenticated: boolean;
     userRole: string | null;
     loading: boolean;
+    user: User | null;
     login: (token: string) => void;
     logout: () => void;
 }
@@ -17,14 +23,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [userRole, setUserRole] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
         const checkAuth = async () => {
             const token = localStorage.getItem('access_token');
             if (token) {
                 try {
-                    const decodedToken = jwtDecode<{ role: string }>(token);
+                    const decodedToken = jwtDecode<{ role: string; name: string; email: string }>(token);
                     setUserRole(decodedToken.role);
+                    setUser({
+                        name: decodedToken.name,
+                        email: decodedToken.email
+                    });
                     setIsAuthenticated(true);
                 } catch (error) {
                     console.error('Error decodificando token:', error);
@@ -40,8 +51,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('access_token', token);
         setIsAuthenticated(true);
         try {
-            const decodedToken = jwtDecode<{ role: string }>(token);
+            const decodedToken = jwtDecode<{ role: string; name: string; email: string }>(token);
             setUserRole(decodedToken.role);
+            setUser({
+                name: decodedToken.name,
+                email: decodedToken.email
+            });
         } catch (error) {
             console.error('Error decodificando token:', error);
         }
@@ -51,10 +66,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('access_token');
         setIsAuthenticated(false);
         setUserRole(null);
+        setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, userRole, loading, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, userRole, loading, user, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

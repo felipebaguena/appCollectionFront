@@ -32,7 +32,6 @@ import { usePathname } from 'next/navigation';
 const Navbar = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showRegisterForm, setShowRegisterForm] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [showManagementMenu, setShowManagementMenu] = useState(false);
 
@@ -55,11 +54,7 @@ const Navbar = () => {
       return (
         <IconsContainer>
           <IconNavLink
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              setShowProfileModal(true);
-            }}
+            href="/profile"
             title="Mi Perfil"
           >
             <FiUser size={20} />
@@ -207,13 +202,6 @@ const Navbar = () => {
           title="Crear Usuario"
         >
           <CreateUserForm onClose={() => setShowRegisterForm(false)} />
-        </Modal>
-        <Modal
-          isOpen={showProfileModal}
-          onClose={() => setShowProfileModal(false)}
-          title="Mi Perfil"
-        >
-          <UserProfileModal isOpen={showProfileModal} onClose={() => setShowProfileModal(false)} />
         </Modal>
         <ConfirmationModal
           isOpen={showLogoutConfirmation}
