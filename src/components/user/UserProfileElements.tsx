@@ -143,6 +143,41 @@ export const GamesList = styled.div`
   background: var(--mid-grey);
   gap: 1.5rem;
   padding: 2rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-areas: 
+      "game1 game1 game1 game2 game2 game2"
+      "game3 game3 game4 game4 game5 game5";
+    gap: 1rem;
+    padding: 1.5rem;
+    
+    & > *:nth-child(1) { 
+      grid-area: game1; 
+    }
+    & > *:nth-child(2) { 
+      grid-area: game2; 
+    }
+    & > *:nth-child(3) { 
+      grid-area: game3; 
+    }
+    & > *:nth-child(4) { 
+      grid-area: game4; 
+    }
+    & > *:nth-child(5) { 
+      grid-area: game5; 
+    }
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas: 
+      "game1 game1"
+      "game2 game3"
+      "game4 game5";
+    gap: 0.8rem;
+    padding: 1rem;
+  }
 `;
 
 export const GamesSection = styled.div`

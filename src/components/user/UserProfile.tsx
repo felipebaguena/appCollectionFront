@@ -59,6 +59,14 @@ const GameTitle = styled.div`
   font-weight: 600;
   background-color: var(--app-yellow);
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 2.8rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  white-space: normal;
 `;
 
 interface UserData {
