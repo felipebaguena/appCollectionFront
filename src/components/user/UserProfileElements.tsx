@@ -15,29 +15,36 @@ export const HeaderContainer = styled.div`
   padding: 0 2rem;
   height: 4rem;
   width: 100%;
+  position: relative;
 `;
 
-export const Title = styled.h2`
+export const HeaderAvatarSection = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+export const HeaderAvatar = styled.img`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--app-yellow);
+  position: absolute;
+  top: -20px;
+  left: 0;
+`;
+
+export const HeaderNik = styled.h2`
   font-size: 1.5rem;
   color: white;
-  margin: 0;
+  margin: 0 0 0 100px;
 `;
-
-interface SectionHeaderProps {
-    title: string;
-    rightContent?: React.ReactNode;
-}
-
-export const SectionHeader = ({ title, rightContent }: SectionHeaderProps) => (
-    <HeaderContainer>
-        <Title>{title}</Title>
-        {rightContent}
-    </HeaderContainer>
-);
 
 export const ProfileInfo = styled.div`
   display: flex;
-  gap: 4rem;
+  gap: 2rem;
   padding: 2rem;
   background-color: var(--light-grey);
 `;
@@ -45,6 +52,33 @@ export const ProfileInfo = styled.div`
 export const InfoItem = styled.div`
   display: flex;
   align-items: center;
+  gap: 1rem;
+`;
+
+export const AvatarSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+`;
+
+export const AvatarImage = styled.img`
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--app-yellow);
+`;
+
+export const NikName = styled.div`
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--dark-grey);
+`;
+
+export const UserInfoSection = styled.div`
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
 `;
 
@@ -102,4 +136,35 @@ export const StatLabel = styled.div`
   font-size: 1rem;
   margin-top: 0.75rem;
   font-weight: 500;
-`; 
+`;
+
+export const Title = styled.h2`
+  font-size: 1.5rem;
+  color: white;
+  margin: 0;
+`;
+
+interface SectionHeaderProps {
+    title?: string;
+    rightContent?: React.ReactNode;
+    avatarUrl?: string;
+    nik?: string;
+}
+
+export const SectionHeader = ({ title, rightContent, avatarUrl, nik }: SectionHeaderProps) => (
+    <HeaderContainer>
+        <HeaderAvatarSection>
+            {avatarUrl && (
+                <>
+                    <HeaderAvatar
+                        src={avatarUrl}
+                        alt="Avatar"
+                    />
+                    <HeaderNik>{nik}</HeaderNik>
+                </>
+            )}
+            {title && <Title>{title}</Title>}
+        </HeaderAvatarSection>
+        {rightContent}
+    </HeaderContainer>
+); 

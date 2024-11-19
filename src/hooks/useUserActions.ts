@@ -2,11 +2,19 @@ import { useState } from "react";
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
 
+interface Role {
+  id: number;
+  name: string;
+}
+
 interface User {
+  id: number;
   nik: string;
   name: string;
   email: string;
   password?: string;
+  avatarPath?: string;
+  role: Role;
 }
 
 interface LoginResponse {

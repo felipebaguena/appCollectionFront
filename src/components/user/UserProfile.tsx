@@ -23,6 +23,10 @@ import {
     StatItem,
     StatValue,
     StatLabel,
+    AvatarSection,
+    AvatarImage,
+    NikName,
+    UserInfoSection,
 } from './UserProfileElements';
 
 const StyledLink = styled(Link)`
@@ -63,6 +67,7 @@ interface UserData {
     nik: string;
     name: string;
     email: string;
+    avatarPath?: string;
 }
 
 const UserProfile = () => {
@@ -109,15 +114,12 @@ const UserProfile = () => {
     return (
         <ProfileContainer>
             <SectionHeader
-                title="Mi Perfil"
+                avatarUrl={userData?.avatarPath ? getImageUrl(userData.avatarPath) : '/default-avatar.png'}
+                nik={userData?.nik}
                 rightContent={editButton}
             />
 
             <ProfileInfo>
-                <InfoItem>
-                    <Label>Nik:</Label>
-                    <Value>{userData?.nik || 'No disponible'}</Value>
-                </InfoItem>
                 <InfoItem>
                     <Label>Nombre:</Label>
                     <Value>{userData?.name || 'No disponible'}</Value>
