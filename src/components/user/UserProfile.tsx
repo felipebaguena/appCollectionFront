@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useUserActions } from '@/hooks/useUserActions';
 import { FiEdit } from 'react-icons/fi';
@@ -23,11 +23,9 @@ import {
     StatItem,
     StatValue,
     StatLabel,
-    AvatarSection,
-    AvatarImage,
-    NikName,
-    UserInfoSection,
+    HiddenFileInput,
 } from './UserProfileElements';
+import FullPageSpinner from '@/components/ui/FullPageSpinner';
 
 const StyledLink = styled(Link)`
   text-decoration: none;
@@ -74,7 +72,9 @@ const UserProfile = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [userStats, setUserStats] = useState<any>(null);
-    const { getUser, getUserStats, isLoading, error } = useUserActions();
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
+    const { getUser, getUserStats, updateAvatar, isLoading, error } = useUserActions();
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleCloseModal = async () => {
         const updatedUser = await getUser();
@@ -84,20 +84,48 @@ const UserProfile = () => {
         setShowEditModal(false);
     };
 
+    const handleAvatarClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        try {
+            const response = await updateAvatar(file);
+            if (response) {
+                const updatedUser = await getUser();
+                if (updatedUser) {
+                    setUserData(updatedUser);
+                }
+            }
+        } catch (error) {
+            console.error('Error al actualizar el avatar:', error);
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
-            const [user, stats] = await Promise.all([
-                getUser(),
-                getUserStats()
-            ]);
-            if (user) setUserData(user);
-            if (stats) setUserStats(stats);
+            try {
+                const [user, stats] = await Promise.all([
+                    getUser(),
+                    getUserStats()
+                ]);
+                if (user) setUserData(user);
+                if (stats) setUserStats(stats);
+            } finally {
+                setIsDataLoaded(true);
+            }
         };
 
         fetchData();
     }, []);
 
-    if (isLoading) return <div>Cargando...</div>;
+    if (!isDataLoaded || isLoading) {
+        return <FullPageSpinner />;
+    }
+
     if (error) return <div>Error: {error}</div>;
 
     const editButton = (
@@ -117,6 +145,13 @@ const UserProfile = () => {
                 avatarUrl={userData?.avatarPath ? getImageUrl(userData.avatarPath) : '/default-avatar.png'}
                 nik={userData?.nik}
                 rightContent={editButton}
+                onAvatarClick={handleAvatarClick}
+            />
+            <HiddenFileInput
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
             />
 
             <ProfileInfo>

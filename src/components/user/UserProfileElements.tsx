@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { FiEdit } from 'react-icons/fi';
 
 export const ProfileContainer = styled.div`
   max-width: 1200px;
@@ -23,23 +24,48 @@ export const HeaderAvatarSection = styled.div`
   display: flex;
   align-items: center;
   gap: 1rem;
+  height: 100%;
+`;
+
+export const HeaderAvatarContainer = styled.div`
+  position: absolute;
+  width: 6rem;
+  height: 6rem;
+  cursor: pointer;
+  top: 50%;
+  transform: translateY(-50%);
+  
+  &:hover::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &:hover svg {
+    opacity: 1;
+  }
 `;
 
 export const HeaderAvatar = styled.img`
-  width: 80px;
-  height: 80px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid var(--app-yellow);
-  position: absolute;
-  top: -20px;
-  left: 0;
 `;
 
 export const HeaderNik = styled.h2`
   font-size: 1.5rem;
   color: white;
-  margin: 0 0 0 100px;
+  margin-left: 7rem;
 `;
 
 export const ProfileInfo = styled.div`
@@ -149,17 +175,21 @@ interface SectionHeaderProps {
     rightContent?: React.ReactNode;
     avatarUrl?: string;
     nik?: string;
+    onAvatarClick?: () => void;
 }
 
-export const SectionHeader = ({ title, rightContent, avatarUrl, nik }: SectionHeaderProps) => (
+export const SectionHeader = ({ title, rightContent, avatarUrl, nik, onAvatarClick }: SectionHeaderProps) => (
     <HeaderContainer>
         <HeaderAvatarSection>
             {avatarUrl && (
                 <>
-                    <HeaderAvatar
-                        src={avatarUrl}
-                        alt="Avatar"
-                    />
+                    <HeaderAvatarContainer onClick={onAvatarClick}>
+                        <HeaderAvatar
+                            src={avatarUrl}
+                            alt="Avatar"
+                        />
+                        <EditIcon />
+                    </HeaderAvatarContainer>
                     <HeaderNik>{nik}</HeaderNik>
                 </>
             )}
@@ -167,4 +197,20 @@ export const SectionHeader = ({ title, rightContent, avatarUrl, nik }: SectionHe
         </HeaderAvatarSection>
         {rightContent}
     </HeaderContainer>
-); 
+);
+
+export const EditIcon = styled(FiEdit)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 1;
+`;
+
+export const HiddenFileInput = styled.input`
+  display: none;
+`;
