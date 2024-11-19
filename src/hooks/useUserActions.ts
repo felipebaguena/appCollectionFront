@@ -12,6 +12,28 @@ interface LoginResponse {
   access_token: string;
 }
 
+interface CoverImage {
+  id: number;
+  path: string;
+}
+
+interface GameStats {
+  id: number;
+  title: string;
+  addedAt: string;
+  coverImage: CoverImage;
+}
+
+interface UserStats {
+  recentOwnedGames: GameStats[];
+  recentWishedGames: GameStats[];
+  totalStats: {
+    ownedGames: number;
+    wishedGames: number;
+    totalGames: number;
+  };
+}
+
 export const useUserActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -106,12 +128,33 @@ export const useUserActions = () => {
     }
   };
 
+  const getUserStats = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const stats = await api.get<UserStats>(ENDPOINTS.GET_USER_STATS, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+
+      setIsLoading(false);
+      return stats;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
   return {
     createUser,
     getUser,
     updateUser,
     deleteUser,
     login,
+    getUserStats,
     isLoading,
     error,
   };

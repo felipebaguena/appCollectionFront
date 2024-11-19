@@ -1,6 +1,7 @@
 export const ENDPOINTS = {
   CREATE_USER: "/users",
   GET_USER_ME: "/users/me",
+  GET_USER_STATS: "/users/me/stats",
   UPDATE_USER_ME: "/users/me",
   UPDATE_USER: (id: string) => `/users/${id}`,
   DELETE_USER: (id: string) => `/users/${id}`,

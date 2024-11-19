@@ -7,44 +7,56 @@ import { FiEdit } from 'react-icons/fi';
 import Modal from '@/components/ui/Modal';
 import UserProfileModal from '@/components/user/UserProfileModal';
 import Button from '@/components/ui/Button';
+import { getImageUrl } from '@/services/api';
+import Link from 'next/link';
+import {
+    SectionHeader,
+    ProfileContainer,
+    GamesList,
+    GamesSection,
+    ProfileInfo,
+    InfoItem,
+    Label,
+    Value,
+    StatsContainer,
+    StatsGrid,
+    StatItem,
+    StatValue,
+    StatLabel,
+} from './UserProfileElements';
 
-const ProfileContainer = styled.div`
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
 `;
 
-const ProfileHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
+const GameCard = styled.div`
+  background: white;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
 `;
 
-const ProfileTitle = styled.h1`
-  font-size: 2rem;
-  color: #333333;
+const GameImage = styled.img`
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  display: block;
 `;
 
-const ProfileInfo = styled.div`
-  display: grid;
-  gap: 1rem;
-`;
-
-const InfoItem = styled.div`
-  display: grid;
-  gap: 0.5rem;
-`;
-
-const Label = styled.span`
-  font-weight: bold;
-  color: #666666;
-`;
-
-const Value = styled.span`
-  color: #333333;
+const GameTitle = styled.div`
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  text-align: center;
+  color: var(--dark-grey);
+  font-weight: 600;
+  background-color: var(--app-yellow);
+  line-height: 1.2;
 `;
 
 interface UserData {
@@ -55,7 +67,8 @@ interface UserData {
 const UserProfile = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [userData, setUserData] = useState<UserData | null>(null);
-    const { getUser, isLoading, error } = useUserActions();
+    const [userStats, setUserStats] = useState<any>(null);
+    const { getUser, getUserStats, isLoading, error } = useUserActions();
 
     const handleCloseModal = async () => {
         const updatedUser = await getUser();
@@ -66,37 +79,38 @@ const UserProfile = () => {
     };
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            const user = await getUser();
-            if (user) {
-                setUserData(user);
-            }
+        const fetchData = async () => {
+            const [user, stats] = await Promise.all([
+                getUser(),
+                getUserStats()
+            ]);
+            if (user) setUserData(user);
+            if (stats) setUserStats(stats);
         };
 
-        fetchUserData();
+        fetchData();
     }, []);
 
-    if (isLoading) {
-        return <div>Cargando...</div>;
-    }
+    if (isLoading) return <div>Cargando...</div>;
+    if (error) return <div>Error: {error}</div>;
 
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
+    const editButton = (
+        <Button
+            $variant="primary"
+            onClick={() => setShowEditModal(true)}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        >
+            <FiEdit size={18} />
+            Editar Perfil
+        </Button>
+    );
 
     return (
         <ProfileContainer>
-            <ProfileHeader>
-                <ProfileTitle>Mi Perfil</ProfileTitle>
-                <Button
-                    $variant="primary"
-                    onClick={() => setShowEditModal(true)}
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                >
-                    <FiEdit size={18} />
-                    Editar Perfil
-                </Button>
-            </ProfileHeader>
+            <SectionHeader
+                title="Mi Perfil"
+                rightContent={editButton}
+            />
 
             <ProfileInfo>
                 <InfoItem>
@@ -108,6 +122,62 @@ const UserProfile = () => {
                     <Value>{userData?.email || 'No disponible'}</Value>
                 </InfoItem>
             </ProfileInfo>
+
+            {userStats && (
+                <>
+                    <SectionHeader title="Estadísticas de la colección" />
+                    <StatsContainer>
+                        <StatsGrid>
+                            <StatItem>
+                                <StatValue>{userStats.totalStats.totalGames}</StatValue>
+                                <StatLabel>Total de Juegos</StatLabel>
+                            </StatItem>
+                            <StatItem>
+                                <StatValue>{userStats.totalStats.ownedGames}</StatValue>
+                                <StatLabel>Juegos en Propiedad</StatLabel>
+                            </StatItem>
+                            <StatItem>
+                                <StatValue>{userStats.totalStats.wishedGames}</StatValue>
+                                <StatLabel>Lista de Deseos</StatLabel>
+                            </StatItem>
+                        </StatsGrid>
+                    </StatsContainer>
+
+                    <GamesSection>
+                        <SectionHeader title="Últimos juegos adquiridos" />
+                        <GamesList>
+                            {userStats.recentOwnedGames.map((game: any) => (
+                                <StyledLink href={`/games/${game.id}`} key={game.id}>
+                                    <GameCard>
+                                        <GameImage
+                                            src={getImageUrl(game.coverImage.path)}
+                                            alt={game.title}
+                                        />
+                                        <GameTitle>{game.title}</GameTitle>
+                                    </GameCard>
+                                </StyledLink>
+                            ))}
+                        </GamesList>
+                    </GamesSection>
+
+                    <GamesSection>
+                        <SectionHeader title="Deseados más recientes" />
+                        <GamesList>
+                            {userStats.recentWishedGames.map((game: any) => (
+                                <StyledLink href={`/games/${game.id}`} key={game.id}>
+                                    <GameCard>
+                                        <GameImage
+                                            src={getImageUrl(game.coverImage.path)}
+                                            alt={game.title}
+                                        />
+                                        <GameTitle>{game.title}</GameTitle>
+                                    </GameCard>
+                                </StyledLink>
+                            ))}
+                        </GamesList>
+                    </GamesSection>
+                </>
+            )}
 
             <Modal
                 isOpen={showEditModal}
