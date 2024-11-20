@@ -79,6 +79,15 @@ const MonthRow = styled.div`
   align-items: center;
   gap: 0.5rem;
   height: 2rem;
+  position: relative;
+`;
+
+const BackgroundBar = styled.div`
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1rem;
+  background-color: var(--bars-grey);
 `;
 
 const Bar = styled.div<{ $width: number; $type: 'owned' | 'wished' }>`
@@ -89,6 +98,7 @@ const Bar = styled.div<{ $width: number; $type: 'owned' | 'wished' }>`
   transition: width 0.3s ease;
   position: relative;
   cursor: pointer;
+  z-index: 1;
 
   &:hover {
     opacity: 0.8;
@@ -231,6 +241,7 @@ const YearlyStatsChart: React.FC<YearlyStatsProps> = ({ data }) => {
                 <BarsContainer>
                     {data.map(month => (
                         <MonthRow key={month.month}>
+                            <BackgroundBar />
                             {month.owned.count > 0 && (
                                 <Bar
                                     $width={calculateWidth(month.owned.count)}
