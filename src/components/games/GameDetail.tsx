@@ -295,7 +295,7 @@ const RelatedArticlesSection = styled.div`
   width: 100%;
   max-width: 1200px;
   margin: 2rem auto;
-  padding: 2rem;
+  padding: 1rem 0 0 0;
   background-color: var(--background);
 
   @media (max-width: 768px) {
