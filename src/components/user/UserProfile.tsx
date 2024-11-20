@@ -29,8 +29,18 @@ import {
     EditButtonText,
     EditButtonWrapper,
     UserData,
+    StatHeader,
+    StatIcon,
 } from './UserProfileElements';
 import YearlyStatsChart from '../stats/YearlyStatsChart';
+import {
+    IoGameController,
+    IoLibrary,
+    IoHeart,
+    IoDesktop,
+    IoGrid,
+    IoBusinessSharp
+} from 'react-icons/io5';
 
 
 const UserProfile = () => {
@@ -145,49 +155,83 @@ const UserProfile = () => {
                     <StatsContainer>
                         <StatsGrid>
                             <StatItem>
-                                <StatValue>{userStats.totalStats.totalGames}</StatValue>
-                                <StatLabel>Total de Juegos</StatLabel>
+                                <StatHeader>
+                                    <StatValue>{userStats.totalStats.totalGames}</StatValue>
+                                    <StatIcon>
+                                        <IoGameController size={24} />
+                                    </StatIcon>
+                                </StatHeader>
+                                <StatLabel>Total Colección</StatLabel>
                             </StatItem>
                             <StatItem>
-                                <StatValue>{userStats.totalStats.ownedGames}</StatValue>
-                                <StatLabel>Juegos en Propiedad</StatLabel>
+                                <StatHeader>
+                                    <StatValue>{userStats.totalStats.ownedGames}</StatValue>
+                                    <StatIcon>
+                                        <IoLibrary size={24} />
+                                    </StatIcon>
+                                </StatHeader>
+                                <StatLabel>En Propiedad</StatLabel>
                             </StatItem>
                             <StatItem>
-                                <StatValue>{userStats.totalStats.wishedGames}</StatValue>
-                                <StatLabel>Lista de Deseos</StatLabel>
+                                <StatHeader>
+                                    <StatValue>{userStats.totalStats.wishedGames}</StatValue>
+                                    <StatIcon>
+                                        <IoHeart size={24} />
+                                    </StatIcon>
+                                </StatHeader>
+                                <StatLabel>Deseados</StatLabel>
                             </StatItem>
                             {userStats.favoritePlatform && (
                                 <StatItem>
-                                    <StatValue>{userStats.favoritePlatform.gamesCount}</StatValue>
+                                    <StatHeader>
+                                        <StatValue>{userStats.favoritePlatform.gamesCount}</StatValue>
+                                        <StatIcon>
+                                            <IoDesktop size={24} />
+                                        </StatIcon>
+                                    </StatHeader>
                                     <StatLabel>
                                         Plataforma Favorita
-                                        <br />
-                                        {userStats.favoritePlatform.name}
+                                        <span>{userStats.favoritePlatform.name}</span>
                                     </StatLabel>
                                 </StatItem>
                             )}
                             {userStats.favoriteGenre && (
                                 <StatItem>
-                                    <StatValue>{userStats.favoriteGenre.gamesCount}</StatValue>
+                                    <StatHeader>
+                                        <StatValue>{userStats.favoriteGenre.gamesCount}</StatValue>
+                                        <StatIcon>
+                                            <IoGrid size={24} />
+                                        </StatIcon>
+                                    </StatHeader>
                                     <StatLabel>
                                         Género Favorito
-                                        <br />
-                                        {userStats.favoriteGenre.name}
+                                        <span>{userStats.favoriteGenre.name}</span>
                                     </StatLabel>
                                 </StatItem>
                             )}
                             {userStats.favoriteDeveloper && (
                                 <StatItem>
-                                    <StatValue>{userStats.favoriteDeveloper.gamesCount}</StatValue>
+                                    <StatHeader>
+                                        <StatValue>{userStats.favoriteDeveloper.gamesCount}</StatValue>
+                                        <StatIcon>
+                                            <IoBusinessSharp size={24} />
+                                        </StatIcon>
+                                    </StatHeader>
                                     <StatLabel>
                                         Desarrollador Favorito
-                                        <br />
-                                        {userStats.favoriteDeveloper.name}
+                                        <span>{userStats.favoriteDeveloper.name}</span>
                                     </StatLabel>
                                 </StatItem>
                             )}
                         </StatsGrid>
                     </StatsContainer>
+
+                    {yearlyStats && (
+                        <GamesSection>
+                            <SectionHeader title="Estadísticas anuales" />
+                            <YearlyStatsChart data={yearlyStats.months} />
+                        </GamesSection>
+                    )}
 
                     <GamesSection>
                         <SectionHeader title="Últimos juegos adquiridos" />
@@ -223,13 +267,6 @@ const UserProfile = () => {
                         </GamesList>
                     </GamesSection>
                 </>
-            )}
-
-            {yearlyStats && (
-                <GamesSection>
-                    <SectionHeader title="Estadísticas anuales" />
-                    <YearlyStatsChart data={yearlyStats.months} />
-                </GamesSection>
             )}
 
             <Modal

@@ -120,10 +120,46 @@ export const StatsGrid = styled.div`
 `;
 
 export const StatItem = styled.div`
-  text-align: center;
-  padding: 1.5rem;
-  background: white;
+  background: var(--mid-grey);
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  padding: 1rem;
+`;
+
+export const StatHeader = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+export const StatValue = styled.div`
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--app-yellow);
+`;
+
+export const StatIcon = styled.div`
+  font-size: 2rem;
+  color: var(--app-yellow);
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  margin-left: 0.6rem;
+`;
+
+export const StatLabel = styled.div`
+  color: white;
+  font-size: 0.875rem;
+  line-height: 1.4;
+
+  span {
+    display: block;
+    color: var(--app-yellow);
+    font-weight: 600;
+    margin-top: 0.25rem;
+  }
 `;
 
 export const GamesList = styled.div`
@@ -163,19 +199,6 @@ export const GamesSection = styled.div`
   &:last-child {
     margin-bottom: 2rem;
   }
-`;
-
-export const StatValue = styled.div`
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--app-yellow);
-`;
-
-export const StatLabel = styled.div`
-  color: #666;
-  font-size: 1rem;
-  margin-top: 0.75rem;
-  font-weight: 500;
 `;
 
 export const Title = styled.h2`
