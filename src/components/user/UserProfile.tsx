@@ -156,6 +156,16 @@ const UserProfile = () => {
                                 <StatValue>{userStats.totalStats.wishedGames}</StatValue>
                                 <StatLabel>Lista de Deseos</StatLabel>
                             </StatItem>
+                            {userStats.favoritePlatform && (
+                                <StatItem>
+                                    <StatValue>{userStats.favoritePlatform.gamesCount}</StatValue>
+                                    <StatLabel>
+                                        Plataforma Favorita
+                                        <br />
+                                        {userStats.favoritePlatform.name}
+                                    </StatLabel>
+                                </StatItem>
+                            )}
                         </StatsGrid>
                     </StatsContainer>
 
