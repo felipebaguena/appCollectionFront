@@ -2,10 +2,18 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { jwtDecode } from "jwt-decode";
+import { useUserActions } from '@/hooks/useUserActions';
 
 interface User {
+    id: number;
+    nik: string;
     name: string;
     email: string;
+    avatarPath?: string;
+    role: {
+        id: number;
+        name: string;
+    };
 }
 
 interface AuthContextType {
@@ -24,19 +32,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [userRole, setUserRole] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState<User | null>(null);
+    const { getUser } = useUserActions();
+
+    const fetchUserData = async () => {
+        try {
+            const userData = await getUser();
+            if (userData) {
+                setUser(userData);
+            }
+        } catch (error) {
+            console.error('Error fetching user data:', error);
+        }
+    };
 
     useEffect(() => {
         const checkAuth = async () => {
             const token = localStorage.getItem('access_token');
             if (token) {
                 try {
-                    const decodedToken = jwtDecode<{ role: string; name: string; email: string }>(token);
+                    const decodedToken = jwtDecode<{ role: string }>(token);
                     setUserRole(decodedToken.role);
-                    setUser({
-                        name: decodedToken.name,
-                        email: decodedToken.email
-                    });
                     setIsAuthenticated(true);
+                    await fetchUserData();
                 } catch (error) {
                     console.error('Error decodificando token:', error);
                 }
@@ -47,16 +64,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         checkAuth();
     }, []);
 
-    const login = (token: string) => {
+    const login = async (token: string) => {
         localStorage.setItem('access_token', token);
         setIsAuthenticated(true);
         try {
-            const decodedToken = jwtDecode<{ role: string; name: string; email: string }>(token);
+            const decodedToken = jwtDecode<{ role: string }>(token);
             setUserRole(decodedToken.role);
-            setUser({
-                name: decodedToken.name,
-                email: decodedToken.email
-            });
+            await fetchUserData();
         } catch (error) {
             console.error('Error decodificando token:', error);
         }

@@ -343,3 +343,32 @@ export const MobileLogoText = styled.span<{ $isActive?: boolean }>`
     display: block;
   }
 `;
+
+export const UserAvatar = styled.img<{ $isActive?: boolean }>`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid ${props => props.$isActive ? 'var(--app-yellow)' : 'var(--grey)'};
+  object-fit: cover;
+  transition: border-color 0.3s ease;
+
+  &:hover {
+    border: 2px solid var(--app-yellow);
+  }
+`;
+
+export const UserName = styled.span`
+  color: var(--app-yellow);
+  font-size: 0.9rem;
+  
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+export const UserContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+`;

@@ -1,12 +1,19 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { FiLogOut, FiChevronDown, FiUser, FiBook, FiBookmark, FiSettings, FiFileText } from 'react-icons/fi';
-import CreateUserForm from '@/components/user/CreateUserForm';
-import LoginForm from '@/components/auth/LoginForm';
-import UserProfileModal from '@/components/user/UserProfileModal';
-import Modal from '@/components/ui/Modal';
-import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import React, { useState } from "react";
+import {
+  FiLogOut,
+  FiChevronDown,
+  FiUser,
+  FiBook,
+  FiBookmark,
+  FiSettings,
+  FiFileText,
+} from "react-icons/fi";
+import CreateUserForm from "@/components/user/CreateUserForm";
+import LoginForm from "@/components/auth/LoginForm";
+import Modal from "@/components/ui/Modal";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 import {
   NavbarContainer,
   NavbarContent,
@@ -25,9 +32,13 @@ import {
   NavbarSpinner,
   SpinnerContainer,
   MobileLogoText,
-} from '@/components/layout/NavbarElements';
-import { useAuth } from '@/contexts/AuthContext';
-import { usePathname } from 'next/navigation';
+  UserAvatar,
+  UserName,
+  UserContainer,
+} from "@/components/layout/NavbarElements";
+import { useAuth } from "@/contexts/AuthContext";
+import { usePathname } from "next/navigation";
+import { getImageUrl } from "@/services/api";
 
 const Navbar = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -35,29 +46,40 @@ const Navbar = () => {
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const [showManagementMenu, setShowManagementMenu] = useState(false);
 
-  const { isAuthenticated, userRole, logout, login, loading } = useAuth();
-  const pathname = usePathname() || '';
+  const { isAuthenticated, user, userRole, logout, login, loading } = useAuth();
+  const pathname = usePathname() || "";
+
+  console.log("Auth State:", { isAuthenticated, user, loading });
 
   const managementOptions = [
     { name: "Juegos", route: "/management/manage-games" },
     { name: "Plataformas", route: "/management/manage-platforms" },
     { name: "Géneros", route: "/management/manage-genres" },
     { name: "Desarrolladores", route: "/management/manage-developers" },
-    { name: "Artículos", route: "/management/manage-articles" }
+    { name: "Artículos", route: "/management/manage-articles" },
   ];
 
-  const isManagementRoute = pathname.includes('/management');
-  const isHome = pathname === '/';
+  const isManagementRoute = pathname.includes("/management");
+  const isHome = pathname === "/";
 
   const renderAuthButtons = () => {
-    if (isAuthenticated) {
+    const isProfileRoute = pathname === "/profile";
+
+    if (isAuthenticated && user) {
       return (
         <IconsContainer>
-          <IconNavLink
-            href="/profile"
-            title="Mi Perfil"
-          >
-            <FiUser size={20} />
+          <IconNavLink href="/profile" $isActive={isProfileRoute}>
+            <UserContainer>
+              {user.avatarPath ? (
+                <UserAvatar
+                  src={getImageUrl(user.avatarPath)}
+                  alt={user.name}
+                  $isActive={isProfileRoute}
+                />
+              ) : (
+                <UserName>{user.nik || user.name}</UserName>
+              )}
+            </UserContainer>
           </IconNavLink>
           <IconNavLink
             href="#"
@@ -109,7 +131,7 @@ const Navbar = () => {
   return (
     <NavbarContainer>
       <NavbarContent>
-        <NavbarSection $position='left'>
+        <NavbarSection $position="left">
           <LogoLink href="/">
             <LogoContainer $isActive={isHome}>
               <div className="full-text">
@@ -132,14 +154,14 @@ const Navbar = () => {
             <>
               <NavLink
                 href="/collection"
-                $isActive={pathname === '/collection'}
+                $isActive={pathname === "/collection"}
               >
                 <span className="nav-text">Catálogo</span>
                 <FiBook className="nav-icon" size={20} />
               </NavLink>
               <NavLink
                 href="/articles/articles-home"
-                $isActive={pathname.includes('/articles')}
+                $isActive={pathname.includes("/articles")}
               >
                 <span className="nav-text">Artículos</span>
                 <FiFileText className="nav-icon" size={20} />
@@ -147,22 +169,19 @@ const Navbar = () => {
               {isAuthenticated && (
                 <NavLink
                   href="/my-collection"
-                  $isActive={pathname === '/my-collection'}
+                  $isActive={pathname === "/my-collection"}
                 >
                   <span className="nav-text">Mi colección</span>
                   <FiBookmark className="nav-icon" size={20} />
                 </NavLink>
               )}
-              {userRole === 'SUPERUSER' && (
+              {userRole === "SUPERUSER" && (
                 <DropdownContainer
                   data-open={showManagementMenu}
                   onMouseEnter={() => setShowManagementMenu(true)}
                   onMouseLeave={() => setShowManagementMenu(false)}
                 >
-                  <DropdownTrigger
-                    href="#"
-                    $isActive={isManagementRoute}
-                  >
+                  <DropdownTrigger href="#" $isActive={isManagementRoute}>
                     <span className="nav-text">Gestión</span>
                     <FiSettings className="nav-icon" size={20} />
                     <FiChevronDown />
