@@ -3,6 +3,7 @@ import { styled } from 'styled-components';
 import { getImageUrl } from '@/services/api';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
+import { GameCard, GameImage as GameModalImage, GameTitle as GameModalTitle, StyledLink } from '../user/UserProfileElements';
 
 interface GameYearStats {
     id: number;
@@ -45,7 +46,7 @@ const ChartContainer = styled.div`
   display: flex;
   gap: 1rem;
   padding: 2rem;
-  height: 500px;
+  height: auto;
   background: var(--light-grey);
 `;
 
@@ -126,26 +127,6 @@ const ModalContent = styled.div`
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 1rem;
   padding: 1rem;
-`;
-
-const GameCard = styled.div`
-  background: white;
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-`;
-
-const GameModalImage = styled.img`
-  width: 100%;
-  aspect-ratio: 3/4;
-  object-fit: cover;
-`;
-
-const GameModalTitle = styled.div`
-  padding: 0.75rem;
-  font-size: 0.875rem;
-  text-align: center;
-  color: var(--dark-grey);
 `;
 
 const CloseButtonContainer = styled.div`
@@ -282,13 +263,15 @@ const YearlyStatsChart: React.FC<YearlyStatsProps> = ({ data }) => {
                 >
                     <ModalContent>
                         {selectedGames.games.map(game => (
-                            <GameCard key={game.id}>
-                                <GameModalImage
-                                    src={getImageUrl(game.coverImage.path)}
-                                    alt={game.title}
-                                />
-                                <GameModalTitle>{game.title}</GameModalTitle>
-                            </GameCard>
+                            <StyledLink href={`/games/${game.id}`} key={game.id}>
+                                <GameCard>
+                                    <GameModalImage
+                                        src={getImageUrl(game.coverImage.path)}
+                                        alt={game.title}
+                                    />
+                                    <GameModalTitle>{game.title}</GameModalTitle>
+                                </GameCard>
+                            </StyledLink>
                         ))}
                     </ModalContent>
                     <CloseButtonContainer>

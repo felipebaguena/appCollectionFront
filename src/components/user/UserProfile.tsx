@@ -32,6 +32,7 @@ import {
 } from './UserProfileElements';
 import YearlyStatsChart from '../stats/YearlyStatsChart';
 
+
 const UserProfile = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [userData, setUserData] = useState<UserData | null>(null);
