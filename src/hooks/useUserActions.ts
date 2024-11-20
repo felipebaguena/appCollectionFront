@@ -40,6 +40,13 @@ interface FavoritePlatform {
   gamesCount: number;
 }
 
+interface FavoriteStats {
+  id: number;
+  name: string;
+  code: string;
+  gamesCount: number;
+}
+
 interface UserStats {
   recentOwnedGames: GameStats[];
   recentWishedGames: GameStats[];
@@ -49,6 +56,8 @@ interface UserStats {
     totalGames: number;
   };
   favoritePlatform: FavoritePlatform;
+  favoriteGenre: FavoriteStats;
+  favoriteDeveloper: FavoriteStats;
 }
 
 interface GameYearStats {

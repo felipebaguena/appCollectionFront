@@ -166,6 +166,26 @@ const UserProfile = () => {
                                     </StatLabel>
                                 </StatItem>
                             )}
+                            {userStats.favoriteGenre && (
+                                <StatItem>
+                                    <StatValue>{userStats.favoriteGenre.gamesCount}</StatValue>
+                                    <StatLabel>
+                                        Género Favorito
+                                        <br />
+                                        {userStats.favoriteGenre.name}
+                                    </StatLabel>
+                                </StatItem>
+                            )}
+                            {userStats.favoriteDeveloper && (
+                                <StatItem>
+                                    <StatValue>{userStats.favoriteDeveloper.gamesCount}</StatValue>
+                                    <StatLabel>
+                                        Desarrollador Favorito
+                                        <br />
+                                        {userStats.favoriteDeveloper.name}
+                                    </StatLabel>
+                                </StatItem>
+                            )}
                         </StatsGrid>
                     </StatsContainer>
 
