@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { styled } from 'styled-components';
 import { getImageUrl } from '@/services/api';
 import Modal from '@/components/ui/Modal';
@@ -49,18 +49,21 @@ const ChartContainer = styled.div`
   background: var(--light-grey);
 `;
 
-const MonthsAxis = styled.div`
+const MonthsAxis = styled.div<{ $isWide: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 0.5rem 0;
+  min-width: ${({ $isWide }) => $isWide ? '6rem' : '3rem'};
+  width: auto;
 `;
 
 const MonthLabel = styled.span`
   font-size: 0.875rem;
   color: var(--dark-grey);
   text-transform: capitalize;
-  width: 3rem;
+  width: auto;
+  white-space: nowrap;
 `;
 
 const BarsContainer = styled.div`
@@ -141,20 +144,20 @@ const CloseButtonContainer = styled.div`
   padding: 1rem;
 `;
 
-const formatMonth = (dateString: string) => {
+const formatMonth = (dateString: string, full: boolean = false) => {
     const months = {
-        '01': 'Ene',
-        '02': 'Feb',
-        '03': 'Mar',
-        '04': 'Abr',
-        '05': 'May',
-        '06': 'Jun',
-        '07': 'Jul',
-        '08': 'Ago',
-        '09': 'Sep',
-        '10': 'Oct',
-        '11': 'Nov',
-        '12': 'Dic'
+        '01': full ? 'Enero' : 'Ene',
+        '02': full ? 'Febrero' : 'Feb',
+        '03': full ? 'Marzo' : 'Mar',
+        '04': full ? 'Abril' : 'Abr',
+        '05': full ? 'Mayo' : 'May',
+        '06': full ? 'Junio' : 'Jun',
+        '07': full ? 'Julio' : 'Jul',
+        '08': full ? 'Agosto' : 'Ago',
+        '09': full ? 'Septiembre' : 'Sep',
+        '10': full ? 'Octubre' : 'Oct',
+        '11': full ? 'Noviembre' : 'Nov',
+        '12': full ? 'Diciembre' : 'Dic'
     };
 
     const [, month] = dateString.split('-');
@@ -166,6 +169,19 @@ const YearlyStatsChart: React.FC<YearlyStatsProps> = ({ data }) => {
     const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition>({ x: 0, y: 0 });
     const [showTooltip, setShowTooltip] = useState(false);
     const [tooltipContent, setTooltipContent] = useState('');
+    const [isWideScreen, setIsWideScreen] = useState(window.innerWidth > 900);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsWideScreen(window.innerWidth > 900);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
     const maxGames = Math.max(...data.map(month =>
         Math.max(month.owned.count, month.wished.count)
     ));
@@ -204,10 +220,10 @@ const YearlyStatsChart: React.FC<YearlyStatsProps> = ({ data }) => {
     return (
         <>
             <ChartContainer>
-                <MonthsAxis>
+                <MonthsAxis $isWide={isWideScreen}>
                     {data.map(month => (
                         <MonthLabel key={month.month}>
-                            {formatMonth(month.month)}
+                            {formatMonth(month.month, isWideScreen)}
                         </MonthLabel>
                     ))}
                 </MonthsAxis>
@@ -251,7 +267,7 @@ const YearlyStatsChart: React.FC<YearlyStatsProps> = ({ data }) => {
                 <Modal
                     isOpen={true}
                     onClose={handleCloseModal}
-                    title={`Juegos ${selectedGames.type === 'owned' ? 'en propiedad' : 'deseados'} - ${formatMonth(selectedGames.month)}`}
+                    title={`Juegos ${selectedGames.type === 'owned' ? 'en propiedad' : 'deseados'} - ${formatMonth(selectedGames.month, true)}`}
                 >
                     <ModalContent>
                         {selectedGames.games.map(game => (
