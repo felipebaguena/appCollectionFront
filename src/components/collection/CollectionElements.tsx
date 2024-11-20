@@ -116,7 +116,6 @@ export const CloseFiltersButton = styled.button`
 
 export const ContentWrapper = styled.div`
   display: flex;
-  gap: 20px;
 `;
 
 export const ControlsRight = styled.div`
