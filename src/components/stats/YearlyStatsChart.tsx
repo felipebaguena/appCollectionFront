@@ -259,7 +259,7 @@ const YearlyStatsChart: React.FC<YearlyStatsProps> = ({ data }) => {
                 <Modal
                     isOpen={true}
                     onClose={handleCloseModal}
-                    title={`Juegos ${selectedGames.type === 'owned' ? 'en propiedad' : 'deseados'} - ${formatMonth(selectedGames.month, true)}`}
+                    title={`Juegos ${selectedGames.type === 'owned' ? 'adquiridos' : 'deseados'} en ${formatMonth(selectedGames.month, true).toLowerCase()}`}
                 >
                     <ModalContent>
                         {selectedGames.games.map(game => (
