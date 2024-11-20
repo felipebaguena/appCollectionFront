@@ -66,7 +66,7 @@ export const FiltersPanel = styled.div<{ isOpen: boolean }>`
   flex-shrink: 0;
   overflow: visible;
   transition: all 0.3s ease-in-out;
-  padding: ${props => props.isOpen ? '1.5rem' : '0'};
+  padding: ${props => props.isOpen ? '1.5rem 0 1.5rem 1.5rem' : '0'};
   opacity: ${props => props.isOpen ? '1' : '0'};
   visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
 
