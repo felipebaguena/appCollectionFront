@@ -30,13 +30,22 @@ import {
     EditButtonWrapper,
     UserData,
 } from './UserProfileElements';
+import YearlyStatsChart from '../stats/YearlyStatsChart';
 
 const UserProfile = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [userData, setUserData] = useState<UserData | null>(null);
     const [userStats, setUserStats] = useState<any>(null);
+    const [yearlyStats, setYearlyStats] = useState<any>(null);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
-    const { getUser, getUserStats, updateAvatar, isLoading, error } = useUserActions();
+    const {
+        getUser,
+        getUserStats,
+        updateAvatar,
+        getUserYearGames,
+        isLoading,
+        error
+    } = useUserActions();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleCloseModal = async () => {
@@ -71,12 +80,14 @@ const UserProfile = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [user, stats] = await Promise.all([
+                const [user, stats, yearStats] = await Promise.all([
                     getUser(),
-                    getUserStats()
+                    getUserStats(),
+                    getUserYearGames()
                 ]);
                 if (user) setUserData(user);
                 if (stats) setUserStats(stats);
+                if (yearStats) setYearlyStats(yearStats);
             } finally {
                 setIsDataLoaded(true);
             }
@@ -181,6 +192,13 @@ const UserProfile = () => {
                         </GamesList>
                     </GamesSection>
                 </>
+            )}
+
+            {yearlyStats && (
+                <GamesSection>
+                    <SectionHeader title="Estadísticas anuales" />
+                    <YearlyStatsChart data={yearlyStats.months} />
+                </GamesSection>
             )}
 
             <Modal

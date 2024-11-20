@@ -43,6 +43,29 @@ interface UserStats {
   };
 }
 
+interface GameYearStats {
+  id: number;
+  title: string;
+  addedAt: string;
+  coverImage: CoverImage;
+}
+
+interface MonthStats {
+  month: string;
+  owned: {
+    count: number;
+    games: GameYearStats[];
+  };
+  wished: {
+    count: number;
+    games: GameYearStats[];
+  };
+}
+
+interface YearlyStats {
+  months: MonthStats[];
+}
+
 export const useUserActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -179,6 +202,26 @@ export const useUserActions = () => {
     }
   };
 
+  const getUserYearGames = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const stats = await api.get<YearlyStats>(ENDPOINTS.GET_USER_YEAR_STATS, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+
+      setIsLoading(false);
+      return stats;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
   return {
     createUser,
     getUser,
@@ -187,6 +230,7 @@ export const useUserActions = () => {
     login,
     getUserStats,
     updateAvatar,
+    getUserYearGames,
     isLoading,
     error,
   };
