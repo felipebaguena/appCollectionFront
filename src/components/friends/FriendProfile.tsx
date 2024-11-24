@@ -30,6 +30,9 @@ import {
     IoGameController,
     IoLibrary,
     IoHeart,
+    IoDesktop,
+    IoGrid,
+    IoBusinessSharp,
 } from 'react-icons/io5';
 
 interface FriendProfileProps {
@@ -115,6 +118,48 @@ const FriendProfile = ({ id }: FriendProfileProps) => {
                         </StatHeader>
                         <StatLabel>Deseados</StatLabel>
                     </StatItem>
+                    {profileData?.profileStats.favoritePlatform && (
+                        <StatItem>
+                            <StatHeader>
+                                <StatValue>{profileData.profileStats.favoritePlatform.gamesCount}</StatValue>
+                                <StatIcon>
+                                    <IoDesktop size={24} />
+                                </StatIcon>
+                            </StatHeader>
+                            <StatLabel>
+                                Plataforma Favorita
+                                <span>{profileData.profileStats.favoritePlatform.name}</span>
+                            </StatLabel>
+                        </StatItem>
+                    )}
+                    {profileData?.profileStats.favoriteGenre && (
+                        <StatItem>
+                            <StatHeader>
+                                <StatValue>{profileData.profileStats.favoriteGenre.gamesCount}</StatValue>
+                                <StatIcon>
+                                    <IoGrid size={24} />
+                                </StatIcon>
+                            </StatHeader>
+                            <StatLabel>
+                                Género Favorito
+                                <span>{profileData.profileStats.favoriteGenre.name}</span>
+                            </StatLabel>
+                        </StatItem>
+                    )}
+                    {profileData?.profileStats.favoriteDeveloper && (
+                        <StatItem>
+                            <StatHeader>
+                                <StatValue>{profileData.profileStats.favoriteDeveloper.gamesCount}</StatValue>
+                                <StatIcon>
+                                    <IoBusinessSharp size={24} />
+                                </StatIcon>
+                            </StatHeader>
+                            <StatLabel>
+                                Desarrollador Favorito
+                                <span>{profileData.profileStats.favoriteDeveloper.name}</span>
+                            </StatLabel>
+                        </StatItem>
+                    )}
                 </StatsGrid>
             </StatsContainer>
 
