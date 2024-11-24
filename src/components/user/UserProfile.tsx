@@ -148,6 +148,7 @@ const UserProfile = () => {
                 nik={userData?.nik}
                 rightContent={editButton}
                 onAvatarClick={handleAvatarClick}
+                isEditable={true}
             />
             <HiddenFileInput
                 type="file"
@@ -174,7 +175,7 @@ const UserProfile = () => {
                         <FriendsList>
                             {friends.length > 0 ? (
                                 friends.map((friend) => (
-                                    <StyledLink href={`/users/${friend.id}`} key={friend.id}>
+                                    <StyledLink href={`/friends/${friend.id}`} key={friend.id}>
                                         <FriendItem>
                                             <FriendAvatar
                                                 src={friend.avatarPath ? getImageUrl(friend.avatarPath) : '/default-avatar.png'}

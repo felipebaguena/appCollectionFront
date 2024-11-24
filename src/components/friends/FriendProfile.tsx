@@ -1,0 +1,165 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { getImageUrl } from '@/services/api';
+import { useUserActions } from '@/hooks/useUserActions';
+import FullPageSpinner from '@/components/ui/FullPageSpinner';
+import {
+    SectionHeader,
+    ProfileContainer,
+    GamesList,
+    GamesSection,
+    StatsContainer,
+    StatsGrid,
+    StatItem,
+    StatValue,
+    StatLabel,
+    StyledLink,
+    GameCard,
+    GameImage,
+    GameTitle,
+    StatHeader,
+    StatIcon,
+    FriendInfo,
+    FriendInfoItem,
+    FriendLabel,
+    FriendValue,
+} from '../user/UserProfileElements';
+import YearlyStatsChart from '../stats/YearlyStatsChart';
+import {
+    IoGameController,
+    IoLibrary,
+    IoHeart,
+} from 'react-icons/io5';
+
+interface FriendProfileProps {
+    id: string;
+}
+
+const FriendProfile = ({ id }: FriendProfileProps) => {
+    const [profileData, setProfileData] = useState<any>(null);
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
+    const { getFriendProfile, isLoading, error } = useUserActions();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const profile = await getFriendProfile(id);
+                if (profile) setProfileData(profile);
+            } finally {
+                setIsDataLoaded(true);
+            }
+        };
+
+        fetchData();
+    }, [id]);
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return new Intl.DateTimeFormat('es-ES', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        }).format(date);
+    };
+
+    if (!isDataLoaded || isLoading) {
+        return <FullPageSpinner />;
+    }
+
+    if (error) return <div>Error: {error}</div>;
+
+    return (
+        <ProfileContainer>
+            <SectionHeader
+                avatarUrl={profileData?.avatarPath ? getImageUrl(profileData.avatarPath) : '/default-avatar.png'}
+                nik={profileData?.nik}
+            />
+
+            <FriendInfo>
+                <FriendInfoItem>
+                    <FriendLabel>Amigos desde:</FriendLabel>
+                    <FriendValue>
+                        {profileData?.friendsSince ? formatDate(profileData.friendsSince) : 'No disponible'}
+                    </FriendValue>
+                </FriendInfoItem>
+            </FriendInfo>
+
+            <SectionHeader title="Estadísticas de la colección" />
+            <StatsContainer>
+                <StatsGrid>
+                    <StatItem>
+                        <StatHeader>
+                            <StatValue>{profileData?.profileStats.totalStats.totalGames}</StatValue>
+                            <StatIcon>
+                                <IoGameController size={24} />
+                            </StatIcon>
+                        </StatHeader>
+                        <StatLabel>Total Colección</StatLabel>
+                    </StatItem>
+                    <StatItem>
+                        <StatHeader>
+                            <StatValue>{profileData?.profileStats.totalStats.ownedGames}</StatValue>
+                            <StatIcon>
+                                <IoLibrary size={24} />
+                            </StatIcon>
+                        </StatHeader>
+                        <StatLabel>En Propiedad</StatLabel>
+                    </StatItem>
+                    <StatItem>
+                        <StatHeader>
+                            <StatValue>{profileData?.profileStats.totalStats.wishedGames}</StatValue>
+                            <StatIcon>
+                                <IoHeart size={24} />
+                            </StatIcon>
+                        </StatHeader>
+                        <StatLabel>Deseados</StatLabel>
+                    </StatItem>
+                </StatsGrid>
+            </StatsContainer>
+
+            {profileData?.yearlyStats && (
+                <GamesSection>
+                    <SectionHeader title="Estadísticas anuales" />
+                    <YearlyStatsChart data={profileData.yearlyStats.months} />
+                </GamesSection>
+            )}
+
+            <GamesSection>
+                <SectionHeader title="Últimos juegos adquiridos" />
+                <GamesList>
+                    {profileData?.profileStats.recentOwnedGames.map((game: any) => (
+                        <StyledLink href={`/games/${game.id}`} key={game.id}>
+                            <GameCard>
+                                <GameImage
+                                    src={getImageUrl(game.coverImage.path)}
+                                    alt={game.title}
+                                />
+                                <GameTitle>{game.title}</GameTitle>
+                            </GameCard>
+                        </StyledLink>
+                    ))}
+                </GamesList>
+            </GamesSection>
+
+            <GamesSection>
+                <SectionHeader title="Deseados más recientes" />
+                <GamesList>
+                    {profileData?.profileStats.recentWishedGames.map((game: any) => (
+                        <StyledLink href={`/games/${game.id}`} key={game.id}>
+                            <GameCard>
+                                <GameImage
+                                    src={getImageUrl(game.coverImage.path)}
+                                    alt={game.title}
+                                />
+                                <GameTitle>{game.title}</GameTitle>
+                            </GameCard>
+                        </StyledLink>
+                    ))}
+                </GamesList>
+            </GamesSection>
+        </ProfileContainer>
+    );
+};
+
+export default FriendProfile; 

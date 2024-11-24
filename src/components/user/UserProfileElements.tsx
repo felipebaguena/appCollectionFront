@@ -30,31 +30,33 @@ export const HeaderAvatarSection = styled.div`
   height: 100%;
 `;
 
-export const HeaderAvatarContainer = styled.div`
+export const HeaderAvatarContainer = styled.div<{ $isEditable?: boolean }>`
   position: absolute;
   width: 6rem;
   height: 6rem;
-  cursor: pointer;
+  cursor: ${props => props.$isEditable ? 'pointer' : 'default'};
   top: 50%;
   transform: translateY(-50%);
   
-  &:hover::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+  ${props => props.$isEditable && `
+    &:hover::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-  &:hover svg {
-    opacity: 1;
-  }
+    &:hover svg {
+      opacity: 1;
+    }
+  `}
 `;
 
 export const HeaderAvatar = styled.img`
@@ -214,19 +216,30 @@ interface SectionHeaderProps {
     avatarUrl?: string;
     nik?: string;
     onAvatarClick?: () => void;
+    isEditable?: boolean;
 }
 
-export const SectionHeader = ({ title, rightContent, avatarUrl, nik, onAvatarClick }: SectionHeaderProps) => (
+export const SectionHeader = ({
+    title,
+    rightContent,
+    avatarUrl,
+    nik,
+    onAvatarClick,
+    isEditable = false
+}: SectionHeaderProps) => (
     <HeaderContainer>
         <HeaderAvatarSection>
             {avatarUrl && (
                 <>
-                    <HeaderAvatarContainer onClick={onAvatarClick}>
+                    <HeaderAvatarContainer
+                        onClick={isEditable ? onAvatarClick : undefined}
+                        $isEditable={isEditable}
+                    >
                         <HeaderAvatar
                             src={avatarUrl}
                             alt="Avatar"
                         />
-                        <EditIcon />
+                        {isEditable && <EditIcon />}
                     </HeaderAvatarContainer>
                     <HeaderNik>{nik}</HeaderNik>
                 </>
@@ -362,6 +375,28 @@ export const EmptyFriendsMessage = styled.div`
 
 export const EmptyFriendsIcon = styled(IoPeople)`
   margin-bottom: 10px;
+`;
+
+export const FriendInfo = styled.div`
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+  background-color: var(--light-grey);
+`;
+
+export const FriendInfoItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+`;
+
+export const FriendLabel = styled.span`
+  font-weight: bold;
+  color: var(--dark-grey);
+`;
+
+export const FriendValue = styled.span`
+  color: var(--dark-grey);
 `;
 
 export interface UserData {

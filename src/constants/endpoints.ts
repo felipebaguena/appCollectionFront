@@ -75,4 +75,6 @@ export const ENDPOINTS = {
       gameId ? `&gameId=${gameId}` : ""
     }`,
   GET_USER_FRIENDS: "/users/me/friends",
+  GET_FRIEND_PROFILE: (friendId: string) =>
+    `/users/me/friends/${friendId}/detail`,
 };

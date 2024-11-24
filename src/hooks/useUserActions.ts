@@ -90,6 +90,22 @@ interface Friend {
   avatarPath?: string;
 }
 
+interface FriendProfile {
+  id: number;
+  nik: string;
+  avatarPath?: string;
+  profileStats: {
+    recentOwnedGames: GameStats[];
+    recentWishedGames: GameStats[];
+    totalStats: {
+      ownedGames: number;
+      wishedGames: number;
+      totalGames: number;
+    };
+  };
+  yearlyStats: YearlyStats;
+}
+
 export const useUserActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -266,6 +282,29 @@ export const useUserActions = () => {
     }
   };
 
+  const getFriendProfile = async (friendId: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const profile = await api.get<FriendProfile>(
+        ENDPOINTS.GET_FRIEND_PROFILE(friendId),
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+
+      setIsLoading(false);
+      return profile;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
   return {
     createUser,
     getUser,
@@ -276,6 +315,7 @@ export const useUserActions = () => {
     updateAvatar,
     getUserYearGames,
     getUserFriends,
+    getFriendProfile,
     isLoading,
     error,
   };
