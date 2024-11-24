@@ -83,6 +83,13 @@ interface YearlyStats {
   months: MonthStats[];
 }
 
+interface Friend {
+  id: number;
+  name: string;
+  nik: string;
+  avatarPath?: string;
+}
+
 export const useUserActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -239,6 +246,26 @@ export const useUserActions = () => {
     }
   };
 
+  const getUserFriends = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const friends = await api.get<Friend[]>(ENDPOINTS.GET_USER_FRIENDS, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+
+      setIsLoading(false);
+      return friends;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
   return {
     createUser,
     getUser,
@@ -248,6 +275,7 @@ export const useUserActions = () => {
     getUserStats,
     updateAvatar,
     getUserYearGames,
+    getUserFriends,
     isLoading,
     error,
   };

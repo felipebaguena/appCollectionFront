@@ -31,6 +31,13 @@ import {
     UserData,
     StatHeader,
     StatIcon,
+    FriendsSection,
+    FriendsList,
+    FriendItem,
+    FriendAvatar,
+    FriendNik,
+    EmptyFriendsMessage,
+    EmptyFriendsIcon,
 } from './UserProfileElements';
 import YearlyStatsChart from '../stats/YearlyStatsChart';
 import {
@@ -39,9 +46,16 @@ import {
     IoHeart,
     IoDesktop,
     IoGrid,
-    IoBusinessSharp
+    IoBusinessSharp,
+    IoPeople
 } from 'react-icons/io5';
 
+interface Friend {
+    id: number;
+    name: string;
+    nik: string;
+    avatarPath?: string;
+}
 
 const UserProfile = () => {
     const [showEditModal, setShowEditModal] = useState(false);
@@ -49,11 +63,13 @@ const UserProfile = () => {
     const [userStats, setUserStats] = useState<any>(null);
     const [yearlyStats, setYearlyStats] = useState<any>(null);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
+    const [friends, setFriends] = useState<Friend[]>([]);
     const {
         getUser,
         getUserStats,
         updateAvatar,
         getUserYearGames,
+        getUserFriends,
         isLoading,
         error
     } = useUserActions();
@@ -91,14 +107,16 @@ const UserProfile = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const [user, stats, yearStats] = await Promise.all([
+                const [user, stats, yearStats, userFriends] = await Promise.all([
                     getUser(),
                     getUserStats(),
-                    getUserYearGames()
+                    getUserYearGames(),
+                    getUserFriends()
                 ]);
                 if (user) setUserData(user);
                 if (stats) setUserStats(stats);
                 if (yearStats) setYearlyStats(yearStats);
+                if (userFriends) setFriends(userFriends);
             } finally {
                 setIsDataLoaded(true);
             }
@@ -151,6 +169,30 @@ const UserProfile = () => {
 
             {userStats && (
                 <>
+                    <GamesSection>
+                        <SectionHeader title="Amigos" />
+                        <FriendsList>
+                            {friends.length > 0 ? (
+                                friends.map((friend) => (
+                                    <StyledLink href={`/users/${friend.id}`} key={friend.id}>
+                                        <FriendItem>
+                                            <FriendAvatar
+                                                src={friend.avatarPath ? getImageUrl(friend.avatarPath) : '/default-avatar.png'}
+                                                alt={friend.nik}
+                                            />
+                                            <FriendNik>{friend.nik}</FriendNik>
+                                        </FriendItem>
+                                    </StyledLink>
+                                ))
+                            ) : (
+                                <EmptyFriendsMessage>
+                                    <EmptyFriendsIcon size={24} />
+                                    <p>No hay amigos añadidos</p>
+                                </EmptyFriendsMessage>
+                            )}
+                        </FriendsList>
+                    </GamesSection>
+
                     <SectionHeader title="Estadísticas de la colección" />
                     <StatsContainer>
                         <StatsGrid>

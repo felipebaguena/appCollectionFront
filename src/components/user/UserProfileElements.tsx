@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { FiEdit } from 'react-icons/fi';
 import Button from '../ui/Button';
 import Link from 'next/link';
+import { IoPeople } from 'react-icons/io5';
 
 export const ProfileContainer = styled.div`
   max-width: 1200px;
@@ -309,6 +310,58 @@ export const EditButtonWrapper = styled(Button)`
     padding: 0.5rem;
     min-width: auto;
   }
+`;
+
+export const FriendsSection = styled.div`
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+`;
+
+export const FriendsList = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 2rem;
+  background: var(--light-grey);
+`;
+
+export const FriendItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80px;
+`;
+
+export const FriendAvatar = styled.img`
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+`;
+
+export const FriendNik = styled.span`
+  font-size: 0.9rem;
+  color: var(--dark-grey);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+`;
+
+export const EmptyFriendsMessage = styled.div`
+  width: 100%;
+  text-align: center;
+  padding: 20px;
+  color: var(--dark-grey);
+`;
+
+export const EmptyFriendsIcon = styled(IoPeople)`
+  margin-bottom: 10px;
 `;
 
 export interface UserData {

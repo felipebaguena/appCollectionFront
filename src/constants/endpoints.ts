@@ -74,4 +74,5 @@ export const ENDPOINTS = {
     `/articles/all-articles?page=${page}&limit=${limit}${
       gameId ? `&gameId=${gameId}` : ""
     }`,
+  GET_USER_FRIENDS: "/users/me/friends",
 };
