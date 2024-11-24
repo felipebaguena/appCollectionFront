@@ -204,7 +204,7 @@ const UserProfile = () => {
                                         <IoGameController size={24} />
                                     </StatIcon>
                                 </StatHeader>
-                                <StatLabel>Total Colección</StatLabel>
+                                <StatLabel>Total Registrados</StatLabel>
                             </StatItem>
                             <StatItem>
                                 <StatHeader>
