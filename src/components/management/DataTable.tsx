@@ -176,10 +176,10 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
 
     useEffect(() => {
         if (shouldRefresh) {
-            refreshDataAndResetPage();
+            refreshData({ ...params });
             setShouldRefresh(false);
         }
-    }, [shouldRefresh, refreshDataAndResetPage]);
+    }, [shouldRefresh, refreshData, params]);
 
     const handleViewCover = (game: Game) => {
         setSelectedGame(game);
