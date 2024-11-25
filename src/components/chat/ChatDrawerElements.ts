@@ -1,62 +1,55 @@
 import styled from "styled-components";
 
-interface ToggleButtonProps {
-  $isOpen: boolean;
-}
-
-export const ToggleButton = styled.button<ToggleButtonProps>`
-  position: fixed;
-  right: ${({ $isOpen }) => ($isOpen ? "400px" : "20px")};
-  bottom: 20px;
-  background-color: var(--mid-grey);
-  color: white;
-  border: none;
-  border-radius: ${({ $isOpen }) => ($isOpen ? "8px 0 0 8px" : "8px")};
-  padding: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  z-index: 1001;
-
-  &:hover {
-    background-color: var(--dark-grey);
-  }
-`;
-
 interface ChatDrawerContainerProps {
   $isOpen: boolean;
 }
 
 export const ChatDrawerContainer = styled.div<ChatDrawerContainerProps>`
   position: fixed;
-  right: ${({ $isOpen }) => ($isOpen ? "0" : "-400px")};
+  right: 0;
   bottom: 0;
   width: 400px;
-  height: calc(100vh - 60px);
+  height: ${({ $isOpen }) => ($isOpen ? "calc(100vh - 10rem)" : "45px")};
   background-color: var(--background);
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-  transition: right 0.3s ease;
+  transition: height 0.3s ease;
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  border-radius: 8px 0 0 0;
-  margin-bottom: 0;
+  overflow: hidden;
 `;
 
-export const ChatHeader = styled.div`
-  padding: 1rem;
+interface ChatHeaderProps {
+  $isOpen: boolean;
+}
+
+export const ChatHeader = styled.div<ChatHeaderProps>`
+  padding: ${({ $isOpen }) => ($isOpen ? "1rem" : "0.5rem 1rem")};
   background-color: var(--dark-grey);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background-color: var(--mid-grey);
+  }
 `;
 
 export const ChatTitle = styled.h2`
   margin: 0;
   font-size: 1.2rem;
   color: var(--app-yellow);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const HeaderActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
 `;
 
 export const ConversationsList = styled.div`
@@ -99,9 +92,15 @@ export const LastMessage = styled.div`
   margin-top: 0.25rem;
 `;
 
-export const UnreadBadge = styled.div`
-  background-color: var(--dark-grey);
-  color: var(--app-yellow);
+interface UnreadBadgeProps {
+  $inHeader?: boolean;
+}
+
+export const UnreadBadge = styled.div<UnreadBadgeProps>`
+  background-color: ${({ $inHeader }) =>
+    $inHeader ? "var(--app-yellow)" : "var(--dark-grey)"};
+  color: ${({ $inHeader }) =>
+    $inHeader ? "var(--dark-grey)" : "var(--app-yellow)"};
   border-radius: 50%;
   min-width: 20px;
   height: 20px;
