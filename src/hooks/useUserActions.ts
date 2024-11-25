@@ -106,6 +106,23 @@ interface FriendProfile {
   yearlyStats: YearlyStats;
 }
 
+export interface Conversation {
+  friend: {
+    id: number;
+    name: string;
+    nik: string;
+    avatarPath?: string;
+  };
+  lastMessage: {
+    id: number;
+    content: string;
+    createdAt: string;
+    read: boolean;
+    isFromMe: boolean;
+  };
+  unreadCount: number;
+}
+
 export const useUserActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -325,6 +342,29 @@ export const useUserActions = () => {
     }
   };
 
+  const getUserConversations = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const conversations = await api.get<Conversation[]>(
+        ENDPOINTS.GET_USER_CONVERSATIONS,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+
+      setIsLoading(false);
+      return conversations;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
   return {
     createUser,
     getUser,
@@ -337,6 +377,7 @@ export const useUserActions = () => {
     getUserFriends,
     getFriendProfile,
     getUnreadMessages,
+    getUserConversations,
     isLoading,
     error,
   };

@@ -11,6 +11,7 @@ import AuthRedirectHandler from "@/components/auth/AuthRedirectHandler";
 import { AuthProvider } from "@/contexts/AuthContext";
 import UnreadMessagesPoller from '@/components/messages/UnreadMessagesPoller';
 import { UnreadMessagesProvider } from '@/contexts/UnreadMessagesContext';
+import ChatDrawer from '@/components/chat/ChatDrawer';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -42,6 +43,7 @@ export default function RootLayout({
                   <AuthRedirectHandler />
                   <UnreadMessagesPoller />
                 </PageWrapper>
+                <ChatDrawer />
               </UnreadMessagesProvider>
             </AuthProvider>
           </StyledComponentsProvider>
