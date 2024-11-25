@@ -81,4 +81,6 @@ export const ENDPOINTS = {
   GET_USER_CONVERSATIONS: "/users/me/conversations",
   GET_FRIEND_MESSAGES: (friendId: string) =>
     `/users/me/friends/${friendId}/messages`,
+  SEND_FRIEND_MESSAGE: (friendId: string) =>
+    `/users/me/friends/${friendId}/messages`,
 };

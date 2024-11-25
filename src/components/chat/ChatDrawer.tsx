@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, FormEvent } from 'react';
 import { useUserActions } from '@/hooks/useUserActions';
 import { getImageUrl } from '@/services/api';
-import { IoChatbubbles, IoChevronUp, IoChevronDown, IoArrowBack } from 'react-icons/io5';
+import { IoChatbubbles, IoChevronUp, IoChevronDown, IoArrowBack, IoSend } from 'react-icons/io5';
 import {
     ChatDrawerContainer,
     ChatHeader,
@@ -20,6 +20,10 @@ import {
     MessagesList,
     MessageBubble,
     BackButton,
+    MessageForm,
+    MessageInputContainer,
+    MessageInput,
+    SendButton,
 } from './ChatDrawerElements';
 import type { Conversation, Message } from '@/hooks/useUserActions';
 
@@ -28,7 +32,8 @@ export default function ChatDrawer() {
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
-    const { getUserConversations, getFriendMessages, isLoading } = useUserActions();
+    const [newMessage, setNewMessage] = useState('');
+    const { getUserConversations, getFriendMessages, sendMessage, isLoading } = useUserActions();
 
     useEffect(() => {
         const fetchConversations = async () => {
@@ -64,6 +69,21 @@ export default function ChatDrawer() {
 
     const handleBack = () => {
         setActiveConversation(null);
+    };
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        if (!newMessage.trim() || !activeConversation) return;
+
+        const result = await sendMessage(
+            activeConversation.friend.id.toString(),
+            newMessage.trim()
+        );
+
+        if (result) {
+            setMessages(prev => [result, ...prev]);
+            setNewMessage('');
+        }
     };
 
     return (
@@ -102,16 +122,31 @@ export default function ChatDrawer() {
 
             <ChatContent>
                 {activeConversation ? (
-                    <MessagesList>
-                        {messages.map((message) => (
-                            <MessageBubble
-                                key={message.id}
-                                $isFromMe={message.sender.id !== activeConversation.friend.id}
-                            >
-                                {message.content}
-                            </MessageBubble>
-                        ))}
-                    </MessagesList>
+                    <>
+                        <MessagesList>
+                            {messages.map((message) => (
+                                <MessageBubble
+                                    key={message.id}
+                                    $isFromMe={message.sender.id !== activeConversation.friend.id}
+                                >
+                                    {message.content}
+                                </MessageBubble>
+                            ))}
+                        </MessagesList>
+                        <MessageForm onSubmit={handleSubmit}>
+                            <MessageInputContainer>
+                                <MessageInput
+                                    type="text"
+                                    placeholder="Escribir mensaje..."
+                                    value={newMessage}
+                                    onChange={(e) => setNewMessage(e.target.value)}
+                                />
+                                <SendButton type="submit" disabled={!newMessage.trim() || isLoading}>
+                                    <IoSend size={18} />
+                                </SendButton>
+                            </MessageInputContainer>
+                        </MessageForm>
+                    </>
                 ) : (
                     <ConversationsList>
                         {conversations.map((conversation) => (

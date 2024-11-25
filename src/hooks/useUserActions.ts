@@ -404,6 +404,26 @@ export const useUserActions = () => {
     }
   };
 
+  const sendMessage = async (friendId: string, content: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const message = await api.post<Message>(
+        ENDPOINTS.SEND_FRIEND_MESSAGE(friendId),
+        { content },
+        true
+      );
+
+      setIsLoading(false);
+      return message;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
   return {
     createUser,
     getUser,
@@ -418,6 +438,7 @@ export const useUserActions = () => {
     getUnreadMessages,
     getUserConversations,
     getFriendMessages,
+    sendMessage,
     isLoading,
     error,
   };

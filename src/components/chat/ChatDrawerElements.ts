@@ -123,7 +123,7 @@ export const MessagesList = styled.div`
   overflow-y: auto;
   padding: 1rem;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   gap: 1rem;
 `;
 
@@ -134,7 +134,7 @@ interface MessageBubbleProps {
 export const MessageBubble = styled.div<MessageBubbleProps>`
   max-width: 80%;
   padding: 0.75rem 1rem;
-  border-radius: 1rem;
+  border-radius: 0.6rem;
   align-self: ${({ $isFromMe }) => ($isFromMe ? "flex-end" : "flex-start")};
   background-color: ${({ $isFromMe }) =>
     $isFromMe ? "var(--dark-grey)" : "var(--clear-grey)"};
@@ -154,5 +154,61 @@ export const BackButton = styled.button`
 
   &:hover {
     opacity: 0.8;
+  }
+`;
+
+export const MessageForm = styled.form`
+  display: flex;
+  padding: 1rem;
+  background-color: var(--background);
+  border-top: 1px solid var(--clear-grey);
+`;
+
+export const MessageInputContainer = styled.div`
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+`;
+
+export const MessageInput = styled.input`
+  width: 100%;
+  padding: 0.75rem;
+  padding-right: 3rem;
+  border: 1px solid var(--clear-grey);
+  background-color: white;
+  font-size: 0.9rem;
+
+  &:focus {
+    outline: none;
+    border-color: var(--app-yellow);
+  }
+
+  &::placeholder {
+    color: var(--mid-grey);
+  }
+`;
+
+export const SendButton = styled.button`
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--dark-grey);
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    color: var(--app-yellow);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
