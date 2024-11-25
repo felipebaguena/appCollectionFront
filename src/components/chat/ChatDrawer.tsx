@@ -25,8 +25,12 @@ import {
     MessageInputContainer,
     MessageInput,
     SendButton,
+    MessageContainer,
+    MessageTimestamp,
 } from './ChatDrawerElements';
 import type { Conversation, Message } from '@/hooks/useUserActions';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 export default function ChatDrawer() {
     const { isAuthenticated } = useAuth();
@@ -104,6 +108,10 @@ export default function ChatDrawer() {
         }
     };
 
+    const formatMessageDate = (date: string) => {
+        return format(new Date(date), "d MMM, HH:mm", { locale: es });
+    };
+
     if (!isAuthenticated) {
         return null;
     }
@@ -147,12 +155,21 @@ export default function ChatDrawer() {
                     <>
                         <MessagesList>
                             {messages.map((message) => (
-                                <MessageBubble
+                                <MessageContainer
                                     key={message.id}
-                                    $isFromMe={message.sender.id !== activeConversation.friend.id}
+                                    $isFromMe={message.sender.id !== activeConversation!.friend.id}
                                 >
-                                    {message.content}
-                                </MessageBubble>
+                                    <MessageBubble
+                                        $isFromMe={message.sender.id !== activeConversation!.friend.id}
+                                    >
+                                        {message.content}
+                                    </MessageBubble>
+                                    <MessageTimestamp
+                                        $isFromMe={message.sender.id !== activeConversation!.friend.id}
+                                    >
+                                        {formatMessageDate(message.createdAt)}
+                                    </MessageTimestamp>
+                                </MessageContainer>
                             ))}
                         </MessagesList>
                         <MessageForm onSubmit={handleSubmit}>

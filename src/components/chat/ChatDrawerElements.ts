@@ -212,3 +212,26 @@ export const SendButton = styled.button`
     cursor: not-allowed;
   }
 `;
+
+interface MessageContainerProps {
+  $isFromMe: boolean;
+}
+
+export const MessageContainer = styled.div<MessageContainerProps>`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 80%;
+  align-self: ${({ $isFromMe }) => ($isFromMe ? "flex-end" : "flex-start")};
+`;
+
+interface MessageTimestampProps {
+  $isFromMe: boolean;
+}
+
+export const MessageTimestamp = styled.span<MessageTimestampProps>`
+  font-size: 0.7rem;
+  color: var(--mid-grey);
+  align-self: ${({ $isFromMe }) => ($isFromMe ? "flex-end" : "flex-start")};
+  padding: 0 0.5rem;
+`;
