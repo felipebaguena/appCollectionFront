@@ -305,6 +305,26 @@ export const useUserActions = () => {
     }
   };
 
+  const getUnreadMessages = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const count = await api.get<number>(ENDPOINTS.GET_UNREAD_MESSAGES, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+
+      setIsLoading(false);
+      return count;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
   return {
     createUser,
     getUser,
@@ -316,6 +336,7 @@ export const useUserActions = () => {
     getUserYearGames,
     getUserFriends,
     getFriendProfile,
+    getUnreadMessages,
     isLoading,
     error,
   };

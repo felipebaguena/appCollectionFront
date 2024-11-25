@@ -49,8 +49,6 @@ const Navbar = () => {
   const { isAuthenticated, user, userRole, logout, login, loading } = useAuth();
   const pathname = usePathname() || "";
 
-  console.log("Auth State:", { isAuthenticated, user, loading });
-
   const managementOptions = [
     { name: "Juegos", route: "/management/manage-games" },
     { name: "Plataformas", route: "/management/manage-platforms" },

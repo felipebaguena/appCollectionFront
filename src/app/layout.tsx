@@ -9,6 +9,8 @@ import StyledComponentsRegistry from "@/components/StyledComponentsRegistry";
 import StyledComponentsProvider from '@/components/StyledComponentsProvider';
 import AuthRedirectHandler from "@/components/auth/AuthRedirectHandler";
 import { AuthProvider } from "@/contexts/AuthContext";
+import UnreadMessagesPoller from '@/components/messages/UnreadMessagesPoller';
+import { UnreadMessagesProvider } from '@/contexts/UnreadMessagesContext';
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,12 +34,15 @@ export default function RootLayout({
         <StyledComponentsRegistry>
           <StyledComponentsProvider>
             <AuthProvider>
-              <PageWrapper>
-                <Navbar />
-                <ClientLayout showLogs={false}>{children}</ClientLayout>
-                <Footer />
-                <AuthRedirectHandler />
-              </PageWrapper>
+              <UnreadMessagesProvider>
+                <PageWrapper>
+                  <Navbar />
+                  <ClientLayout showLogs={false}>{children}</ClientLayout>
+                  <Footer />
+                  <AuthRedirectHandler />
+                  <UnreadMessagesPoller />
+                </PageWrapper>
+              </UnreadMessagesProvider>
             </AuthProvider>
           </StyledComponentsProvider>
         </StyledComponentsRegistry>
