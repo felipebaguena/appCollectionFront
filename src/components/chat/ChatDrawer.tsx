@@ -27,6 +27,7 @@ import {
     SendButton,
     MessageContainer,
     MessageTimestamp,
+    ReadStatus,
 } from './ChatDrawerElements';
 import type { Conversation, Message } from '@/hooks/useUserActions';
 import { format } from 'date-fns';
@@ -61,7 +62,6 @@ const groupMessages = (messages: Message[]): MessageGroup[] => {
             };
         } else {
             currentGroup.messages.push(message);
-            // Actualizamos el timestamp al mensaje más reciente del grupo
             currentGroup.timestamp = message.createdAt;
         }
     });
@@ -195,26 +195,35 @@ export default function ChatDrawer() {
                 {activeConversation ? (
                     <>
                         <MessagesList>
-                            {groupMessages(messages).map((group, index) => (
-                                <MessageContainer
-                                    key={`group-${group.messages[0].id}`}
-                                    $isFromMe={group.sender.id !== activeConversation!.friend.id}
-                                >
-                                    {group.messages.map((message) => (
-                                        <MessageBubble
-                                            key={message.id}
-                                            $isFromMe={message.sender.id !== activeConversation!.friend.id}
-                                        >
-                                            {message.content}
-                                        </MessageBubble>
-                                    ))}
-                                    <MessageTimestamp
-                                        $isFromMe={group.sender.id !== activeConversation!.friend.id}
+                            {groupMessages(messages).map((group, index, array) => {
+                                const isFromMe = group.sender.id !== activeConversation!.friend.id;
+                                const isLastMessage = index === 1;
+                                const allMessagesRead = group.messages.every(msg => msg.read);
+
+                                return (
+                                    <MessageContainer
+                                        key={`group-${group.messages[0].id}`}
+                                        $isFromMe={isFromMe}
                                     >
-                                        {formatMessageDate(group.timestamp)}
-                                    </MessageTimestamp>
-                                </MessageContainer>
-                            ))}
+                                        {group.messages.map((message) => (
+                                            <MessageBubble
+                                                key={message.id}
+                                                $isFromMe={isFromMe}
+                                            >
+                                                {message.content}
+                                            </MessageBubble>
+                                        ))}
+                                        <MessageTimestamp
+                                            $isFromMe={isFromMe}
+                                        >
+                                            {formatMessageDate(group.timestamp)}
+                                            {isFromMe && isLastMessage && allMessagesRead && (
+                                                <ReadStatus>· visto</ReadStatus>
+                                            )}
+                                        </MessageTimestamp>
+                                    </MessageContainer>
+                                );
+                            })}
                         </MessagesList>
                         <MessageForm onSubmit={handleSubmit}>
                             <MessageInputContainer>

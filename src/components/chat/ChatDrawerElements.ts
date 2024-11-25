@@ -245,4 +245,12 @@ export const MessageTimestamp = styled.span<MessageTimestampProps>`
   color: var(--mid-grey);
   align-self: ${({ $isFromMe }) => ($isFromMe ? "flex-end" : "flex-start")};
   padding: 0 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+export const ReadStatus = styled.span`
+  color: var(--dark-grey);
+  margin-left: 2px;
 `;
