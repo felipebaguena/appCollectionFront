@@ -110,3 +110,49 @@ export const UnreadBadge = styled.div<UnreadBadgeProps>`
   font-size: 0.8rem;
   padding: 0 6px;
 `;
+
+export const ChatContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+`;
+
+export const MessagesList = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
+interface MessageBubbleProps {
+  $isFromMe: boolean;
+}
+
+export const MessageBubble = styled.div<MessageBubbleProps>`
+  max-width: 80%;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  align-self: ${({ $isFromMe }) => ($isFromMe ? "flex-end" : "flex-start")};
+  background-color: ${({ $isFromMe }) =>
+    $isFromMe ? "var(--dark-grey)" : "var(--clear-grey)"};
+  color: ${({ $isFromMe }) =>
+    $isFromMe ? "var(--app-yellow)" : "var(--dark-grey)"};
+`;
+
+export const BackButton = styled.button`
+  background: none;
+  border: none;
+  color: var(--app-yellow);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;

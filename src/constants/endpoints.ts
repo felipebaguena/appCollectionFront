@@ -79,4 +79,6 @@ export const ENDPOINTS = {
     `/users/me/friends/${friendId}/detail`,
   GET_UNREAD_MESSAGES: "/users/me/messages/unread-count",
   GET_USER_CONVERSATIONS: "/users/me/conversations",
+  GET_FRIEND_MESSAGES: (friendId: string) =>
+    `/users/me/friends/${friendId}/messages`,
 };

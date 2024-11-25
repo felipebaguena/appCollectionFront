@@ -123,6 +123,22 @@ export interface Conversation {
   unreadCount: number;
 }
 
+interface MessageSender {
+  id: number;
+  name: string;
+  nik: string;
+  avatarPath?: string;
+}
+
+export interface Message {
+  id: number;
+  content: string;
+  createdAt: string;
+  read: boolean;
+  sender: MessageSender;
+  receiver: MessageSender;
+}
+
 export const useUserActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -365,6 +381,29 @@ export const useUserActions = () => {
     }
   };
 
+  const getFriendMessages = async (friendId: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const messages = await api.get<Message[]>(
+        ENDPOINTS.GET_FRIEND_MESSAGES(friendId),
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+
+      setIsLoading(false);
+      return messages;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
   return {
     createUser,
     getUser,
@@ -378,6 +417,7 @@ export const useUserActions = () => {
     getFriendProfile,
     getUnreadMessages,
     getUserConversations,
+    getFriendMessages,
     isLoading,
     error,
   };
