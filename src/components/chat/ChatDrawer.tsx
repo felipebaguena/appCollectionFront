@@ -195,35 +195,42 @@ export default function ChatDrawer() {
                 {activeConversation ? (
                     <>
                         <MessagesList>
-                            {groupMessages(messages).map((group, index, array) => {
-                                const isFromMe = group.sender.id !== activeConversation!.friend.id;
-                                const isLastMessage = index === 1;
-                                const allMessagesRead = group.messages.every(msg => msg.read);
+                            {(() => {
+                                const groups = groupMessages(messages);
+                                const lastReadGroupIndex = groups.findIndex(group =>
+                                    group.sender.id !== activeConversation!.friend.id &&
+                                    group.messages.every(msg => msg.read)
+                                );
 
-                                return (
-                                    <MessageContainer
-                                        key={`group-${group.messages[0].id}`}
-                                        $isFromMe={isFromMe}
-                                    >
-                                        {group.messages.map((message) => (
-                                            <MessageBubble
-                                                key={message.id}
-                                                $isFromMe={isFromMe}
-                                            >
-                                                {message.content}
-                                            </MessageBubble>
-                                        ))}
-                                        <MessageTimestamp
+                                return groups.map((group, index) => {
+                                    const isFromMe = group.sender.id !== activeConversation!.friend.id;
+                                    const isLastReadMessage = index === lastReadGroupIndex;
+
+                                    return (
+                                        <MessageContainer
+                                            key={`group-${group.messages[0].id}`}
                                             $isFromMe={isFromMe}
                                         >
-                                            {formatMessageDate(group.timestamp)}
-                                            {isFromMe && isLastMessage && allMessagesRead && (
-                                                <ReadStatus>· visto</ReadStatus>
-                                            )}
-                                        </MessageTimestamp>
-                                    </MessageContainer>
-                                );
-                            })}
+                                            {group.messages.map((message) => (
+                                                <MessageBubble
+                                                    key={message.id}
+                                                    $isFromMe={isFromMe}
+                                                >
+                                                    {message.content}
+                                                </MessageBubble>
+                                            ))}
+                                            <MessageTimestamp
+                                                $isFromMe={isFromMe}
+                                            >
+                                                {formatMessageDate(group.timestamp)}
+                                                {isFromMe && isLastReadMessage && (
+                                                    <ReadStatus>· visto</ReadStatus>
+                                                )}
+                                            </MessageTimestamp>
+                                        </MessageContainer>
+                                    );
+                                });
+                            })()}
                         </MessagesList>
                         <MessageForm onSubmit={handleSubmit}>
                             <MessageInputContainer>
