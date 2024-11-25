@@ -2,6 +2,7 @@
 
 import { useEffect, useState, FormEvent } from 'react';
 import { useUserActions } from '@/hooks/useUserActions';
+import { useAuth } from '@/contexts/AuthContext';
 import { getImageUrl } from '@/services/api';
 import { IoChatbubbles, IoChevronUp, IoChevronDown, IoArrowBack, IoSend } from 'react-icons/io5';
 import {
@@ -28,6 +29,7 @@ import {
 import type { Conversation, Message } from '@/hooks/useUserActions';
 
 export default function ChatDrawer() {
+    const { isAuthenticated } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
@@ -36,6 +38,8 @@ export default function ChatDrawer() {
     const { getUserConversations, getFriendMessages, sendMessage, isLoading } = useUserActions();
 
     useEffect(() => {
+        if (!isAuthenticated) return;
+
         const fetchConversations = async () => {
             const result = await getUserConversations();
             if (result) {
@@ -43,23 +47,37 @@ export default function ChatDrawer() {
             }
         };
 
-        if (isOpen) {
-            fetchConversations();
-        }
-    }, [isOpen]);
+        fetchConversations();
+
+        const interval = setInterval(fetchConversations, 30000);
+
+        return () => clearInterval(interval);
+    }, [isAuthenticated]);
 
     useEffect(() => {
+        if (!isAuthenticated || !isOpen) return;
+
+        const fetchConversations = async () => {
+            const result = await getUserConversations();
+            if (result) {
+                setConversations(result);
+            }
+        };
+        fetchConversations();
+    }, [isOpen, isAuthenticated]);
+
+    useEffect(() => {
+        if (!isAuthenticated || !activeConversation) return;
+
         const fetchMessages = async () => {
-            if (activeConversation) {
-                const result = await getFriendMessages(activeConversation.friend.id.toString());
-                if (result) {
-                    setMessages(result);
-                }
+            const result = await getFriendMessages(activeConversation.friend.id.toString());
+            if (result) {
+                setMessages(result);
             }
         };
 
         fetchMessages();
-    }, [activeConversation]);
+    }, [activeConversation, isAuthenticated]);
 
     const totalUnreadCount = conversations.reduce((acc, conv) => acc + conv.unreadCount, 0);
 
@@ -85,6 +103,10 @@ export default function ChatDrawer() {
             setNewMessage('');
         }
     };
+
+    if (!isAuthenticated) {
+        return null;
+    }
 
     return (
         <ChatDrawerContainer $isOpen={isOpen}>
