@@ -223,9 +223,17 @@ interface MessageContainerProps {
 export const MessageContainer = styled.div<MessageContainerProps>`
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   max-width: 80%;
   align-self: ${({ $isFromMe }) => ($isFromMe ? "flex-end" : "flex-start")};
+
+  ${MessageBubble} {
+    margin-bottom: 2px;
+
+    &:last-of-type {
+      margin-bottom: 4px;
+    }
+  }
 `;
 
 interface MessageTimestampProps {

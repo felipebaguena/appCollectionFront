@@ -31,6 +31,47 @@ import {
 import type { Conversation, Message } from '@/hooks/useUserActions';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { isSameDay, differenceInDays } from 'date-fns';
+
+interface MessageGroup {
+    messages: Message[];
+    sender: Message['sender'];
+    timestamp: string;
+}
+
+const groupMessages = (messages: Message[]): MessageGroup[] => {
+    const groups: MessageGroup[] = [];
+    let currentGroup: MessageGroup | null = null;
+
+    messages.forEach((message, index) => {
+        const nextMessage = messages[index + 1];
+
+        if (!currentGroup ||
+            currentGroup.sender.id !== message.sender.id ||
+            (nextMessage && differenceInDays(new Date(message.createdAt), new Date(nextMessage.createdAt)) >= 1)) {
+
+            if (currentGroup) {
+                groups.push(currentGroup);
+            }
+
+            currentGroup = {
+                messages: [message],
+                sender: message.sender,
+                timestamp: message.createdAt
+            };
+        } else {
+            currentGroup.messages.push(message);
+            // Actualizamos el timestamp al mensaje más reciente del grupo
+            currentGroup.timestamp = message.createdAt;
+        }
+    });
+
+    if (currentGroup) {
+        groups.push(currentGroup);
+    }
+
+    return groups;
+};
 
 export default function ChatDrawer() {
     const { isAuthenticated } = useAuth();
@@ -154,20 +195,23 @@ export default function ChatDrawer() {
                 {activeConversation ? (
                     <>
                         <MessagesList>
-                            {messages.map((message) => (
+                            {groupMessages(messages).map((group, index) => (
                                 <MessageContainer
-                                    key={message.id}
-                                    $isFromMe={message.sender.id !== activeConversation!.friend.id}
+                                    key={`group-${group.messages[0].id}`}
+                                    $isFromMe={group.sender.id !== activeConversation!.friend.id}
                                 >
-                                    <MessageBubble
-                                        $isFromMe={message.sender.id !== activeConversation!.friend.id}
-                                    >
-                                        {message.content}
-                                    </MessageBubble>
+                                    {group.messages.map((message) => (
+                                        <MessageBubble
+                                            key={message.id}
+                                            $isFromMe={message.sender.id !== activeConversation!.friend.id}
+                                        >
+                                            {message.content}
+                                        </MessageBubble>
+                                    ))}
                                     <MessageTimestamp
-                                        $isFromMe={message.sender.id !== activeConversation!.friend.id}
+                                        $isFromMe={group.sender.id !== activeConversation!.friend.id}
                                     >
-                                        {formatMessageDate(message.createdAt)}
+                                        {formatMessageDate(group.timestamp)}
                                     </MessageTimestamp>
                                 </MessageContainer>
                             ))}
