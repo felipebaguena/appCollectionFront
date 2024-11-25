@@ -11,8 +11,11 @@ export const ChatDrawerContainer = styled.div<ChatDrawerContainerProps>`
   width: 400px;
   height: ${({ $isOpen }) => ($isOpen ? "calc(100vh - 10rem)" : "45px")};
   background-color: var(--background);
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-  transition: height 0.3s ease;
+  box-shadow: ${({ $isOpen }) =>
+    $isOpen
+      ? "-1px 0 6px var(--grey), 0 -1px 3px var(--clear-grey)"
+      : "-1px 0 6px var(--grey)"};
+  transition: height 0.3s ease, box-shadow 0.3s ease;
   z-index: 1000;
   display: flex;
   flex-direction: column;
