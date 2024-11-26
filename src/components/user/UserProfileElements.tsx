@@ -1,8 +1,23 @@
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 import { FiEdit } from 'react-icons/fi';
 import Button from '../ui/Button';
 import Link from 'next/link';
 import { IoPeople } from 'react-icons/io5';
+
+const breatheAnimation = keyframes`
+  0% {
+    background-color: #2b7400;
+    transform: scale(0.95);
+  }
+  50% {
+    background-color: #44b700;
+    transform: scale(1);
+  }
+  100% {
+    background-color: #2b7400;
+    transform: scale(0.95);
+  }
+`;
 
 export const ProfileContainer = styled.div`
   max-width: 1200px;
@@ -413,6 +428,10 @@ export const OnlineIndicator = styled.div<{ $isOnline: boolean }>`
   background-color: ${props => props.$isOnline ? '#44b700' : '#ccc'};
   border: 2px solid white;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+  
+  ${props => props.$isOnline && css`
+    animation: ${breatheAnimation} 3s ease-in-out infinite;
+  `}
 `;
 
 export interface UserData {
