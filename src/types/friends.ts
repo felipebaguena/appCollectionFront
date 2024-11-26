@@ -11,3 +11,10 @@ export interface FriendRequest {
   message: string;
   createdAt: string;
 }
+
+export interface Friend {
+  id: number;
+  name: string;
+  nik: string;
+  avatarPath?: string;
+}

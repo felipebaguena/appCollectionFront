@@ -4,7 +4,7 @@ import { useEffect, useState, FormEvent } from 'react';
 import { useUserActions } from '@/hooks/useUserActions';
 import { useAuth } from '@/contexts/AuthContext';
 import { getImageUrl } from '@/services/api';
-import { IoChatbubbles, IoChevronUp, IoChevronDown, IoArrowBack, IoSend } from 'react-icons/io5';
+import { IoChatbubbles, IoChevronUp, IoChevronDown, IoArrowBack, IoSend, IoAdd } from 'react-icons/io5';
 import {
     ChatDrawerContainer,
     ChatHeader,
@@ -33,6 +33,9 @@ import type { Conversation, Message } from '@/hooks/useUserActions';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { isSameDay, differenceInDays } from 'date-fns';
+import Modal from '@/components/ui/Modal';
+import NewMessageModal from './NewMessageModal';
+import { Friend } from '@/types/friends';
 
 interface MessageGroup {
     messages: Message[];
@@ -83,6 +86,7 @@ export default function ChatDrawer() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const { getUserConversations, getFriendMessages, sendMessage, isLoading } = useUserActions();
+    const [showNewMessageModal, setShowNewMessageModal] = useState(false);
 
     useEffect(() => {
         if (!isAuthenticated) return;
@@ -132,7 +136,11 @@ export default function ChatDrawer() {
         setActiveConversation(conversation);
     };
 
-    const handleBack = () => {
+    const handleBack = async () => {
+        const updatedConversations = await getUserConversations();
+        if (updatedConversations) {
+            setConversations(updatedConversations);
+        }
         setActiveConversation(null);
     };
 
@@ -148,6 +156,11 @@ export default function ChatDrawer() {
         if (result) {
             setMessages(prev => [result, ...prev]);
             setNewMessage('');
+
+            const updatedConversations = await getUserConversations();
+            if (updatedConversations) {
+                setConversations(updatedConversations);
+            }
         }
     };
 
@@ -155,124 +168,177 @@ export default function ChatDrawer() {
         return format(new Date(date), "d MMM, HH:mm", { locale: es });
     };
 
+    const handleNewMessage = (friend: Friend) => {
+        const existingConversation = conversations.find(
+            conv => conv.friend.id === friend.id
+        );
+
+        if (existingConversation) {
+            setActiveConversation(existingConversation);
+        } else {
+            const newConversation: Conversation = {
+                friend: {
+                    id: friend.id,
+                    name: friend.name,
+                    nik: friend.nik,
+                    avatarPath: friend.avatarPath
+                },
+                lastMessage: {
+                    id: 0,
+                    content: '',
+                    createdAt: new Date().toISOString(),
+                    read: true,
+                    isFromMe: true
+                },
+                unreadCount: 0
+            };
+            setActiveConversation(newConversation);
+        }
+        setShowNewMessageModal(false);
+    };
+
     if (!isAuthenticated) {
         return null;
     }
 
     return (
-        <ChatDrawerContainer $isOpen={isOpen}>
-            <ChatHeader $isOpen={isOpen} onClick={() => !activeConversation && setIsOpen(!isOpen)}>
-                <ChatTitle>
+        <>
+            <ChatDrawerContainer $isOpen={isOpen}>
+                <ChatHeader $isOpen={isOpen} onClick={() => !activeConversation && setIsOpen(!isOpen)}>
+                    <ChatTitle>
+                        {activeConversation ? (
+                            <>
+                                <BackButton onClick={handleBack}>
+                                    <IoArrowBack size={20} />
+                                    {activeConversation.friend.nik}
+                                </BackButton>
+                            </>
+                        ) : (
+                            <>
+                                <IoChatbubbles size={20} />
+                                Mensajes
+                            </>
+                        )}
+                    </ChatTitle>
+                    <HeaderActions>
+                        {!activeConversation && isOpen && (
+                            <IoAdd
+                                size={20}
+                                color="var(--app-yellow)"
+                                style={{ cursor: 'pointer', marginRight: '0.5rem' }}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setShowNewMessageModal(true);
+                                }}
+                            />
+                        )}
+                        {!isOpen && totalUnreadCount > 0 && (
+                            <UnreadBadge $inHeader>
+                                {totalUnreadCount}
+                            </UnreadBadge>
+                        )}
+                        {!activeConversation && (
+                            isOpen ? (
+                                <IoChevronDown size={20} color="var(--app-yellow)" />
+                            ) : (
+                                <IoChevronUp size={20} color="var(--app-yellow)" />
+                            )
+                        )}
+                    </HeaderActions>
+                </ChatHeader>
+
+                <ChatContent>
                     {activeConversation ? (
                         <>
-                            <BackButton onClick={handleBack}>
-                                <IoArrowBack size={20} />
-                                {activeConversation.friend.nik}
-                            </BackButton>
-                        </>
-                    ) : (
-                        <>
-                            <IoChatbubbles size={20} />
-                            Mensajes
-                        </>
-                    )}
-                </ChatTitle>
-                <HeaderActions>
-                    {!isOpen && totalUnreadCount > 0 && (
-                        <UnreadBadge $inHeader>
-                            {totalUnreadCount}
-                        </UnreadBadge>
-                    )}
-                    {!activeConversation && (
-                        isOpen ? (
-                            <IoChevronDown size={20} color="var(--app-yellow)" />
-                        ) : (
-                            <IoChevronUp size={20} color="var(--app-yellow)" />
-                        )
-                    )}
-                </HeaderActions>
-            </ChatHeader>
+                            <MessagesList>
+                                {(() => {
+                                    const groups = groupMessages(messages);
+                                    const lastReadGroupIndex = groups.findIndex(group =>
+                                        group.sender.id !== activeConversation!.friend.id &&
+                                        group.messages.every(msg => msg.read)
+                                    );
 
-            <ChatContent>
-                {activeConversation ? (
-                    <>
-                        <MessagesList>
-                            {(() => {
-                                const groups = groupMessages(messages);
-                                const lastReadGroupIndex = groups.findIndex(group =>
-                                    group.sender.id !== activeConversation!.friend.id &&
-                                    group.messages.every(msg => msg.read)
-                                );
+                                    return groups.map((group, index) => {
+                                        const isFromMe = group.sender.id !== activeConversation!.friend.id;
+                                        const isLastReadMessage = index === lastReadGroupIndex;
 
-                                return groups.map((group, index) => {
-                                    const isFromMe = group.sender.id !== activeConversation!.friend.id;
-                                    const isLastReadMessage = index === lastReadGroupIndex;
-
-                                    return (
-                                        <MessageContainer
-                                            key={`group-${group.messages[0].id}`}
-                                            $isFromMe={isFromMe}
-                                        >
-                                            {group.messages.map((message) => (
-                                                <MessageBubble
-                                                    key={message.id}
-                                                    $isFromMe={isFromMe}
-                                                >
-                                                    {message.content}
-                                                </MessageBubble>
-                                            ))}
-                                            <MessageTimestamp
+                                        return (
+                                            <MessageContainer
+                                                key={`group-${group.messages[0].id}`}
                                                 $isFromMe={isFromMe}
                                             >
-                                                {formatMessageDate(group.timestamp)}
-                                                {isFromMe && isLastReadMessage && (
-                                                    <ReadStatus>· visto</ReadStatus>
-                                                )}
-                                            </MessageTimestamp>
-                                        </MessageContainer>
-                                    );
-                                });
-                            })()}
-                        </MessagesList>
-                        <MessageForm onSubmit={handleSubmit}>
-                            <MessageInputContainer>
-                                <MessageInput
-                                    type="text"
-                                    placeholder="Escribir mensaje..."
-                                    value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
-                                />
-                                <SendButton type="submit" disabled={!newMessage.trim() || isLoading}>
-                                    <IoSend size={18} />
-                                </SendButton>
-                            </MessageInputContainer>
-                        </MessageForm>
-                    </>
-                ) : (
-                    <ConversationsList>
-                        {conversations.map((conversation) => (
-                            <ConversationItem
-                                key={conversation.friend.id}
-                                onClick={() => handleConversationClick(conversation)}
-                            >
-                                <Avatar
-                                    src={conversation.friend.avatarPath ? getImageUrl(conversation.friend.avatarPath) : USER_PROFILE_AVATAR}
-                                    alt={conversation.friend.name}
-                                />
-                                <ConversationInfo>
-                                    <UserName>{conversation.friend.nik}</UserName>
-                                    <LastMessage>{conversation.lastMessage.content}</LastMessage>
-                                </ConversationInfo>
-                                {conversation.unreadCount > 0 && (
-                                    <UnreadBadge>
-                                        {conversation.unreadCount}
-                                    </UnreadBadge>
-                                )}
-                            </ConversationItem>
-                        ))}
-                    </ConversationsList>
-                )}
-            </ChatContent>
-        </ChatDrawerContainer>
+                                                {group.messages.map((message) => (
+                                                    <MessageBubble
+                                                        key={message.id}
+                                                        $isFromMe={isFromMe}
+                                                    >
+                                                        {message.content}
+                                                    </MessageBubble>
+                                                ))}
+                                                <MessageTimestamp
+                                                    $isFromMe={isFromMe}
+                                                >
+                                                    {formatMessageDate(group.timestamp)}
+                                                    {isFromMe && isLastReadMessage && (
+                                                        <ReadStatus>· visto</ReadStatus>
+                                                    )}
+                                                </MessageTimestamp>
+                                            </MessageContainer>
+                                        );
+                                    });
+                                })()}
+                            </MessagesList>
+                            <MessageForm onSubmit={handleSubmit}>
+                                <MessageInputContainer>
+                                    <MessageInput
+                                        type="text"
+                                        placeholder="Escribir mensaje..."
+                                        value={newMessage}
+                                        onChange={(e) => setNewMessage(e.target.value)}
+                                    />
+                                    <SendButton type="submit" disabled={!newMessage.trim() || isLoading}>
+                                        <IoSend size={18} />
+                                    </SendButton>
+                                </MessageInputContainer>
+                            </MessageForm>
+                        </>
+                    ) : (
+                        <ConversationsList>
+                            {conversations.map((conversation) => (
+                                <ConversationItem
+                                    key={conversation.friend.id}
+                                    onClick={() => handleConversationClick(conversation)}
+                                >
+                                    <Avatar
+                                        src={conversation.friend.avatarPath ? getImageUrl(conversation.friend.avatarPath) : USER_PROFILE_AVATAR}
+                                        alt={conversation.friend.name}
+                                    />
+                                    <ConversationInfo>
+                                        <UserName>{conversation.friend.nik}</UserName>
+                                        <LastMessage>{conversation.lastMessage.content}</LastMessage>
+                                    </ConversationInfo>
+                                    {conversation.unreadCount > 0 && (
+                                        <UnreadBadge>
+                                            {conversation.unreadCount}
+                                        </UnreadBadge>
+                                    )}
+                                </ConversationItem>
+                            ))}
+                        </ConversationsList>
+                    )}
+                </ChatContent>
+            </ChatDrawerContainer>
+
+            <Modal
+                isOpen={showNewMessageModal}
+                onClose={() => setShowNewMessageModal(false)}
+                title="Nuevo mensaje"
+            >
+                <NewMessageModal
+                    onClose={() => setShowNewMessageModal(false)}
+                    onSelectFriend={handleNewMessage}
+                />
+            </Modal>
+        </>
     );
 } 
