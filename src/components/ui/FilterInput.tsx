@@ -2,9 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { FaSearch } from 'react-icons/fa';
 
-const InputWrapper = styled.div`
+const InputWrapper = styled.div<{ $fullWidth?: boolean }>`
   position: relative;
   display: inline-block;
+  width: ${props => props.$fullWidth ? '100%' : 'auto'};
 `;
 
 const StyledInput = styled.input`
@@ -42,11 +43,12 @@ interface FilterInputProps {
   label: string;
   value: any;
   onChange: (value: any) => void;
+  fullWidth?: boolean;
 }
 
-const FilterInput: React.FC<FilterInputProps> = ({ label, value, onChange }) => {
+const FilterInput: React.FC<FilterInputProps> = ({ label, value, onChange, fullWidth }) => {
   return (
-    <InputWrapper>
+    <InputWrapper $fullWidth={fullWidth}>
       <StyledInput
         type="text"
         value={value}

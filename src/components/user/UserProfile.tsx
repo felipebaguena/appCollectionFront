@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { FiEdit } from 'react-icons/fi';
+import { FiEdit, FiUserPlus } from 'react-icons/fi';
 import Modal from '@/components/ui/Modal';
 import UserProfileModal from '@/components/user/UserProfileModal';
 import { getImageUrl } from '@/services/api';
@@ -49,6 +49,7 @@ import {
     IoBusinessSharp,
     IoPeople
 } from 'react-icons/io5';
+import AddFriendsModal from './AddFriendsModal';
 
 interface Friend {
     id: number;
@@ -66,6 +67,7 @@ const UserProfile = () => {
     const [yearlyStats, setYearlyStats] = useState<any>(null);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [friends, setFriends] = useState<Friend[]>([]);
+    const [showAddFriendsModal, setShowAddFriendsModal] = useState(false);
     const {
         getUser,
         getUserStats,
@@ -173,7 +175,18 @@ const UserProfile = () => {
             {userStats && (
                 <>
                     <GamesSection>
-                        <SectionHeader title="Amigos" />
+                        <SectionHeader
+                            title="Amigos"
+                            rightContent={
+                                <EditButtonWrapper
+                                    $variant="primary"
+                                    onClick={() => setShowAddFriendsModal(true)}
+                                >
+                                    <FiUserPlus size={18} />
+                                    <EditButtonText>Añadir Amigos</EditButtonText>
+                                </EditButtonWrapper>
+                            }
+                        />
                         <FriendsList>
                             {friends.length > 0 ? (
                                 friends.map((friend) => (
@@ -323,6 +336,14 @@ const UserProfile = () => {
                     isOpen={showEditModal}
                     onClose={handleCloseModal}
                 />
+            </Modal>
+
+            <Modal
+                isOpen={showAddFriendsModal}
+                onClose={() => setShowAddFriendsModal(false)}
+                title="Añadir Amigos"
+            >
+                <AddFriendsModal onClose={() => setShowAddFriendsModal(false)} />
             </Modal>
         </ProfileContainer>
     );

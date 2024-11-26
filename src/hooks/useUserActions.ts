@@ -146,6 +146,13 @@ export interface CreateUserData {
   password: string;
 }
 
+interface BasicUser {
+  id: number;
+  nik: string;
+  avatarPath?: string;
+  isFriend: boolean;
+}
+
 export const useUserActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -431,6 +438,26 @@ export const useUserActions = () => {
     }
   };
 
+  const getBasicUsers = async (nik?: string) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const users = await api.get<BasicUser[]>(ENDPOINTS.GET_BASIC_USERS(nik), {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+      });
+
+      setIsLoading(false);
+      return users;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
   return {
     createUser,
     getUser,
@@ -446,6 +473,7 @@ export const useUserActions = () => {
     getUserConversations,
     getFriendMessages,
     sendMessage,
+    getBasicUsers,
     isLoading,
     error,
   };
