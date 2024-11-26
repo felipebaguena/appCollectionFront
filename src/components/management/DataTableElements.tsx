@@ -147,11 +147,13 @@ export const ButtonDataTable = styled(Button)`
   font-weight: bold;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: var(--dark-grey);
+    color: var(--app-yellow);
   }
 
   &:disabled {
     background-color: #ccc;
+    color: var(--grey);
     cursor: not-allowed;
   }
 `;
