@@ -58,13 +58,19 @@ const FriendProfile = ({ id }: FriendProfileProps) => {
         fetchData();
     }, [id]);
 
-    const formatDate = (dateString: string) => {
+    const formatDate = (dateString: string, includeTime: boolean = false) => {
         const date = new Date(dateString);
-        return new Intl.DateTimeFormat('es-ES', {
+        const options: Intl.DateTimeFormatOptions = {
             day: 'numeric',
             month: 'long',
-            year: 'numeric'
-        }).format(date);
+            year: 'numeric',
+            ...(includeTime && {
+                hour: '2-digit',
+                minute: '2-digit'
+            })
+        };
+
+        return new Intl.DateTimeFormat('es-ES', options).format(date);
     };
 
     if (!isDataLoaded || isLoading) {
@@ -78,6 +84,7 @@ const FriendProfile = ({ id }: FriendProfileProps) => {
             <SectionHeader
                 avatarUrl={profileData?.avatarPath ? getImageUrl(profileData.avatarPath) : USER_PROFILE_AVATAR}
                 nik={profileData?.nik}
+                isOnline={profileData?.isOnline}
             />
 
             <FriendInfo>
@@ -87,6 +94,14 @@ const FriendProfile = ({ id }: FriendProfileProps) => {
                         {profileData?.friendsSince ? formatDate(profileData.friendsSince) : 'No disponible'}
                     </FriendValue>
                 </FriendInfoItem>
+                {!profileData?.isOnline && profileData?.lastSeen && (
+                    <FriendInfoItem>
+                        <FriendLabel>Última conexión:</FriendLabel>
+                        <FriendValue>
+                            {formatDate(profileData.lastSeen, true)}
+                        </FriendValue>
+                    </FriendInfoItem>
+                )}
             </FriendInfo>
 
             <SectionHeader title="Estadísticas de la colección" />
