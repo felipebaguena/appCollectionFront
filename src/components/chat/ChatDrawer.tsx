@@ -266,7 +266,7 @@ export default function ChatDrawer() {
                                                 key={`group-${group.messages[0].id}`}
                                                 $isFromMe={isFromMe}
                                             >
-                                                {group.messages.map((message) => (
+                                                {group.messages.slice().reverse().map((message) => (
                                                     <MessageBubble
                                                         key={message.id}
                                                         $isFromMe={isFromMe}
