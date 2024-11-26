@@ -85,4 +85,7 @@ export const ENDPOINTS = {
     `/users/me/friends/${friendId}/messages`,
   GET_BASIC_USERS: (nik?: string) => `/users/basic${nik ? `?nik=${nik}` : ""}`,
   SEND_FRIEND_REQUEST: "/users/me/friends/requests",
+  GET_FRIEND_REQUESTS: "/users/me/friends/requests",
+  ANSWER_FRIEND_REQUEST: (requestId: number) =>
+    `/users/me/friends/requests/${requestId}`,
 };

@@ -159,6 +159,20 @@ interface FriendRequestData {
   message: string;
 }
 
+interface FriendRequestSender {
+  id: number;
+  name: string;
+  nik: string;
+  avatarPath?: string;
+}
+
+interface FriendRequest {
+  id: number;
+  sender: FriendRequestSender;
+  message: string;
+  createdAt: string;
+}
+
 export const useUserActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -479,6 +493,48 @@ export const useUserActions = () => {
     }
   };
 
+  const getFriendRequests = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const requests = await api.get<FriendRequest[]>(
+        ENDPOINTS.GET_FRIEND_REQUESTS,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+
+      setIsLoading(false);
+      return requests;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return null;
+    }
+  };
+
+  const answerFriendRequest = async (requestId: number, accept: boolean) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await api.put(
+        ENDPOINTS.ANSWER_FRIEND_REQUEST(requestId),
+        requestId.toString(),
+        { accept }
+      );
+      setIsLoading(false);
+      return true;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return false;
+    }
+  };
+
   return {
     createUser,
     getUser,
@@ -496,6 +552,8 @@ export const useUserActions = () => {
     sendMessage,
     getBasicUsers,
     sendFriendRequest,
+    getFriendRequests,
+    answerFriendRequest,
     isLoading,
     error,
   };
