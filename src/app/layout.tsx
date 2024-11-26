@@ -21,8 +21,8 @@ const geistSans = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Mi Aplicación",
-  description: "Descripción de mi aplicación",
+  title: "MVC - My Videogame Collection",
+  description: "Tu biblioteca favorita de videojuegos retro",
 };
 
 export default function RootLayout({
