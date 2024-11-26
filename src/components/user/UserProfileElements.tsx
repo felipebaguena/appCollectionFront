@@ -31,7 +31,7 @@ export const HeaderAvatarSection = styled.div`
 `;
 
 export const HeaderAvatarContainer = styled.div<{ $isEditable?: boolean }>`
-  position: absolute;
+  position: relative;
   width: 6rem;
   height: 6rem;
   cursor: ${props => props.$isEditable ? 'pointer' : 'default'};
@@ -70,7 +70,6 @@ export const HeaderAvatar = styled.img`
 export const HeaderNik = styled.h2`
   font-size: 1.5rem;
   color: var(--app-yellow);
-  margin-left: 7rem;
 `;
 
 export const ProfileInfo = styled.div`
@@ -217,6 +216,7 @@ interface SectionHeaderProps {
   rightContent?: React.ReactNode;
   onAvatarClick?: () => void;
   isEditable?: boolean;
+  isOnline?: boolean;
 }
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
@@ -225,7 +225,8 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   nik,
   rightContent,
   onAvatarClick,
-  isEditable
+  isEditable,
+  isOnline = false
 }) => {
   return (
     <HeaderContainer>
@@ -240,6 +241,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
                 src={avatarUrl}
                 alt="Avatar"
               />
+              <OnlineIndicator $isOnline={isOnline} />
               {isEditable && <EditIcon />}
             </HeaderAvatarContainer>
             <HeaderNik>{nik}</HeaderNik>
@@ -401,9 +403,23 @@ export const FriendValue = styled.span`
   color: var(--dark-grey);
 `;
 
+export const OnlineIndicator = styled.div<{ $isOnline: boolean }>`
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: ${props => props.$isOnline ? '#44b700' : '#ccc'};
+  border: 2px solid white;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+`;
+
 export interface UserData {
   nik: string;
   name: string;
   email: string;
   avatarPath?: string;
+  isOnline?: boolean;
+  lastSeen?: string;
 }

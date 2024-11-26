@@ -222,6 +222,7 @@ const UserProfile = () => {
                 rightContent={editButton}
                 onAvatarClick={handleAvatarClick}
                 isEditable={true}
+                isOnline={userData?.isOnline}
             />
             <HiddenFileInput
                 type="file"
