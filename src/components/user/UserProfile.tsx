@@ -52,6 +52,7 @@ import {
 import AddFriendsModal from './AddFriendsModal';
 import PendingRequestsModal from './PendingRequestsModal';
 import styled from 'styled-components';
+import FriendsListModal from './FriendsListModal';
 
 interface Friend {
     id: number;
@@ -90,6 +91,23 @@ const ButtonsContainer = styled.div`
   align-items: center;
 `;
 
+const FriendsCount = styled.span`
+  color: var(--app-yellow);
+  font-weight: normal;
+  cursor: pointer;
+  
+  &:hover {
+    font-weight: bold;
+  }
+`;
+
+const FriendsTitle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+`;
+
 const UserProfile = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [userData, setUserData] = useState<UserData | null>(null);
@@ -100,6 +118,7 @@ const UserProfile = () => {
     const [showAddFriendsModal, setShowAddFriendsModal] = useState(false);
     const [showPendingRequestsModal, setShowPendingRequestsModal] = useState(false);
     const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
+    const [showFriendsListModal, setShowFriendsListModal] = useState(false);
     const {
         getUser,
         getUserStats,
@@ -227,7 +246,12 @@ const UserProfile = () => {
                 <>
                     <GamesSection>
                         <SectionHeader
-                            title="Amigos"
+                            title={
+                                <FriendsTitle onClick={() => setShowFriendsListModal(true)}>
+                                    <span>Amigos</span>
+                                    <FriendsCount>({friends.length})</FriendsCount>
+                                </FriendsTitle>
+                            }
                             rightContent={
                                 <ButtonsContainer>
                                     <RequestButtonWrapper
@@ -421,6 +445,17 @@ const UserProfile = () => {
                     onClose={() => setShowPendingRequestsModal(false)}
                     onRequestsUpdate={setPendingRequests}
                     onFriendAccepted={updateFriendsList}
+                />
+            </Modal>
+
+            <Modal
+                isOpen={showFriendsListModal}
+                onClose={() => setShowFriendsListModal(false)}
+                title={`Amigos (${friends.length})`}
+            >
+                <FriendsListModal
+                    friends={friends}
+                    onClose={() => setShowFriendsListModal(false)}
                 />
             </Modal>
         </ProfileContainer>

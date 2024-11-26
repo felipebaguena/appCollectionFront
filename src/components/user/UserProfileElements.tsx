@@ -211,44 +211,46 @@ export const Title = styled.h2`
 `;
 
 interface SectionHeaderProps {
-    title?: string;
-    rightContent?: React.ReactNode;
-    avatarUrl?: string;
-    nik?: string;
-    onAvatarClick?: () => void;
-    isEditable?: boolean;
+  title?: string | React.ReactNode;
+  avatarUrl?: string;
+  nik?: string;
+  rightContent?: React.ReactNode;
+  onAvatarClick?: () => void;
+  isEditable?: boolean;
 }
 
-export const SectionHeader = ({
-    title,
-    rightContent,
-    avatarUrl,
-    nik,
-    onAvatarClick,
-    isEditable = false
-}: SectionHeaderProps) => (
+export const SectionHeader: React.FC<SectionHeaderProps> = ({
+  title,
+  avatarUrl,
+  nik,
+  rightContent,
+  onAvatarClick,
+  isEditable
+}) => {
+  return (
     <HeaderContainer>
-        <HeaderAvatarSection>
-            {avatarUrl && (
-                <>
-                    <HeaderAvatarContainer
-                        onClick={isEditable ? onAvatarClick : undefined}
-                        $isEditable={isEditable}
-                    >
-                        <HeaderAvatar
-                            src={avatarUrl}
-                            alt="Avatar"
-                        />
-                        {isEditable && <EditIcon />}
-                    </HeaderAvatarContainer>
-                    <HeaderNik>{nik}</HeaderNik>
-                </>
-            )}
-            {title && <Title>{title}</Title>}
-        </HeaderAvatarSection>
-        {rightContent}
+      <HeaderAvatarSection>
+        {avatarUrl && (
+          <>
+            <HeaderAvatarContainer
+              onClick={isEditable ? onAvatarClick : undefined}
+              $isEditable={isEditable}
+            >
+              <HeaderAvatar
+                src={avatarUrl}
+                alt="Avatar"
+              />
+              {isEditable && <EditIcon />}
+            </HeaderAvatarContainer>
+            <HeaderNik>{nik}</HeaderNik>
+          </>
+        )}
+        {title && <Title>{title}</Title>}
+      </HeaderAvatarSection>
+      {rightContent}
     </HeaderContainer>
-);
+  );
+};
 
 export const EditIcon = styled(FiEdit)`
   position: absolute;
@@ -400,8 +402,8 @@ export const FriendValue = styled.span`
 `;
 
 export interface UserData {
-    nik: string;
-    name: string;
-    email: string;
-    avatarPath?: string;
+  nik: string;
+  name: string;
+  email: string;
+  avatarPath?: string;
 }
