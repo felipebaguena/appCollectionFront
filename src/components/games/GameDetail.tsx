@@ -304,7 +304,7 @@ const RelatedArticlesSection = styled.div`
 `;
 
 const WishlistButton = styled(BaseButton)`
-  background-color: var(--grey);
+  background-color: var(--dark-grey);
   cursor: pointer;
 
   svg {

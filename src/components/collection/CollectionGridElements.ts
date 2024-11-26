@@ -387,7 +387,7 @@ export const WishlistIcon = styled.div<{ $isCompact?: boolean }>`
   position: absolute;
   top: ${(props) => (props.$isCompact ? "0.5rem" : "1rem")};
   right: ${(props) => (props.$isCompact ? "0.5rem" : "1rem")};
-  background-color: var(--grey);
+  background-color: var(--dark-grey);
   width: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
   height: ${(props) => (props.$isCompact ? "2rem" : "2.5rem")};
   display: flex;
