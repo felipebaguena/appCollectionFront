@@ -291,8 +291,8 @@ export const ArticleTitleWrapper = styled.div`
 `;
 
 export const ArticleCardTitle = styled.h3<{ $xl?: boolean }>`
-  font-size: ${props => props.$xl ? '1.5rem' : '1.3rem'};
-  margin-bottom: ${props => props.$xl ? '0.7rem' : '0.5rem'};
+  font-size: ${props => props.$xl ? '1.5rem' : '1.2rem'};
+  margin-bottom: ${props => props.$xl ? '0.7rem' : '0'};
   color: var(--dark-grey);
 
   @media (max-width: 1000px) {
@@ -311,7 +311,7 @@ export const ArticleCardTitle = styled.h3<{ $xl?: boolean }>`
 `;
 
 export const ArticleCardSubtitle = styled.p<{ $xl?: boolean }>`
-  font-size: ${props => props.$xl ? '1.1rem' : '1rem'};
+  font-size: ${props => props.$xl ? '1.1rem' : '0.95rem'};
   color: var(--mid-grey);
 
   @media (max-width: 1000px) {
@@ -324,7 +324,7 @@ export const ArticleCardSubtitle = styled.p<{ $xl?: boolean }>`
 `;
 
 export const ArticleMetadata = styled.p<{ $xl?: boolean }>`
-  font-size: ${props => props.$xl ? '0.9rem' : '0.8rem'};
+  font-size: ${props => props.$xl ? '0.9rem' : '0.7rem'};
   color: var(--grey);
   margin-top: auto;
 
