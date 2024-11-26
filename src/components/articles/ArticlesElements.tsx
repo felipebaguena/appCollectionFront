@@ -201,6 +201,8 @@ export const CoverArticleContainer = styled.div`
   }
   
   &:hover {
+    background-color: var(--mid-grey);
+    padding: 1px;
     transform: scale(1.01);
     transition: transform 0.2s ease-in-out;
   }
@@ -211,9 +213,13 @@ export const HomeCoverArticleContent = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 2rem;
+  padding: 1.5rem;
   color: white;
   z-index: 20;
+
+  @media (max-width: 480px) {
+    padding: 1rem;
+  }
 `;
 
 export const HomeCoverArticleTitle = styled.h2`
@@ -221,12 +227,12 @@ export const HomeCoverArticleTitle = styled.h2`
   margin-bottom: 0.5rem;
   font-weight: bold;
 
-  @media (max-width: 768px) {
-    font-size: 2rem;
+  @media (max-width: 900px) {
+    font-size: 1.8rem;
   }
 
   @media (max-width: 480px) {
-    font-size: 1.6rem;
+    font-size: 1.3rem;
   }
 `;
 
@@ -235,12 +241,8 @@ export const HomeCoverArticleSubtitle = styled.h3`
   opacity: 0.9;
   color: var(--clear-grey);
 
-  @media (max-width: 768px) {
-    font-size: 1rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.9rem;
+  @media (max-width: 900px) {
+    display: none;
   }
 `;
 
