@@ -365,14 +365,20 @@ export const FriendItem = styled.div`
   flex-direction: column;
   align-items: center;
   width: 80px;
+  position: relative;
+`;
+
+export const FriendAvatarContainer = styled.div`
+  position: relative;
+  width: 60px;
+  height: 60px;
 `;
 
 export const FriendAvatar = styled.img`
-  width: 60px;
-  height: 60px;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  margin-bottom: 8px;
 `;
 
 export const FriendNik = styled.span`
@@ -420,10 +426,10 @@ export const FriendValue = styled.span`
 
 export const OnlineIndicator = styled.div<{ $isOnline: boolean }>`
   position: absolute;
-  bottom: 5px;
-  right: 5px;
-  width: 16px;
-  height: 16px;
+  bottom: 0;
+  right: 2px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background-color: ${props => props.$isOnline ? '#44b700' : '#ccc'};
   border: 2px solid white;
@@ -432,6 +438,14 @@ export const OnlineIndicator = styled.div<{ $isOnline: boolean }>`
   ${props => props.$isOnline && css`
     animation: ${breatheAnimation} 3s ease-in-out infinite;
   `}
+`;
+
+export const FriendOnlineIndicator = styled(OnlineIndicator)`
+  width: 12px;
+  height: 12px;
+  right: 0;
+  bottom: 0;
+  border-width: 1.5px;
 `;
 
 export interface UserData {

@@ -34,10 +34,13 @@ import {
     FriendsSection,
     FriendsList,
     FriendItem,
+    FriendAvatarContainer,
     FriendAvatar,
     FriendNik,
     EmptyFriendsMessage,
     EmptyFriendsIcon,
+    OnlineIndicator,
+    FriendOnlineIndicator,
 } from './UserProfileElements';
 import YearlyStatsChart from '../stats/YearlyStatsChart';
 import {
@@ -60,6 +63,8 @@ interface Friend {
     name: string;
     nik: string;
     avatarPath?: string;
+    isOnline: boolean;
+    lastSeen?: string;
 }
 
 interface FriendRequestSender {
@@ -171,7 +176,7 @@ const UserProfile = () => {
                 if (user) setUserData(user);
                 if (stats) setUserStats(stats);
                 if (yearStats) setYearlyStats(yearStats);
-                if (userFriends) setFriends(userFriends);
+                if (userFriends) setFriends(userFriends as Friend[]);
             } finally {
                 setIsDataLoaded(true);
             }
@@ -194,7 +199,7 @@ const UserProfile = () => {
     const updateFriendsList = async () => {
         const userFriends = await getUserFriends();
         if (userFriends) {
-            setFriends(userFriends);
+            setFriends(userFriends as Friend[]);
         }
     };
 
@@ -282,10 +287,13 @@ const UserProfile = () => {
                                     {friends.slice(0, MAX_FRIENDS_DISPLAY).map((friend) => (
                                         <StyledLink href={`/friends/${friend.id}`} key={friend.id}>
                                             <FriendItem>
-                                                <FriendAvatar
-                                                    src={friend.avatarPath ? getImageUrl(friend.avatarPath) : USER_PROFILE_AVATAR}
-                                                    alt={friend.nik}
-                                                />
+                                                <FriendAvatarContainer>
+                                                    <FriendAvatar
+                                                        src={friend.avatarPath ? getImageUrl(friend.avatarPath) : USER_PROFILE_AVATAR}
+                                                        alt={friend.nik}
+                                                    />
+                                                    <FriendOnlineIndicator $isOnline={friend.isOnline} />
+                                                </FriendAvatarContainer>
                                                 <FriendNik>{friend.nik}</FriendNik>
                                             </FriendItem>
                                         </StyledLink>
@@ -295,11 +303,13 @@ const UserProfile = () => {
                                             style={{ cursor: 'pointer' }}
                                             onClick={() => setShowFriendsListModal(true)}
                                         >
-                                            <FriendAvatar
-                                                src={USER_PROFILE_AVATAR}
-                                                alt="Ver más"
-                                                style={{ opacity: 0.5 }}
-                                            />
+                                            <FriendAvatarContainer>
+                                                <FriendAvatar
+                                                    src={USER_PROFILE_AVATAR}
+                                                    alt="Ver más"
+                                                />
+                                                <FriendOnlineIndicator $isOnline={false} />
+                                            </FriendAvatarContainer>
                                             <FriendNik>Ver más</FriendNik>
                                         </FriendItem>
                                     )}
