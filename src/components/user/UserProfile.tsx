@@ -99,10 +99,6 @@ const FriendsCount = styled.span`
   color: var(--app-yellow);
   font-weight: normal;
   cursor: pointer;
-  
-  &:hover {
-    font-weight: bold;
-  }
 `;
 
 const FriendsTitle = styled.div`
