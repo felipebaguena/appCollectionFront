@@ -1,9 +1,10 @@
 import styled from 'styled-components';
-import { FaEye, FaEdit, FaTrash, FaImages, FaPlus, FaSync, FaSortUp, FaSortDown, FaSort } from 'react-icons/fa';
+import { FaEye, FaEdit, FaTrash, FaImages, FaPlus, FaSync, FaSortUp, FaSortDown, FaSort, FaChevronDown } from 'react-icons/fa';
 import Button from '../ui/Button';
 import { keyframes } from 'styled-components';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MdSchedule, MdPublish, MdUnpublished } from 'react-icons/md';
+import { FOOTER_HEIGHT } from '../layout/FooterElements';
 
 const fadeInOut = keyframes`
   0% {
@@ -135,10 +136,11 @@ export const PaginationContainer = styled.div`
   align-items: center;
   font-size: 14px;
   color: #333;
+  padding-bottom: 1rem;
 `;
 
 export const ButtonDataTable = styled(Button)`
-  margin: 0 1rem 1rem;
+  margin: 0 1rem 0;
   padding: 10px 10px;
   background-color: var(--app-yellow);
   color: var(--dark-grey);
@@ -442,5 +444,130 @@ export const FilterButton = styled(Button)`
 export const CompactFilterGroup = styled(FilterGroup)`
     width: auto;
 `;
+
+export const CustomSelectContainer = styled.div`
+  position: relative;
+  display: inline-block;
+  margin: 0 5px;
+`;
+
+export const CustomSelectButton = styled.button<{ disabled?: boolean }>`
+  background-color: ${props => props.disabled ? '#f5f5f5' : 'white'};
+  border: 1px solid #ddd;
+  padding: 4px 24px 4px 8px;
+  cursor: ${props => props.disabled ? 'default' : 'pointer'};
+  position: relative;
+  min-width: 60px;
+  text-align: left;
+  color: ${props => props.disabled ? '#999' : '#333'};
+  font-size: 14px;
+
+  &:hover {
+    border-color: ${props => props.disabled ? '#ddd' : '#999'};
+  }
+
+  &:focus {
+    outline: none;
+    border-color: ${props => props.disabled ? '#ddd' : 'var(--app-yellow)'};
+  }
+`;
+
+export const ChevronIcon = styled(FaChevronDown) <{ disabled?: boolean }>`
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: ${props => props.disabled ? '#999' : '#666'};
+`;
+
+export const CustomSelectList = styled.ul<{ $position: 'top' | 'bottom' }>`
+  position: absolute;
+  ${props => props.$position === 'top' ? 'bottom: 100%;' : 'top: 100%;'}
+  left: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  margin: ${props => props.$position === 'top' ? '0 0 4px 0' : '4px 0 0 0'};
+  padding: 4px 0;
+  list-style: none;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  min-width: 100%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+`;
+
+export const CustomSelectItem = styled.li`
+  padding: 4px 8px;
+  cursor: pointer;
+  color: #333;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+`;
+
+interface CustomSelectProps {
+  value: number;
+  onChange: (page: number) => void;
+  totalPages: number;
+}
+
+export const CustomSelect: React.FC<CustomSelectProps> = ({ value, onChange, totalPages }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dropDirection, setDropDirection] = useState<'top' | 'bottom'>('bottom');
+  const isDisabled = totalPages <= 1;
+
+  useEffect(() => {
+    if (isOpen && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const footerHeightInPx = parseFloat(FOOTER_HEIGHT) * parseFloat(getComputedStyle(document.documentElement).fontSize);
+      const spaceBelow = window.innerHeight - rect.bottom - footerHeightInPx;
+      const spaceAbove = rect.top;
+      const listHeight = Math.min(200, totalPages * 28);
+
+      setDropDirection(spaceBelow < listHeight && spaceAbove > spaceBelow ? 'top' : 'bottom');
+    }
+  }, [isOpen, totalPages]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <CustomSelectContainer ref={containerRef}>
+      <CustomSelectButton
+        onClick={() => !isDisabled && setIsOpen(!isOpen)}
+        disabled={isDisabled}
+      >
+        {value}
+        <ChevronIcon disabled={isDisabled} />
+      </CustomSelectButton>
+      {!isDisabled && isOpen && (
+        <CustomSelectList $position={dropDirection}>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <CustomSelectItem
+              key={i + 1}
+              onClick={() => {
+                onChange(i + 1);
+                setIsOpen(false);
+              }}
+            >
+              {i + 1}
+            </CustomSelectItem>
+          ))}
+        </CustomSelectList>
+      )}
+    </CustomSelectContainer>
+  );
+};
 
 

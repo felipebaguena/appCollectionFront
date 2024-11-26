@@ -33,6 +33,7 @@ import {
     ScheduleButtonDataTable,
     PublishButtonDataTable,
     UnpublishButtonDataTable,
+    CustomSelect,
 } from './DataTableElements';
 
 // Next imports
@@ -501,6 +502,11 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
         setShowPublishActions(true);
     };
 
+    const handlePageSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const selectedPage = parseInt(event.target.value, 10);
+        handlePageChange(selectedPage);
+    };
+
     return (
         <DataTableContainer>
             {title && (
@@ -592,8 +598,13 @@ function DataTable<T extends { id: number }, F extends BaseFilter>({
                     Anterior
                 </ButtonDataTable>
                 <span>
-                    Página {params.page} de {totalPages} |
-                    Mostrando {Math.min(params.limit, data.length)} de {totalItems} registros
+                    Página
+                    <CustomSelect
+                        value={params.page}
+                        onChange={handlePageChange}
+                        totalPages={totalPages}
+                    />
+                    de {totalPages} | {totalItems} registros
                 </span>
                 <ButtonDataTable onClick={() => handlePageChange(params.page + 1)} disabled={params.page === totalPages}>
                     Siguiente
