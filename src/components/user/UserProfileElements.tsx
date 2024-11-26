@@ -441,8 +441,8 @@ export const OnlineIndicator = styled.div<{ $isOnline: boolean }>`
 `;
 
 export const FriendOnlineIndicator = styled(OnlineIndicator)`
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   right: 0;
   bottom: 0;
   border-width: 1.5px;
