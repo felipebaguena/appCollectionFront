@@ -57,6 +57,8 @@ interface Friend {
     avatarPath?: string;
 }
 
+const USER_PROFILE_AVATAR = "http://localhost:3000/uploads/front/user-image-placeholder.jpg";
+
 const UserProfile = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [userData, setUserData] = useState<UserData | null>(null);
@@ -144,7 +146,7 @@ const UserProfile = () => {
     return (
         <ProfileContainer>
             <SectionHeader
-                avatarUrl={userData?.avatarPath ? getImageUrl(userData.avatarPath) : '/default-avatar.png'}
+                avatarUrl={userData?.avatarPath ? getImageUrl(userData.avatarPath) : USER_PROFILE_AVATAR}
                 nik={userData?.nik}
                 rightContent={editButton}
                 onAvatarClick={handleAvatarClick}
@@ -178,7 +180,7 @@ const UserProfile = () => {
                                     <StyledLink href={`/friends/${friend.id}`} key={friend.id}>
                                         <FriendItem>
                                             <FriendAvatar
-                                                src={friend.avatarPath ? getImageUrl(friend.avatarPath) : '/default-avatar.png'}
+                                                src={friend.avatarPath ? getImageUrl(friend.avatarPath) : USER_PROFILE_AVATAR}
                                                 alt={friend.nik}
                                             />
                                             <FriendNik>{friend.nik}</FriendNik>

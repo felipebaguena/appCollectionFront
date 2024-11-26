@@ -37,7 +37,7 @@ import {
   UserContainer,
 } from "@/components/layout/NavbarElements";
 import { useAuth } from "@/contexts/AuthContext";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { getImageUrl } from "@/services/api";
 
 const Navbar = () => {
@@ -48,6 +48,7 @@ const Navbar = () => {
 
   const { isAuthenticated, user, userRole, logout, login, loading } = useAuth();
   const pathname = usePathname() || "";
+  const router = useRouter();
 
   const managementOptions = [
     { name: "Juegos", route: "/management/manage-games" },
@@ -119,6 +120,7 @@ const Navbar = () => {
   const handleLogoutConfirm = () => {
     logout();
     setShowLogoutConfirmation(false);
+    router.push('/');
   };
 
   const handleRegisterClick = () => {

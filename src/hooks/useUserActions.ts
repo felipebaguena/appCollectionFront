@@ -139,11 +139,18 @@ export interface Message {
   receiver: MessageSender;
 }
 
+export interface CreateUserData {
+  name: string;
+  nik: string;
+  email: string;
+  password: string;
+}
+
 export const useUserActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createUser = async (userData: User) => {
+  const createUser = async (userData: CreateUserData) => {
     setIsLoading(true);
     setError(null);
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@/components/ui/Button';
-import { useUserActions } from '@/hooks/useUserActions';
+import { useUserActions, CreateUserData } from '@/hooks/useUserActions';
 import {
   StyledForm,
   InputGroup,
@@ -16,6 +16,7 @@ interface CreateUserFormProps {
 
 const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose }) => {
   const [name, setName] = useState('');
+  const [nik, setNik] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -39,11 +40,19 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose }) => {
       return;
     }
 
-    const success = await createUser({ name, email, password });
+    const userData: CreateUserData = {
+      name,
+      nik,
+      email,
+      password
+    };
+
+    const success = await createUser(userData);
 
     if (success) {
       setMessage('Usuario creado con éxito');
       setName('');
+      setNik('');
       setEmail('');
       setPassword('');
       setConfirmPassword('');
@@ -63,6 +72,16 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose }) => {
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </InputGroup>
+        <InputGroup>
+          <Label htmlFor="nik">Nik:</Label>
+          <Input
+            type="text"
+            id="nik"
+            value={nik}
+            onChange={(e) => setNik(e.target.value)}
             required
           />
         </InputGroup>

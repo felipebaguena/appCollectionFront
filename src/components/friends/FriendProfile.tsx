@@ -39,6 +39,8 @@ interface FriendProfileProps {
     id: string;
 }
 
+const USER_PROFILE_AVATAR = "http://localhost:3000/uploads/front/user-image-placeholder.jpg";
+
 const FriendProfile = ({ id }: FriendProfileProps) => {
     const [profileData, setProfileData] = useState<any>(null);
     const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -75,7 +77,7 @@ const FriendProfile = ({ id }: FriendProfileProps) => {
     return (
         <ProfileContainer>
             <SectionHeader
-                avatarUrl={profileData?.avatarPath ? getImageUrl(profileData.avatarPath) : '/default-avatar.png'}
+                avatarUrl={profileData?.avatarPath ? getImageUrl(profileData.avatarPath) : USER_PROFILE_AVATAR}
                 nik={profileData?.nik}
             />
 

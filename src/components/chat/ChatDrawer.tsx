@@ -73,6 +73,8 @@ const groupMessages = (messages: Message[]): MessageGroup[] => {
     return groups;
 };
 
+const USER_PROFILE_AVATAR = "http://localhost:3000/uploads/front/user-image-placeholder.jpg";
+
 export default function ChatDrawer() {
     const { isAuthenticated } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
@@ -254,7 +256,7 @@ export default function ChatDrawer() {
                                 onClick={() => handleConversationClick(conversation)}
                             >
                                 <Avatar
-                                    src={conversation.friend.avatarPath ? getImageUrl(conversation.friend.avatarPath) : '/default-avatar.png'}
+                                    src={conversation.friend.avatarPath ? getImageUrl(conversation.friend.avatarPath) : USER_PROFILE_AVATAR}
                                     alt={conversation.friend.name}
                                 />
                                 <ConversationInfo>
