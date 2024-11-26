@@ -14,38 +14,46 @@ const Container = styled.div`
   min-height: 200px;
 `;
 
-const FriendsList = styled.div`
+const SearchContainer = styled.div`
+  margin-bottom: 1rem;
+  width: 100%;
+`;
+
+const UsersList = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+`;
+
+const UserItem = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  flex: 1;
-`;
-
-const FriendItem = styled.div`
-  display: flex;
   align-items: center;
-  padding: 1rem;
-  gap: 1rem;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  text-align: center;
+  position: relative;
   cursor: pointer;
-  background: var(--dark-grey);
-  border-radius: 8px;
-
-  &:hover {
-    background: var(--mid-grey);
-  }
 `;
 
-const Avatar = styled.img`
-  width: 40px;
-  height: 40px;
+const AvatarContainer = styled.div`
+  position: relative;
+  width: 64px;
+  height: 64px;
+`;
+
+const UserAvatar = styled.img`
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   object-fit: cover;
 `;
 
-const FriendName = styled.div`
-  font-weight: 600;
+const UserNik = styled.span`
+  font-size: 0.9rem;
   color: var(--text-color);
+  word-break: break-word;
 `;
 
 const ButtonContainer = styled.div`
@@ -80,27 +88,31 @@ const NewMessageModal: React.FC<NewMessageModalProps> = ({ onClose, onSelectFrie
 
     return (
         <Container>
-            <FilterInput
-                label="Buscar amigo..."
-                value={searchTerm}
-                onChange={setSearchTerm}
-                fullWidth
-            />
+            <SearchContainer>
+                <FilterInput
+                    label="Buscar amigo..."
+                    value={searchTerm}
+                    onChange={setSearchTerm}
+                    fullWidth
+                />
+            </SearchContainer>
 
-            <FriendsList>
+            <UsersList>
                 {filteredFriends.map(friend => (
-                    <FriendItem
+                    <UserItem
                         key={friend.id}
                         onClick={() => onSelectFriend(friend)}
                     >
-                        <Avatar
-                            src={friend.avatarPath ? getImageUrl(friend.avatarPath) : USER_PROFILE_AVATAR}
-                            alt={friend.nik}
-                        />
-                        <FriendName>{friend.nik}</FriendName>
-                    </FriendItem>
+                        <AvatarContainer>
+                            <UserAvatar
+                                src={friend.avatarPath ? getImageUrl(friend.avatarPath) : USER_PROFILE_AVATAR}
+                                alt={friend.nik}
+                            />
+                        </AvatarContainer>
+                        <UserNik>{friend.nik}</UserNik>
+                    </UserItem>
                 ))}
-            </FriendsList>
+            </UsersList>
 
             <ButtonContainer>
                 <Button
