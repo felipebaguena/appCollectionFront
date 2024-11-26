@@ -151,6 +151,12 @@ interface BasicUser {
   nik: string;
   avatarPath?: string;
   isFriend: boolean;
+  hasPendingFriendRequest: boolean;
+}
+
+interface FriendRequestData {
+  nik: string;
+  message: string;
 }
 
 export const useUserActions = () => {
@@ -458,6 +464,21 @@ export const useUserActions = () => {
     }
   };
 
+  const sendFriendRequest = async (data: FriendRequestData) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await api.post(ENDPOINTS.SEND_FRIEND_REQUEST, data);
+      setIsLoading(false);
+      return true;
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Error desconocido");
+      setIsLoading(false);
+      return false;
+    }
+  };
+
   return {
     createUser,
     getUser,
@@ -474,6 +495,7 @@ export const useUserActions = () => {
     getFriendMessages,
     sendMessage,
     getBasicUsers,
+    sendFriendRequest,
     isLoading,
     error,
   };

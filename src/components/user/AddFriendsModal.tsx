@@ -4,7 +4,7 @@ import FilterInput from '@/components/ui/FilterInput';
 import Button from '@/components/ui/Button';
 import { useUserActions } from '@/hooks/useUserActions';
 import { getImageUrl } from '@/services/api';
-import { IoHeart, IoAdd } from 'react-icons/io5';
+import { IoHeart, IoAdd, IoArrowBack, IoTime } from 'react-icons/io5';
 
 const SearchContainer = styled.div`
   margin-bottom: 1rem;
@@ -61,11 +61,20 @@ const ButtonContainer = styled.div`
   margin-top: 2rem;
 `;
 
-const StatusIcon = styled.div<{ $isFriend: boolean }>`
+const StatusIcon = styled.div<{ $status: 'friend' | 'pending' | 'none' }>`
   position: absolute;
   top: -4px;
   right: -4px;
-  background-color: ${props => props.$isFriend ? 'var(--app-yellow)' : 'var(--dark-grey)'};
+  background-color: ${props => {
+        switch (props.$status) {
+            case 'friend':
+                return 'var(--app-yellow)';
+            case 'pending':
+                return 'var(--clear-grey)';
+            default:
+                return 'var(--dark-grey)';
+        }
+    }};
   border-radius: 50%;
   padding: 0.3rem;
   display: flex;
@@ -74,13 +83,71 @@ const StatusIcon = styled.div<{ $isFriend: boolean }>`
   z-index: 1;
   
   svg {
-    color: ${props => props.$isFriend ? 'var(--dark-grey)' : 'white'};
+    color: ${props => {
+        switch (props.$status) {
+            case 'friend':
+                return 'var(--dark-grey)';
+            case 'pending':
+                return 'var(--dark-grey)';
+            default:
+                return 'white';
+        }
+    }};
     width: 16px;
     height: 16px;
   }
 `;
 
 const USER_PROFILE_AVATAR = "http://localhost:3000/uploads/front/user-image-placeholder.jpg";
+
+const HeaderContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+`;
+
+const BackButton = styled.button`
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  
+  &:hover {
+    color: var(--app-yellow);
+  }
+`;
+
+const MessageInput = styled.textarea`
+  width: 100%;
+  min-height: 100px;
+  padding: 0.8rem;
+  margin: 1rem 0;
+  background: var(--dark-grey);
+  border: 1px solid var(--clear-grey);
+  color: var(--text-color);
+  resize: vertical;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--app-yellow);
+  }
+`;
+
+const Title = styled.h3`
+  margin: 0;
+  color: var(--text-color);
+`;
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+`;
 
 interface AddFriendsModalProps {
     onClose: () => void;
@@ -89,7 +156,9 @@ interface AddFriendsModalProps {
 const AddFriendsModal: React.FC<AddFriendsModalProps> = ({ onClose }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState<any[]>([]);
-    const { getBasicUsers, isLoading } = useUserActions();
+    const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [message, setMessage] = useState('¡Hola! Me gustaría que fuésemos amigos.');
+    const { getBasicUsers, sendFriendRequest, isLoading } = useUserActions();
 
     useEffect(() => {
         const searchUsers = async () => {
@@ -103,8 +172,61 @@ const AddFriendsModal: React.FC<AddFriendsModalProps> = ({ onClose }) => {
     }, [searchTerm]);
 
     const handleAddFriend = (user: any) => {
-        console.log('añadir amigo:', user.nik);
+        setSelectedUser(user);
     };
+
+    const handleBack = () => {
+        setSelectedUser(null);
+    };
+
+    const handleSendRequest = async () => {
+        if (selectedUser) {
+            const success = await sendFriendRequest({
+                nik: selectedUser.nik,
+                message
+            });
+            if (success) {
+                onClose();
+            }
+        }
+    };
+
+    if (selectedUser) {
+        return (
+            <div>
+                <HeaderContainer>
+                    <BackButton onClick={handleBack}>
+                        <IoArrowBack size={24} />
+                    </BackButton>
+                    <Title>Añadir a {selectedUser.nik} a amigos</Title>
+                </HeaderContainer>
+
+                <MessageInput
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Escribe un mensaje para la solicitud..."
+                />
+
+                <ButtonsContainer>
+                    <Button
+                        type="button"
+                        $variant="cancel"
+                        onClick={onClose}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        type="button"
+                        $variant="primary"
+                        onClick={handleSendRequest}
+                        disabled={isLoading}
+                    >
+                        Enviar solicitud
+                    </Button>
+                </ButtonsContainer>
+            </div>
+        );
+    }
 
     return (
         <div>
@@ -121,16 +243,30 @@ const AddFriendsModal: React.FC<AddFriendsModalProps> = ({ onClose }) => {
                 {users.map(user => (
                     <UserItem
                         key={user.id}
-                        $isClickable={!user.isFriend}
-                        onClick={() => !user.isFriend && handleAddFriend(user)}
+                        $isClickable={!user.isFriend && !user.hasPendingFriendRequest}
+                        onClick={() => !user.isFriend && !user.hasPendingFriendRequest && handleAddFriend(user)}
                     >
                         <AvatarContainer>
                             <UserAvatar
                                 src={user.avatarPath ? getImageUrl(user.avatarPath) : USER_PROFILE_AVATAR}
                                 alt={user.nik}
                             />
-                            <StatusIcon $isFriend={user.isFriend}>
-                                {user.isFriend ? <IoHeart /> : <IoAdd />}
+                            <StatusIcon
+                                $status={
+                                    user.isFriend
+                                        ? 'friend'
+                                        : user.hasPendingFriendRequest
+                                            ? 'pending'
+                                            : 'none'
+                                }
+                            >
+                                {user.isFriend ? (
+                                    <IoHeart />
+                                ) : user.hasPendingFriendRequest ? (
+                                    <IoTime />
+                                ) : (
+                                    <IoAdd />
+                                )}
                             </StatusIcon>
                         </AvatarContainer>
                         <UserNik>{user.nik}</UserNik>
