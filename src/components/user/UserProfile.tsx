@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { FiEdit, FiUserPlus } from 'react-icons/fi';
+import { FiEdit, FiUserPlus, FiUserCheck } from 'react-icons/fi';
 import Modal from '@/components/ui/Modal';
 import UserProfileModal from '@/components/user/UserProfileModal';
 import { getImageUrl } from '@/services/api';
@@ -50,6 +50,8 @@ import {
     IoPeople
 } from 'react-icons/io5';
 import AddFriendsModal from './AddFriendsModal';
+import PendingRequestsModal from './PendingRequestsModal';
+import styled from 'styled-components';
 
 interface Friend {
     id: number;
@@ -58,7 +60,35 @@ interface Friend {
     avatarPath?: string;
 }
 
+interface FriendRequestSender {
+    id: number;
+    name: string;
+    nik: string;
+    avatarPath?: string;
+}
+
+interface FriendRequest {
+    id: number;
+    sender: FriendRequestSender;
+    message: string;
+    createdAt: string;
+}
+
 const USER_PROFILE_AVATAR = "http://localhost:3000/uploads/front/user-image-placeholder.jpg";
+
+const RequestButtonWrapper = styled(EditButtonWrapper) <{ $hasPendingRequests: boolean }>`
+  background-color: ${props => props.$hasPendingRequests ? 'var(--app-yellow)' : 'var(--dark-grey)'};
+  margin-right: 1rem;
+  
+  svg, span {
+    color: ${props => props.$hasPendingRequests ? 'var(--dark-grey)' : 'white'};
+  }
+`;
+
+const ButtonsContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const UserProfile = () => {
     const [showEditModal, setShowEditModal] = useState(false);
@@ -68,6 +98,8 @@ const UserProfile = () => {
     const [isDataLoaded, setIsDataLoaded] = useState(false);
     const [friends, setFriends] = useState<Friend[]>([]);
     const [showAddFriendsModal, setShowAddFriendsModal] = useState(false);
+    const [showPendingRequestsModal, setShowPendingRequestsModal] = useState(false);
+    const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
     const {
         getUser,
         getUserStats,
@@ -75,7 +107,8 @@ const UserProfile = () => {
         getUserYearGames,
         getUserFriends,
         isLoading,
-        error
+        error,
+        getFriendRequests,
     } = useUserActions();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -129,6 +162,24 @@ const UserProfile = () => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        const fetchPendingRequests = async () => {
+            const requests = await getFriendRequests();
+            if (requests) {
+                setPendingRequests(requests);
+            }
+        };
+
+        fetchPendingRequests();
+    }, []);
+
+    const updateFriendsList = async () => {
+        const userFriends = await getUserFriends();
+        if (userFriends) {
+            setFriends(userFriends);
+        }
+    };
+
     if (!isDataLoaded || isLoading) {
         return <FullPageSpinner />;
     }
@@ -178,13 +229,27 @@ const UserProfile = () => {
                         <SectionHeader
                             title="Amigos"
                             rightContent={
-                                <EditButtonWrapper
-                                    $variant="primary"
-                                    onClick={() => setShowAddFriendsModal(true)}
-                                >
-                                    <FiUserPlus size={18} />
-                                    <EditButtonText>Añadir Amigos</EditButtonText>
-                                </EditButtonWrapper>
+                                <ButtonsContainer>
+                                    <RequestButtonWrapper
+                                        $variant="primary"
+                                        $hasPendingRequests={pendingRequests.length > 0}
+                                        onClick={() => setShowPendingRequestsModal(true)}
+                                    >
+                                        <FiUserCheck size={18} />
+                                        <EditButtonText>
+                                            {pendingRequests.length > 0
+                                                ? `Solicitudes (${pendingRequests.length})`
+                                                : 'Solicitudes'}
+                                        </EditButtonText>
+                                    </RequestButtonWrapper>
+                                    <EditButtonWrapper
+                                        $variant="primary"
+                                        onClick={() => setShowAddFriendsModal(true)}
+                                    >
+                                        <FiUserPlus size={18} />
+                                        <EditButtonText>Añadir Amigos</EditButtonText>
+                                    </EditButtonWrapper>
+                                </ButtonsContainer>
                             }
                         />
                         <FriendsList>
@@ -344,6 +409,19 @@ const UserProfile = () => {
                 title="Añadir Amigos"
             >
                 <AddFriendsModal onClose={() => setShowAddFriendsModal(false)} />
+            </Modal>
+
+            <Modal
+                isOpen={showPendingRequestsModal}
+                onClose={() => setShowPendingRequestsModal(false)}
+                title="Solicitudes de amistad pendientes"
+            >
+                <PendingRequestsModal
+                    requests={pendingRequests}
+                    onClose={() => setShowPendingRequestsModal(false)}
+                    onRequestsUpdate={setPendingRequests}
+                    onFriendAccepted={updateFriendsList}
+                />
             </Modal>
         </ProfileContainer>
     );
