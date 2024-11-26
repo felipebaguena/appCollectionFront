@@ -34,12 +34,11 @@ import {
     IoGrid,
     IoBusinessSharp,
 } from 'react-icons/io5';
+import { USER_PROFILE_AVATAR } from '@/constants/ui';
 
 interface FriendProfileProps {
     id: string;
 }
-
-const USER_PROFILE_AVATAR = "http://localhost:3000/uploads/front/user-image-placeholder.jpg";
 
 const FriendProfile = ({ id }: FriendProfileProps) => {
     const [profileData, setProfileData] = useState<any>(null);

@@ -36,6 +36,7 @@ import { isSameDay, differenceInDays } from 'date-fns';
 import Modal from '@/components/ui/Modal';
 import NewMessageModal from './NewMessageModal';
 import { Friend } from '@/types/friends';
+import { USER_PROFILE_AVATAR } from '@/constants/ui';
 
 interface MessageGroup {
     messages: Message[];
@@ -75,8 +76,6 @@ const groupMessages = (messages: Message[]): MessageGroup[] => {
 
     return groups;
 };
-
-const USER_PROFILE_AVATAR = "http://localhost:3000/uploads/front/user-image-placeholder.jpg";
 
 export default function ChatDrawer() {
     const { isAuthenticated } = useAuth();

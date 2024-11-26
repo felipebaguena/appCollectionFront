@@ -53,6 +53,7 @@ import AddFriendsModal from './AddFriendsModal';
 import PendingRequestsModal from './PendingRequestsModal';
 import styled from 'styled-components';
 import FriendsListModal from './FriendsListModal';
+import { MAX_FRIENDS_DISPLAY, USER_PROFILE_AVATAR } from '@/constants/ui';
 
 interface Friend {
     id: number;
@@ -74,8 +75,6 @@ interface FriendRequest {
     message: string;
     createdAt: string;
 }
-
-const USER_PROFILE_AVATAR = "http://localhost:3000/uploads/front/user-image-placeholder.jpg";
 
 const RequestButtonWrapper = styled(EditButtonWrapper) <{ $hasPendingRequests: boolean }>`
   background-color: ${props => props.$hasPendingRequests ? 'var(--app-yellow)' : 'var(--dark-grey)'};
@@ -278,17 +277,32 @@ const UserProfile = () => {
                         />
                         <FriendsList>
                             {friends.length > 0 ? (
-                                friends.map((friend) => (
-                                    <StyledLink href={`/friends/${friend.id}`} key={friend.id}>
-                                        <FriendItem>
+                                <>
+                                    {friends.slice(0, MAX_FRIENDS_DISPLAY).map((friend) => (
+                                        <StyledLink href={`/friends/${friend.id}`} key={friend.id}>
+                                            <FriendItem>
+                                                <FriendAvatar
+                                                    src={friend.avatarPath ? getImageUrl(friend.avatarPath) : USER_PROFILE_AVATAR}
+                                                    alt={friend.nik}
+                                                />
+                                                <FriendNik>{friend.nik}</FriendNik>
+                                            </FriendItem>
+                                        </StyledLink>
+                                    ))}
+                                    {friends.length > MAX_FRIENDS_DISPLAY && (
+                                        <FriendItem
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => setShowFriendsListModal(true)}
+                                        >
                                             <FriendAvatar
-                                                src={friend.avatarPath ? getImageUrl(friend.avatarPath) : USER_PROFILE_AVATAR}
-                                                alt={friend.nik}
+                                                src={USER_PROFILE_AVATAR}
+                                                alt="Ver más"
+                                                style={{ opacity: 0.5 }}
                                             />
-                                            <FriendNik>{friend.nik}</FriendNik>
+                                            <FriendNik>Ver más</FriendNik>
                                         </FriendItem>
-                                    </StyledLink>
-                                ))
+                                    )}
+                                </>
                             ) : (
                                 <EmptyFriendsMessage>
                                     <EmptyFriendsIcon size={24} />

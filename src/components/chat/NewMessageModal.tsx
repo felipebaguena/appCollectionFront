@@ -5,8 +5,7 @@ import Button from '@/components/ui/Button';
 import { useUserActions } from '@/hooks/useUserActions';
 import { getImageUrl } from '@/services/api';
 import { Friend } from '@/types/friends';
-
-const USER_PROFILE_AVATAR = "http://localhost:3000/uploads/front/user-image-placeholder.jpg";
+import { USER_PROFILE_AVATAR } from '@/constants/ui';
 
 const Container = styled.div`
   display: flex;

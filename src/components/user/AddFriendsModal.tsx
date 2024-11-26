@@ -5,6 +5,7 @@ import Button from '@/components/ui/Button';
 import { useUserActions } from '@/hooks/useUserActions';
 import { getImageUrl } from '@/services/api';
 import { IoHeart, IoAdd, IoArrowBack, IoTime } from 'react-icons/io5';
+import { USER_PROFILE_AVATAR } from '@/constants/ui';
 
 const SearchContainer = styled.div`
   margin-bottom: 1rem;
@@ -97,8 +98,6 @@ const StatusIcon = styled.div<{ $status: 'friend' | 'pending' | 'none' }>`
     height: 16px;
   }
 `;
-
-const USER_PROFILE_AVATAR = "http://localhost:3000/uploads/front/user-image-placeholder.jpg";
 
 const HeaderContainer = styled.div`
   display: flex;
