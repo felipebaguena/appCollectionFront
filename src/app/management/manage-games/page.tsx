@@ -13,6 +13,14 @@ import { FilterPackage } from '@/types/filters';
 export default function ManageGames() {
   const columns = getGameColumns(gameColumns);
 
+  const initialParams = {
+    page: 1,
+    limit: 20,
+    sortField: 'id' as keyof Game,
+    sortOrder: 'desc' as const,
+    filters: {}
+  };
+
   return (
     <div>
       <DataTableContainer>
@@ -21,6 +29,7 @@ export default function ManageGames() {
           columns={columns}
           endpoint={ENDPOINTS.GET_GAMES_DATATABLE}
           form="game"
+          initialParams={initialParams}
           filterPackage={filterPackages.game as FilterPackage<Game, typeof filterPackages.game.filters>}
           breakpoint={968}
         />
