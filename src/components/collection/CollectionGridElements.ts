@@ -121,7 +121,7 @@ export const AddToCollectionLabel = styled.div`
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: var(--grey);
+  background-color: var(--dark-grey);
   color: white;
   padding: 0.6rem 0.8rem;
   font-weight: bold;
@@ -133,11 +133,6 @@ export const AddToCollectionLabel = styled.div`
 
   @media (max-width: 768px) {
     display: none;
-  }
-
-  &:hover {
-    background-color: var(--dark-grey);
-    transition: background-color 0.4s ease;
   }
 `;
 
