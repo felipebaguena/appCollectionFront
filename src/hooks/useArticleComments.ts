@@ -9,6 +9,8 @@ export interface User {
   name: string;
   nik: string;
   avatarPath: string | null;
+  isFriend?: boolean;
+  isPending?: boolean;
 }
 
 export interface Comment {

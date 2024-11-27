@@ -150,14 +150,21 @@ const ButtonsContainer = styled.div`
 
 interface AddFriendsModalProps {
     onClose: () => void;
+    initialUser?: any;
 }
 
-const AddFriendsModal: React.FC<AddFriendsModalProps> = ({ onClose }) => {
+const AddFriendsModal: React.FC<AddFriendsModalProps> = ({ onClose, initialUser }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState<any[]>([]);
-    const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [selectedUser, setSelectedUser] = useState<any>(initialUser || null);
     const [message, setMessage] = useState('¡Hola! Me gustaría que fuésemos amigos.');
     const { getBasicUsers, sendFriendRequest, isLoading } = useUserActions();
+
+    useEffect(() => {
+        if (initialUser) {
+            setSelectedUser(initialUser);
+        }
+    }, [initialUser]);
 
     useEffect(() => {
         const searchUsers = async () => {

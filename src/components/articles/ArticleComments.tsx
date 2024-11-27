@@ -9,6 +9,9 @@ import { USER_PROFILE_AVATAR } from '@/constants/ui';
 import { FiEdit2, FiTrash2, FiCornerUpLeft } from 'react-icons/fi';
 import Button from '@/components/ui/Button';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import AddFriendsModal from '@/components/user/AddFriendsModal';
+import Modal from '@/components/ui/Modal';
+import { GoPersonAdd } from 'react-icons/go';
 
 const CommentsContainer = styled.div`
   max-width: 1200px;
@@ -163,6 +166,21 @@ const ReplyButton = styled.button`
   }
 `;
 
+const AddFriendButton = styled.button`
+  background: none;
+  border: none;
+  color: var(--grey);
+  cursor: pointer;
+  padding: 0.2rem;
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  
+  &:hover {
+    color: var(--mid-grey);
+  }
+`;
+
 interface ArticleCommentsProps {
     articleId: string;
 }
@@ -177,6 +195,8 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
     const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
     const [replyingTo, setReplyingTo] = useState<number | null>(null);
     const [replyContent, setReplyContent] = useState('');
+    const [showAddFriendModal, setShowAddFriendModal] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<any>(null);
 
     useEffect(() => {
         fetchComments(articleId);
@@ -248,6 +268,11 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
         }
     };
 
+    const handleAddFriend = (userToAdd: any) => {
+        setSelectedUser(userToAdd);
+        setShowAddFriendModal(true);
+    };
+
     const renderComment = (comment: Comment, isReply = false) => (
         <CommentItem key={comment.id}>
             <CommentHeader>
@@ -257,6 +282,14 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
                         alt={comment.user.nik}
                     />
                     <UserName>{comment.user.nik}</UserName>
+                    {isAuthenticated &&
+                        user?.id !== comment.user.id &&
+                        !comment.user.isFriend &&
+                        !comment.user.isPending && (
+                            <AddFriendButton onClick={() => handleAddFriend(comment.user)}>
+                                <GoPersonAdd />
+                            </AddFriendButton>
+                        )}
                     <CommentDate>
                         {new Date(comment.createdAt).toLocaleDateString()}
                         {comment.isEdited && ' (editado)'}
@@ -353,53 +386,74 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
     );
 
     return (
-        <CommentsContainer>
-            <CommentsSection>
-                <CommentsHeader>
-                    {comments?.totalItems === 1
-                        ? "1 Comentario"
-                        : `${comments?.totalItems || 0} Comentarios`}
-                </CommentsHeader>
+        <>
+            <CommentsContainer>
+                <CommentsSection>
+                    <CommentsHeader>
+                        {comments?.totalItems === 1
+                            ? "1 Comentario"
+                            : `${comments?.totalItems || 0} Comentarios`}
+                    </CommentsHeader>
 
-                <CommentForm onSubmit={handleSubmit}>
-                    <CommentInput
-                        value={newComment}
-                        onChange={(e) => setNewComment(e.target.value)}
-                        placeholder={isAuthenticated ? "Escribe un comentario..." : "Inicia sesión para comentar"}
-                        disabled={!isAuthenticated}
+                    <CommentForm onSubmit={handleSubmit}>
+                        <CommentInput
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            placeholder={isAuthenticated ? "Escribe un comentario..." : "Inicia sesión para comentar"}
+                            disabled={!isAuthenticated}
+                        />
+                        <SendButtonContainer>
+                            <Button
+                                type="submit"
+                                disabled={!isAuthenticated || !newComment.trim()}
+                                $variant="primary"
+                            >
+                                Publicar comentario
+                            </Button>
+                        </SendButtonContainer>
+                    </CommentForm>
+
+                    {loading ? (
+                        <div>Cargando comentarios...</div>
+                    ) : (
+                        <CommentsList>
+                            {comments?.comments
+                                .filter(comment => !comment.parentId)
+                                .map(comment => renderComment(comment))}
+                        </CommentsList>
+                    )}
+                </CommentsSection>
+                <ConfirmationModal
+                    isOpen={isDeleteModalOpen}
+                    onClose={handleDeleteCancel}
+                    onConfirm={handleDeleteConfirm}
+                    title="Eliminar comentario"
+                    message="¿Estás seguro de que deseas eliminar este comentario?"
+                    confirmText="Eliminar"
+                    cancelText="Cancelar"
+                    confirmVariant="danger"
+                />
+            </CommentsContainer>
+            {showAddFriendModal && (
+                <Modal
+                    isOpen={showAddFriendModal}
+                    onClose={() => {
+                        setShowAddFriendModal(false);
+                        setSelectedUser(null);
+                    }}
+                    title={`Añadir a ${selectedUser?.nik} a amigos`}
+                    width="500px"
+                >
+                    <AddFriendsModal
+                        onClose={() => {
+                            setShowAddFriendModal(false);
+                            setSelectedUser(null);
+                        }}
+                        initialUser={selectedUser}
                     />
-                    <SendButtonContainer>
-                        <Button
-                            type="submit"
-                            disabled={!isAuthenticated || !newComment.trim()}
-                            $variant="primary"
-                        >
-                            Publicar comentario
-                        </Button>
-                    </SendButtonContainer>
-                </CommentForm>
-
-                {loading ? (
-                    <div>Cargando comentarios...</div>
-                ) : (
-                    <CommentsList>
-                        {comments?.comments
-                            .filter(comment => !comment.parentId)
-                            .map(comment => renderComment(comment))}
-                    </CommentsList>
-                )}
-            </CommentsSection>
-            <ConfirmationModal
-                isOpen={isDeleteModalOpen}
-                onClose={handleDeleteCancel}
-                onConfirm={handleDeleteConfirm}
-                title="Eliminar comentario"
-                message="¿Estás seguro de que deseas eliminar este comentario?"
-                confirmText="Eliminar"
-                cancelText="Cancelar"
-                confirmVariant="danger"
-            />
-        </CommentsContainer>
+                </Modal>
+            )}
+        </>
     );
 };
 
