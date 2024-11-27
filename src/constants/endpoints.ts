@@ -88,4 +88,12 @@ export const ENDPOINTS = {
   GET_FRIEND_REQUESTS: "/users/me/friends/requests",
   ANSWER_FRIEND_REQUEST: (requestId: number) =>
     `/users/me/friends/requests/${requestId}`,
+  CREATE_ARTICLE_COMMENT: (articleId: string) =>
+    `/articles/comments/article/${articleId}`,
+  GET_ARTICLE_COMMENTS: (articleId: string, page: number, limit: number) =>
+    `/articles/comments/article/${articleId}?page=${page}&limit=${limit}`,
+  UPDATE_ARTICLE_COMMENT: (commentId: string) =>
+    `/articles/comments/${commentId}`,
+  DELETE_ARTICLE_COMMENT: (commentId: string) =>
+    `/articles/comments/${commentId}`,
 };
