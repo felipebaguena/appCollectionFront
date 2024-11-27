@@ -31,7 +31,6 @@ import {
     UserData,
     StatHeader,
     StatIcon,
-    FriendsSection,
     FriendsList,
     FriendItem,
     FriendAvatarContainer,
@@ -39,7 +38,6 @@ import {
     FriendNik,
     EmptyFriendsMessage,
     EmptyFriendsIcon,
-    OnlineIndicator,
     FriendOnlineIndicator,
 } from './UserProfileElements';
 import YearlyStatsChart from '../stats/YearlyStatsChart';
@@ -49,14 +47,15 @@ import {
     IoHeart,
     IoDesktop,
     IoGrid,
-    IoBusinessSharp,
-    IoPeople
+    IoBusinessSharp
 } from 'react-icons/io5';
 import AddFriendsModal from './AddFriendsModal';
 import PendingRequestsModal from './PendingRequestsModal';
 import styled from 'styled-components';
 import FriendsListModal from './FriendsListModal';
 import { MAX_FRIENDS_DISPLAY, USER_PROFILE_AVATAR } from '@/constants/ui';
+import { useAuth } from '@/contexts/AuthContext';
+
 
 interface Friend {
     id: number;
@@ -129,6 +128,7 @@ const UserProfile = () => {
         error,
         getFriendRequests,
     } = useUserActions();
+    const { updateUser } = useAuth();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleCloseModal = async () => {
@@ -153,6 +153,7 @@ const UserProfile = () => {
                 const updatedUser = await getUser();
                 if (updatedUser) {
                     setUserData(updatedUser);
+                    updateUser(updatedUser);
                 }
             }
         } catch (error) {
