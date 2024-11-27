@@ -15,6 +15,11 @@
   --font-principal: Arial, Helvetica, sans-serif;
 }
 
+textarea,
+input {
+  font-family: var(--font-geist-sans);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
