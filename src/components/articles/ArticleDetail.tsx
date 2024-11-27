@@ -4,6 +4,7 @@ import { useArticle } from '@/hooks/useArticle';
 import { getImageUrl } from '@/services/api';
 import { TemplateCode, templateComponents } from '@/types/articleTemplate';
 import ArticleTags from '@/components/articles/ArticleTags';
+import ArticleComments from '@/components/articles/ArticleComments';
 
 interface ArticleDetailProps {
     id: string;
@@ -45,6 +46,7 @@ const ArticleDetail: React.FC<ArticleDetailProps> = ({ id }) => {
                 relatedDevelopers={article.relatedDevelopers}
                 relatedGenres={article.relatedGenres}
             />
+            <ArticleComments articleId={id} />
         </>
     );
 };

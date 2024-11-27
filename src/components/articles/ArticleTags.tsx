@@ -3,7 +3,6 @@ import { useRouter } from 'next/navigation';
 
 const TagsWrapper = styled.div`
   width: 100%;
-  padding: 0 0 2rem 0;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
@@ -13,7 +12,7 @@ const TagsContainer = styled.div`
   width: 100%;
   max-width: 1200px;
   background-color: white;
-  margin: 0 auto 2rem;
+  margin: 0 auto 0;
   padding-bottom: 4rem;
 `;
 
@@ -24,7 +23,7 @@ const TagsList = styled.div`
   max-width: 45rem;
   gap: 0.5rem;
   border-top: 1px solid var(--light-grey);
-  padding-top: 2rem;
+  padding: 2rem 1.5rem 0 1.5rem;
 `;
 
 const BaseTag = styled.span`
