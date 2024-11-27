@@ -11,6 +11,7 @@ export interface User {
   avatarPath: string | null;
   isFriend?: boolean;
   isPending?: boolean;
+  isOnline: boolean;
 }
 
 export interface Comment {

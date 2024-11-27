@@ -181,6 +181,23 @@ const AddFriendButton = styled.button`
   }
 `;
 
+const AvatarContainer = styled.div`
+  position: relative;
+  width: 32px;
+  height: 32px;
+`;
+
+const OnlineIndicator = styled.div<{ $isOnline: boolean }>`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: ${props => props.$isOnline ? '#44b700' : '#ccc'};
+  border: 2px solid white;
+`;
+
 interface ArticleCommentsProps {
     articleId: string;
 }
@@ -277,10 +294,13 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
         <CommentItem key={comment.id}>
             <CommentHeader>
                 <UserInfo>
-                    <UserAvatar
-                        src={comment.user.avatarPath ? getImageUrl(comment.user.avatarPath) : USER_PROFILE_AVATAR}
-                        alt={comment.user.nik}
-                    />
+                    <AvatarContainer>
+                        <UserAvatar
+                            src={comment.user.avatarPath ? getImageUrl(comment.user.avatarPath) : USER_PROFILE_AVATAR}
+                            alt={comment.user.nik}
+                        />
+                        <OnlineIndicator $isOnline={comment.user.isOnline} />
+                    </AvatarContainer>
                     <UserName>{comment.user.nik}</UserName>
                     {isAuthenticated &&
                         user?.id !== comment.user.id &&
