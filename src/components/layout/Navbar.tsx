@@ -220,7 +220,10 @@ const Navbar = () => {
           onClose={() => setShowRegisterForm(false)}
           title="Crear Usuario"
         >
-          <CreateUserForm onClose={() => setShowRegisterForm(false)} />
+          <CreateUserForm
+            onClose={() => setShowRegisterForm(false)}
+            onLoginSuccess={handleLoginSuccess}
+          />
         </Modal>
         <ConfirmationModal
           isOpen={showLogoutConfirmation}

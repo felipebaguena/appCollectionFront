@@ -182,13 +182,27 @@ export const useUserActions = () => {
     setError(null);
 
     try {
-      await api.post(ENDPOINTS.CREATE_USER, userData);
+      const response = await api.post<{ access_token: string }>(
+        ENDPOINTS.CREATE_USER,
+        userData
+      );
       setIsLoading(false);
-      return true;
+
+      if (response.access_token) {
+        localStorage.setItem("access_token", response.access_token);
+      }
+
+      return {
+        success: true,
+        access_token: response.access_token,
+      };
     } catch (error) {
       setError(error instanceof Error ? error.message : "Error desconocido");
       setIsLoading(false);
-      return false;
+      return {
+        success: false,
+        access_token: null,
+      };
     }
   };
 

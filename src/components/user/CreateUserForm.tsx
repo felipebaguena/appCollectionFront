@@ -12,9 +12,10 @@ import {
 
 interface CreateUserFormProps {
   onClose: () => void;
+  onLoginSuccess?: (access_token: string) => void;
 }
 
-const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose }) => {
+const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose, onLoginSuccess }) => {
   const [name, setName] = useState('');
   const [nik, setNik] = useState('');
   const [email, setEmail] = useState('');
@@ -47,18 +48,20 @@ const CreateUserForm: React.FC<CreateUserFormProps> = ({ onClose }) => {
       password
     };
 
-    const success = await createUser(userData);
+    try {
+      const response = await createUser(userData);
 
-    if (success) {
-      setMessage('Usuario creado con éxito');
-      setName('');
-      setNik('');
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
-      setTimeout(onClose, 2000);
-    } else {
-      setMessage(error || 'No se pudo crear el usuario');
+      if (response.success) {
+        setMessage('Usuario creado con éxito');
+        if (response.access_token && onLoginSuccess) {
+          onLoginSuccess(response.access_token);
+        }
+        onClose();
+      } else {
+        setMessage(error || 'No se pudo crear el usuario');
+      }
+    } catch (err) {
+      setMessage('Error al crear el usuario');
     }
   };
 
