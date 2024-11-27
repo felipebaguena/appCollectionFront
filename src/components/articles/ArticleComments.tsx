@@ -6,7 +6,7 @@ import { Comment, useArticleComments } from '@/hooks/useArticleComments';
 import styled from 'styled-components';
 import { getImageUrl } from '@/services/api';
 import { USER_PROFILE_AVATAR } from '@/constants/ui';
-import { FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiCornerUpLeft } from 'react-icons/fi';
 import Button from '@/components/ui/Button';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
@@ -128,12 +128,6 @@ const CommentDate = styled.span`
   color: #666;
 `;
 
-const LoginMessage = styled.div`
-  text-align: center;
-  color: #666;
-  padding: 1rem;
-`;
-
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -147,7 +141,7 @@ const CommentsHeader = styled.h2`
 `;
 
 const ReplyContainer = styled.div`
-  margin-left: 2rem;
+  margin-left: 1rem;
   margin-top: 1rem;
   padding-left: 1rem;
   border-left: 2px solid #e0e0e0;
@@ -156,13 +150,16 @@ const ReplyContainer = styled.div`
 const ReplyButton = styled.button`
   background: none;
   border: none;
-  color: var(--app-yellow);
+  color: var(--grey);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   padding: 0.5rem 0;
-  
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+
   &:hover {
-    text-decoration: underline;
+    color: var(--mid-grey);
   }
 `;
 
@@ -309,7 +306,7 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
                     <CommentContent>{comment.content}</CommentContent>
                     {isAuthenticated && (
                         <ReplyButton onClick={() => setReplyingTo(comment.id)}>
-                            Responder
+                            <FiCornerUpLeft /> Responder
                         </ReplyButton>
                     )}
                 </>
