@@ -4,20 +4,22 @@ import { useState, useCallback } from "react";
 import { api } from "@/services/api";
 import { ENDPOINTS } from "@/constants/endpoints";
 
-interface User {
+export interface User {
   id: number;
   name: string;
   nik: string;
   avatarPath: string | null;
 }
 
-interface Comment {
+export interface Comment {
   id: number;
   content: string;
   createdAt: string;
   updatedAt: string;
   isEdited: boolean;
+  parentId: number | null;
   user: User;
+  replies: Comment[];
 }
 
 interface CommentsResponse {
@@ -110,6 +112,26 @@ export const useArticleComments = () => {
     }
   }, []);
 
+  const replyToComment = useCallback(
+    async (commentId: string, commentData: CreateCommentData) => {
+      setLoading(true);
+      try {
+        const data = await api.post<Comment>(
+          ENDPOINTS.REPLY_TO_COMMENT(commentId),
+          commentData
+        );
+        setError(null);
+        return data;
+      } catch (error) {
+        setError("Error al responder al comentario");
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
   return {
     comments,
     loading,
@@ -118,5 +140,6 @@ export const useArticleComments = () => {
     createComment,
     updateComment,
     deleteComment,
+    replyToComment,
   };
 };

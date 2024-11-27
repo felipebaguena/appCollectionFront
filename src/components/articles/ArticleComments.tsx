@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useArticleComments } from '@/hooks/useArticleComments';
+import { Comment, useArticleComments } from '@/hooks/useArticleComments';
 import styled from 'styled-components';
 import { getImageUrl } from '@/services/api';
 import { USER_PROFILE_AVATAR } from '@/constants/ui';
@@ -146,18 +146,40 @@ const CommentsHeader = styled.h2`
   color: var(--grey);
 `;
 
+const ReplyContainer = styled.div`
+  margin-left: 2rem;
+  margin-top: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid #e0e0e0;
+`;
+
+const ReplyButton = styled.button`
+  background: none;
+  border: none;
+  color: var(--app-yellow);
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 interface ArticleCommentsProps {
     articleId: string;
 }
 
 const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
     const { isAuthenticated, user } = useAuth();
-    const { comments, loading, fetchComments, createComment, updateComment, deleteComment } = useArticleComments();
+    const { comments, loading, fetchComments, createComment, updateComment, deleteComment, replyToComment } = useArticleComments();
     const [newComment, setNewComment] = useState('');
     const [editingComment, setEditingComment] = useState<number | null>(null);
     const [editContent, setEditContent] = useState('');
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
+    const [replyingTo, setReplyingTo] = useState<number | null>(null);
+    const [replyContent, setReplyContent] = useState('');
 
     useEffect(() => {
         fetchComments(articleId);
@@ -216,6 +238,123 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
         setEditContent('');
     };
 
+    const handleReply = async (commentId: string) => {
+        if (!replyContent.trim()) return;
+
+        try {
+            await replyToComment(commentId, { content: replyContent.trim() });
+            setReplyContent('');
+            setReplyingTo(null);
+            fetchComments(articleId);
+        } catch (error) {
+            console.error('Error al responder al comentario:', error);
+        }
+    };
+
+    const renderComment = (comment: Comment, isReply = false) => (
+        <CommentItem key={comment.id}>
+            <CommentHeader>
+                <UserInfo>
+                    <UserAvatar
+                        src={comment.user.avatarPath ? getImageUrl(comment.user.avatarPath) : USER_PROFILE_AVATAR}
+                        alt={comment.user.nik}
+                    />
+                    <UserName>{comment.user.nik}</UserName>
+                    <CommentDate>
+                        {new Date(comment.createdAt).toLocaleDateString()}
+                        {comment.isEdited && ' (editado)'}
+                    </CommentDate>
+                </UserInfo>
+                {user?.id === comment.user.id && (
+                    <CommentActions>
+                        <ActionButton onClick={() => {
+                            setEditingComment(comment.id);
+                            setEditContent(comment.content);
+                        }}>
+                            <FiEdit2 />
+                        </ActionButton>
+                        <ActionButton onClick={() => handleDeleteClick(comment.id.toString())}>
+                            <FiTrash2 />
+                        </ActionButton>
+                    </CommentActions>
+                )}
+            </CommentHeader>
+            {editingComment === comment.id ? (
+                <CommentForm onSubmit={(e) => {
+                    e.preventDefault();
+                    handleEdit(comment.id.toString());
+                }}>
+                    <CommentInput
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                    />
+                    <ButtonContainer>
+                        <Button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            $variant="cancel"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            type="submit"
+                            $variant="primary"
+                        >
+                            Actualizar comentario
+                        </Button>
+                    </ButtonContainer>
+                </CommentForm>
+            ) : (
+                <>
+                    <CommentContent>{comment.content}</CommentContent>
+                    {isAuthenticated && (
+                        <ReplyButton onClick={() => setReplyingTo(comment.id)}>
+                            Responder
+                        </ReplyButton>
+                    )}
+                </>
+            )}
+
+            {replyingTo === comment.id && (
+                <CommentForm onSubmit={(e) => {
+                    e.preventDefault();
+                    handleReply(comment.id.toString());
+                }}>
+                    <CommentInput
+                        value={replyContent}
+                        onChange={(e) => setReplyContent(e.target.value)}
+                        placeholder="Escribe una respuesta..."
+                    />
+                    <ButtonContainer>
+                        <Button
+                            type="button"
+                            onClick={() => {
+                                setReplyingTo(null);
+                                setReplyContent('');
+                            }}
+                            $variant="cancel"
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            type="submit"
+                            $variant="primary"
+                            disabled={!replyContent.trim()}
+                        >
+                            Responder
+                        </Button>
+                    </ButtonContainer>
+                </CommentForm>
+            )}
+
+            {comment.replies && comment.replies.length > 0 && (
+                <ReplyContainer>
+                    {comment.replies.map(reply => renderComment(reply, true))}
+                </ReplyContainer>
+            )}
+        </CommentItem>
+    );
+
     return (
         <CommentsContainer>
             <CommentsSection>
@@ -247,64 +386,9 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
                     <div>Cargando comentarios...</div>
                 ) : (
                     <CommentsList>
-                        {comments?.comments.map((comment) => (
-                            <CommentItem key={comment.id}>
-                                <CommentHeader>
-                                    <UserInfo>
-                                        <UserAvatar
-                                            src={comment.user.avatarPath ? getImageUrl(comment.user.avatarPath) : USER_PROFILE_AVATAR}
-                                            alt={comment.user.nik}
-                                        />
-                                        <UserName>{comment.user.nik}</UserName>
-                                        <CommentDate>
-                                            {new Date(comment.createdAt).toLocaleDateString()}
-                                            {comment.isEdited && ' (editado)'}
-                                        </CommentDate>
-                                    </UserInfo>
-                                    {user?.id === comment.user.id && (
-                                        <CommentActions>
-                                            <ActionButton onClick={() => {
-                                                setEditingComment(comment.id);
-                                                setEditContent(comment.content);
-                                            }}>
-                                                <FiEdit2 />
-                                            </ActionButton>
-                                            <ActionButton onClick={() => handleDeleteClick(comment.id.toString())}>
-                                                <FiTrash2 />
-                                            </ActionButton>
-                                        </CommentActions>
-                                    )}
-                                </CommentHeader>
-                                {editingComment === comment.id ? (
-                                    <CommentForm onSubmit={(e) => {
-                                        e.preventDefault();
-                                        handleEdit(comment.id.toString());
-                                    }}>
-                                        <CommentInput
-                                            value={editContent}
-                                            onChange={(e) => setEditContent(e.target.value)}
-                                        />
-                                        <ButtonContainer>
-                                            <Button
-                                                type="button"
-                                                onClick={handleCancelEdit}
-                                                $variant="cancel"
-                                            >
-                                                Cancelar
-                                            </Button>
-                                            <Button
-                                                type="submit"
-                                                $variant="primary"
-                                            >
-                                                Actualizar comentario
-                                            </Button>
-                                        </ButtonContainer>
-                                    </CommentForm>
-                                ) : (
-                                    <CommentContent>{comment.content}</CommentContent>
-                                )}
-                            </CommentItem>
-                        ))}
+                        {comments?.comments
+                            .filter(comment => !comment.parentId)
+                            .map(comment => renderComment(comment))}
                     </CommentsList>
                 )}
             </CommentsSection>

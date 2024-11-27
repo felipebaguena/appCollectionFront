@@ -96,4 +96,6 @@ export const ENDPOINTS = {
     `/articles/comments/${commentId}`,
   DELETE_ARTICLE_COMMENT: (commentId: string) =>
     `/articles/comments/${commentId}`,
+  REPLY_TO_COMMENT: (commentId: string) =>
+    `/articles/comments/${commentId}/reply`,
 };
