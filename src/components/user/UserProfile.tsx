@@ -70,6 +70,8 @@ import {
     CommentContent,
     ArticleTitle,
 } from './UserProfileElements';
+import PaginationGrid from '../ui/PaginationGrid';
+
 
 interface Friend {
     id: number;
@@ -108,6 +110,8 @@ const UserProfile = () => {
     const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
     const [showFriendsListModal, setShowFriendsListModal] = useState(false);
     const [replies, setReplies] = useState<any>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const {
         getUser,
         getUserStats,
@@ -187,9 +191,10 @@ const UserProfile = () => {
     useEffect(() => {
         const fetchReplies = async () => {
             try {
-                const data = await getCommentsReplies();
+                const data = await getCommentsReplies(currentPage);
                 if (data) {
                     setReplies(data);
+                    setTotalPages(data.totalPages);
                 }
             } catch (error) {
                 console.error('Error al cargar las respuestas:', error);
@@ -197,13 +202,17 @@ const UserProfile = () => {
         };
 
         fetchReplies();
-    }, []);
+    }, [currentPage]);
 
     const updateFriendsList = async () => {
         const userFriends = await getUserFriends();
         if (userFriends) {
             setFriends(userFriends as Friend[]);
         }
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
     };
 
     if (!isDataLoaded || isLoading) {
@@ -336,25 +345,33 @@ const UserProfile = () => {
                             </CommentsHeader>
 
                             {replies && replies.replies.length > 0 ? (
-                                replies.replies.map((reply: any) => (
-                                    <CommentItem key={reply.id}>
-                                        <CommentUserInfo>
-                                            <FriendAvatarContainer>
-                                                <FriendAvatar
-                                                    src={reply.user.avatarPath ? getImageUrl(reply.user.avatarPath) : USER_PROFILE_AVATAR}
-                                                    alt={reply.user.nik}
-                                                />
-                                            </FriendAvatarContainer>
-                                            <FriendNik>{reply.user.nik}</FriendNik>
-                                        </CommentUserInfo>
-                                        <CommentContent>
-                                            {reply.content}
-                                        </CommentContent>
-                                        <ArticleTitle>
-                                            {replies.article.title}
-                                        </ArticleTitle>
-                                    </CommentItem>
-                                ))
+                                <>
+                                    {replies.replies.map((reply: any) => (
+                                        <CommentItem key={reply.id}>
+                                            <CommentUserInfo>
+                                                <FriendAvatarContainer>
+                                                    <FriendAvatar
+                                                        src={reply.user.avatarPath ? getImageUrl(reply.user.avatarPath) : USER_PROFILE_AVATAR}
+                                                        alt={reply.user.nik}
+                                                    />
+                                                </FriendAvatarContainer>
+                                                <FriendNik>{reply.user.nik}</FriendNik>
+                                            </CommentUserInfo>
+                                            <CommentContent>
+                                                {reply.content}
+                                            </CommentContent>
+                                            <ArticleTitle>
+                                                {replies.article.title}
+                                            </ArticleTitle>
+                                        </CommentItem>
+                                    ))}
+                                    <PaginationGrid
+                                        currentPage={currentPage}
+                                        totalPages={totalPages}
+                                        onPageChange={handlePageChange}
+                                        noPadding
+                                    />
+                                </>
                             ) : (
                                 <EmptyCommentsMessage>
                                     <IoChatbubbleEllipses size={24} />

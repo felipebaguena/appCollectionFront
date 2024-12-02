@@ -509,7 +509,7 @@ export const CommentItem = styled.div`
   align-items: center;
   gap: 1.5rem;
   padding: 1rem 2rem;
-  border-bottom: 1px solid var(--dark-grey);
+  border-bottom: 1px solid var(--clear-grey);
   min-height: 5rem;
 
   &:last-child {

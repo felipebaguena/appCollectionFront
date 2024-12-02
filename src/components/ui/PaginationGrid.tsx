@@ -1,17 +1,27 @@
 import React from 'react';
 import { PageButton, Pagination } from '../collection/CollectionGridElements';
 import { PaginationContainer } from '../management/DataTableElements';
+import styled from 'styled-components';
 
+const CustomPaginationContainer = styled(PaginationContainer) <{ $noPadding?: boolean }>`
+  padding-bottom: ${props => props.$noPadding ? '0' : '1rem'};
+`;
 
 interface PaginationGridProps {
     currentPage: number;
     totalPages: number;
     onPageChange: (page: number) => void;
+    noPadding?: boolean;
 }
 
-const PaginationGrid: React.FC<PaginationGridProps> = ({ currentPage, totalPages, onPageChange }) => {
+const PaginationGrid: React.FC<PaginationGridProps> = ({
+    currentPage,
+    totalPages,
+    onPageChange,
+    noPadding
+}) => {
     return (
-        <PaginationContainer>
+        <CustomPaginationContainer $noPadding={noPadding}>
             <Pagination>
                 <PageButton
                     onClick={() => onPageChange(currentPage - 1)}
@@ -38,7 +48,7 @@ const PaginationGrid: React.FC<PaginationGridProps> = ({ currentPage, totalPages
                     Siguiente
                 </PageButton>
             </Pagination>
-        </PaginationContainer>
+        </CustomPaginationContainer>
     );
 };
 
