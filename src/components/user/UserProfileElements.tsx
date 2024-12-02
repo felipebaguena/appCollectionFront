@@ -372,6 +372,7 @@ export const FriendAvatarContainer = styled.div`
   position: relative;
   width: 60px;
   height: 60px;
+  flex-shrink: 0;
 `;
 
 export const FriendAvatar = styled.img`
@@ -483,7 +484,7 @@ export const CommentsList = styled.div`
 
 export const CommentsHeader = styled.div`
   display: grid;
-  grid-template-columns: 120px 2fr 1fr;
+  grid-template-columns: 140px 2fr 1fr;
   gap: 1.5rem;
   padding: 0 2rem;
   background-color: var(--mid-grey);
@@ -505,7 +506,7 @@ export const HeaderColumn = styled.div<{ $align?: string }>`
 
 export const CommentItem = styled.div`
   display: grid;
-  grid-template-columns: 120px 2fr 1fr;
+  grid-template-columns: 140px 2fr 1fr;
   align-items: center;
   gap: 1.5rem;
   padding: 1rem 2rem;
@@ -529,12 +530,28 @@ export const CommentItem = styled.div`
 
 export const CommentUserInfo = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   width: 100%;
+  gap: 0.8rem;
 
   @media (max-width: 480px) {
     grid-area: user;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+`;
+
+export const UserInfoText = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1;
+  
+  @media (max-width: 480px) {
+    align-items: center;
+    width: 100%;
   }
 `;
 
@@ -572,6 +589,19 @@ export const ArticleTitle = styled.div`
 export const EmptyCommentsMessage = styled(EmptyFriendsMessage)`
   svg {
     margin-bottom: 10px;
+  }
+`;
+
+export const CommentDate = styled.span`
+  font-size: 0.75rem;
+  color: var(--grey);
+`;
+
+export const CommentNik = styled(FriendNik)`
+  text-align: left;
+  
+  @media (max-width: 480px) {
+    text-align: center;
   }
 `;
 

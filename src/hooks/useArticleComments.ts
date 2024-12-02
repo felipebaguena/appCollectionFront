@@ -50,6 +50,7 @@ interface ReplyUser {
 interface Reply {
   id: number;
   content: string;
+  createdAt: string;
   user: ReplyUser;
 }
 

@@ -39,6 +39,10 @@ import {
     EmptyFriendsMessage,
     EmptyFriendsIcon,
     FriendOnlineIndicator,
+    CommentDate,
+    CommentUserInfo,
+    UserInfoText,
+    CommentNik,
 } from './UserProfileElements';
 import YearlyStatsChart from '../stats/YearlyStatsChart';
 import {
@@ -66,7 +70,6 @@ import {
     CommentsHeader,
     HeaderColumn,
     CommentItem,
-    CommentUserInfo,
     CommentContent,
     ArticleTitle,
 } from './UserProfileElements';
@@ -339,7 +342,7 @@ const UserProfile = () => {
                         <SectionHeader title="Comentarios" />
                         <CommentsList>
                             <CommentsHeader>
-                                <HeaderColumn $align="center">Te responde</HeaderColumn>
+                                <HeaderColumn>Te responde</HeaderColumn>
                                 <HeaderColumn>Comentario</HeaderColumn>
                                 <HeaderColumn>Artículo</HeaderColumn>
                             </CommentsHeader>
@@ -355,7 +358,16 @@ const UserProfile = () => {
                                                         alt={reply.user.nik}
                                                     />
                                                 </FriendAvatarContainer>
-                                                <FriendNik>{reply.user.nik}</FriendNik>
+                                                <UserInfoText>
+                                                    <CommentNik>{reply.user.nik}</CommentNik>
+                                                    <CommentDate>
+                                                        {new Date(reply.createdAt).toLocaleDateString('es-ES', {
+                                                            day: '2-digit',
+                                                            month: '2-digit',
+                                                            year: '2-digit'
+                                                        })}
+                                                    </CommentDate>
+                                                </UserInfoText>
                                             </CommentUserInfo>
                                             <CommentContent>
                                                 {reply.content}
