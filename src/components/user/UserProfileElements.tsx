@@ -285,10 +285,7 @@ export const HiddenFileInput = styled.input`
   display: none;
 `;
 
-export const StyledLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
-`;
+
 
 export const GameCard = styled.div`
   background: white;
@@ -525,6 +522,16 @@ export const CommentItem = styled.div`
     gap: 1rem;
     padding: 1.5rem 1rem;
     align-items: end;
+  }
+`;
+
+export const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  
+  &:hover ${CommentItem} {
+    background-color: var(--clear-grey);
   }
 `;
 

@@ -73,6 +73,11 @@ const CommentItem = styled.div`
   background-color: white;
   border: 1px solid #e0e0e0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+
+  &.highlight {
+    background-color: rgba(255, 198, 0, 0.1);
+  }
 `;
 
 const CommentHeader = styled.div`
@@ -219,6 +224,25 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
         fetchComments(articleId);
     }, [articleId, fetchComments]);
 
+    useEffect(() => {
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#comment-')) {
+            setTimeout(() => {
+                const element = document.querySelector(hash);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    element.classList.add('highlight');
+                    setTimeout(() => {
+                        const elementStillExists = document.querySelector(hash);
+                        if (elementStillExists) {
+                            elementStillExists.classList.remove('highlight');
+                        }
+                    }, 2000);
+                }
+            }, 500);
+        }
+    }, [comments]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newComment.trim()) return;
@@ -291,7 +315,7 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
     };
 
     const renderComment = (comment: Comment, isReply = false) => (
-        <CommentItem key={comment.id}>
+        <CommentItem key={comment.id} id={`comment-${comment.id}`}>
             <CommentHeader>
                 <UserInfo>
                     <AvatarContainer>

@@ -350,32 +350,37 @@ const UserProfile = () => {
                             {replies && replies.replies.length > 0 ? (
                                 <>
                                     {replies.replies.map((reply: any) => (
-                                        <CommentItem key={reply.id}>
-                                            <CommentUserInfo>
-                                                <FriendAvatarContainer>
-                                                    <FriendAvatar
-                                                        src={reply.user.avatarPath ? getImageUrl(reply.user.avatarPath) : USER_PROFILE_AVATAR}
-                                                        alt={reply.user.nik}
-                                                    />
-                                                </FriendAvatarContainer>
-                                                <UserInfoText>
-                                                    <CommentNik>{reply.user.nik}</CommentNik>
-                                                    <CommentDate>
-                                                        {new Date(reply.createdAt).toLocaleDateString('es-ES', {
-                                                            day: '2-digit',
-                                                            month: '2-digit',
-                                                            year: '2-digit'
-                                                        })}
-                                                    </CommentDate>
-                                                </UserInfoText>
-                                            </CommentUserInfo>
-                                            <CommentContent>
-                                                {reply.content}
-                                            </CommentContent>
-                                            <ArticleTitle>
-                                                {replies.article.title}
-                                            </ArticleTitle>
-                                        </CommentItem>
+                                        <StyledLink
+                                            key={reply.id}
+                                            href={`/articles/${replies.article.id}#comment-${reply.id}`}
+                                        >
+                                            <CommentItem>
+                                                <CommentUserInfo>
+                                                    <FriendAvatarContainer>
+                                                        <FriendAvatar
+                                                            src={reply.user.avatarPath ? getImageUrl(reply.user.avatarPath) : USER_PROFILE_AVATAR}
+                                                            alt={reply.user.nik}
+                                                        />
+                                                    </FriendAvatarContainer>
+                                                    <UserInfoText>
+                                                        <CommentNik>{reply.user.nik}</CommentNik>
+                                                        <CommentDate>
+                                                            {new Date(reply.createdAt).toLocaleDateString('es-ES', {
+                                                                day: '2-digit',
+                                                                month: '2-digit',
+                                                                year: '2-digit'
+                                                            })}
+                                                        </CommentDate>
+                                                    </UserInfoText>
+                                                </CommentUserInfo>
+                                                <CommentContent>
+                                                    {reply.content}
+                                                </CommentContent>
+                                                <ArticleTitle>
+                                                    {replies.article.title}
+                                                </ArticleTitle>
+                                            </CommentItem>
+                                        </StyledLink>
                                     ))}
                                     <PaginationGrid
                                         currentPage={currentPage}
