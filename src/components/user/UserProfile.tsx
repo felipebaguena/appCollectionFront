@@ -55,7 +55,21 @@ import styled from 'styled-components';
 import FriendsListModal from './FriendsListModal';
 import { MAX_FRIENDS_DISPLAY, USER_PROFILE_AVATAR } from '@/constants/ui';
 import { useAuth } from '@/contexts/AuthContext';
-
+import { useArticleComments } from '@/hooks/useArticleComments';
+import { IoChatbubbleEllipses } from 'react-icons/io5';
+import {
+    RequestButtonWrapper,
+    ButtonsContainer,
+    FriendsCount,
+    FriendsTitle,
+    CommentsList,
+    CommentsHeader,
+    HeaderColumn,
+    CommentItem,
+    CommentUserInfo,
+    CommentContent,
+    ArticleTitle,
+} from './UserProfileElements';
 
 interface Friend {
     id: number;
@@ -80,32 +94,7 @@ interface FriendRequest {
     createdAt: string;
 }
 
-const RequestButtonWrapper = styled(EditButtonWrapper) <{ $hasPendingRequests: boolean }>`
-  background-color: ${props => props.$hasPendingRequests ? 'var(--app-yellow)' : 'var(--dark-grey)'};
-  margin-right: 1rem;
-  
-  svg, span {
-    color: ${props => props.$hasPendingRequests ? 'var(--dark-grey)' : 'white'};
-  }
-`;
-
-const ButtonsContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const FriendsCount = styled.span`
-  color: var(--app-yellow);
-  font-weight: normal;
-  cursor: pointer;
-`;
-
-const FriendsTitle = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  cursor: pointer;
-`;
+const EmptyCommentsMessage = styled(EmptyFriendsMessage)``;
 
 const UserProfile = () => {
     const [showEditModal, setShowEditModal] = useState(false);
@@ -118,6 +107,7 @@ const UserProfile = () => {
     const [showPendingRequestsModal, setShowPendingRequestsModal] = useState(false);
     const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
     const [showFriendsListModal, setShowFriendsListModal] = useState(false);
+    const [replies, setReplies] = useState<any>(null);
     const {
         getUser,
         getUserStats,
@@ -130,6 +120,7 @@ const UserProfile = () => {
     } = useUserActions();
     const { updateUser } = useAuth();
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { getCommentsReplies } = useArticleComments();
 
     const handleCloseModal = async () => {
         const updatedUser = await getUser();
@@ -191,6 +182,21 @@ const UserProfile = () => {
         };
 
         fetchPendingRequests();
+    }, []);
+
+    useEffect(() => {
+        const fetchReplies = async () => {
+            try {
+                const data = await getCommentsReplies();
+                if (data) {
+                    setReplies(data);
+                }
+            } catch (error) {
+                console.error('Error al cargar las respuestas:', error);
+            }
+        };
+
+        fetchReplies();
     }, []);
 
     const updateFriendsList = async () => {
@@ -318,6 +324,44 @@ const UserProfile = () => {
                                 </EmptyFriendsMessage>
                             )}
                         </FriendsList>
+                    </GamesSection>
+
+                    <GamesSection>
+                        <SectionHeader title="Comentarios" />
+                        <CommentsList>
+                            <CommentsHeader>
+                                <HeaderColumn $align="center">Te responde</HeaderColumn>
+                                <HeaderColumn>Comentario</HeaderColumn>
+                                <HeaderColumn>Artículo</HeaderColumn>
+                            </CommentsHeader>
+
+                            {replies && replies.replies.length > 0 ? (
+                                replies.replies.map((reply: any) => (
+                                    <CommentItem key={reply.id}>
+                                        <CommentUserInfo>
+                                            <FriendAvatarContainer>
+                                                <FriendAvatar
+                                                    src={reply.user.avatarPath ? getImageUrl(reply.user.avatarPath) : USER_PROFILE_AVATAR}
+                                                    alt={reply.user.nik}
+                                                />
+                                            </FriendAvatarContainer>
+                                            <FriendNik>{reply.user.nik}</FriendNik>
+                                        </CommentUserInfo>
+                                        <CommentContent>
+                                            {reply.content}
+                                        </CommentContent>
+                                        <ArticleTitle>
+                                            {replies.article.title}
+                                        </ArticleTitle>
+                                    </CommentItem>
+                                ))
+                            ) : (
+                                <EmptyCommentsMessage>
+                                    <IoChatbubbleEllipses size={24} />
+                                    <p>No hay respuestas a tus comentarios</p>
+                                </EmptyCommentsMessage>
+                            )}
+                        </CommentsList>
                     </GamesSection>
 
                     <SectionHeader title="Estadísticas de la colección" />

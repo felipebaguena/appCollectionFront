@@ -35,6 +35,31 @@ interface CreateCommentData {
   content: string;
 }
 
+interface ArticleReply {
+  id: number;
+  title: string;
+}
+
+interface ReplyUser {
+  id: number;
+  name: string;
+  nik: string;
+  avatarPath: string;
+}
+
+interface Reply {
+  id: number;
+  content: string;
+  user: ReplyUser;
+}
+
+interface RepliesResponse {
+  article: ArticleReply;
+  replies: Reply[];
+  totalItems: number;
+  totalPages: number;
+}
+
 export const useArticleComments = () => {
   const [comments, setComments] = useState<CommentsResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -135,6 +160,25 @@ export const useArticleComments = () => {
     []
   );
 
+  const getCommentsReplies = useCallback(
+    async (page: number = 1, limit: number = 10) => {
+      setLoading(true);
+      try {
+        const data = await api.get<RepliesResponse>(
+          ENDPOINTS.GET_COMMENTS_REPLIES(page, limit)
+        );
+        setError(null);
+        return data;
+      } catch (error) {
+        setError("Error al cargar las respuestas");
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
   return {
     comments,
     loading,
@@ -144,5 +188,6 @@ export const useArticleComments = () => {
     updateComment,
     deleteComment,
     replyToComment,
+    getCommentsReplies,
   };
 };

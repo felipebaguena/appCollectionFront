@@ -276,7 +276,7 @@ export const EditIcon = styled(FiEdit)`
   transform: translate(-50%, -50%);
   color: white;
   font-size: 1.5rem;
-  opacity: 0;
+  opacity: 0.8;
   transition: opacity 0.2s ease;
   z-index: 1;
 `;
@@ -446,6 +446,102 @@ export const FriendOnlineIndicator = styled(OnlineIndicator)`
   right: 0;
   bottom: 0;
   border-width: 1.5px;
+`;
+
+export const RequestButtonWrapper = styled(EditButtonWrapper) <{ $hasPendingRequests: boolean }>`
+  background-color: ${props => props.$hasPendingRequests ? 'var(--app-yellow)' : 'var(--dark-grey)'};
+  margin-right: 1rem;
+  
+  svg, span {
+    color: ${props => props.$hasPendingRequests ? 'var(--dark-grey)' : 'white'};
+  }
+`;
+
+export const ButtonsContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+export const FriendsCount = styled.span`
+  color: var(--app-yellow);
+  font-weight: normal;
+  cursor: pointer;
+`;
+
+export const FriendsTitle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+`;
+
+export const CommentsList = styled.div`
+  display: flex;
+  flex-direction: column;
+  background: var(--light-grey);
+`;
+
+export const CommentsHeader = styled.div`
+  display: grid;
+  grid-template-columns: 120px 2fr 1fr;
+  gap: 1.5rem;
+  padding: 0 2rem;
+  background-color: var(--mid-grey);
+  height: 4rem;
+  align-items: center;
+`;
+
+export const HeaderColumn = styled.div<{ $align?: string }>`
+  color: var(--app-yellow);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: ${props => props.$align || 'left'};
+  padding: ${props => props.$align === 'center' ? '0' : '0 1rem'};
+`;
+
+export const CommentItem = styled.div`
+  display: grid;
+  grid-template-columns: 120px 2fr 1fr;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--dark-grey);
+  min-height: 5rem;
+
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+export const CommentUserInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+`;
+
+export const CommentContent = styled.div`
+  color: var(--dark-grey);
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 1rem;
+`;
+
+export const ArticleTitle = styled.div`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--grey);
+  font-weight: 500;
+  padding: 0 1rem;
+`;
+
+export const EmptyCommentsMessage = styled(EmptyFriendsMessage)`
+  svg {
+    margin-bottom: 10px;
+  }
 `;
 
 export interface UserData {

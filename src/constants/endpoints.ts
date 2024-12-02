@@ -98,4 +98,6 @@ export const ENDPOINTS = {
     `/articles/comments/${commentId}`,
   REPLY_TO_COMMENT: (commentId: string) =>
     `/articles/comments/${commentId}/reply`,
+  GET_COMMENTS_REPLIES: (page: number = 1, limit: number = 10) =>
+    `/users/me/comments/replies?page=${page}&limit=${limit}`,
 };
