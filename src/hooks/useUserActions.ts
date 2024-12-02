@@ -173,6 +173,10 @@ interface FriendRequest {
   createdAt: string;
 }
 
+interface UnreadMessagesResponse {
+  unreadChats: number;
+}
+
 export const useUserActions = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -391,14 +395,17 @@ export const useUserActions = () => {
     setError(null);
 
     try {
-      const count = await api.get<number>(ENDPOINTS.GET_UNREAD_MESSAGES, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-      });
+      const response = await api.get<UnreadMessagesResponse>(
+        ENDPOINTS.GET_UNREAD_MESSAGES,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
 
       setIsLoading(false);
-      return count;
+      return response.unreadChats;
     } catch (error) {
       setError(error instanceof Error ? error.message : "Error desconocido");
       setIsLoading(false);
