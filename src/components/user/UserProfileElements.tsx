@@ -489,6 +489,10 @@ export const CommentsHeader = styled.div`
   background-color: var(--mid-grey);
   height: 4rem;
   align-items: center;
+
+  @media (max-width: 480px) {
+    display: none;
+  }
 `;
 
 export const HeaderColumn = styled.div<{ $align?: string }>`
@@ -511,6 +515,16 @@ export const CommentItem = styled.div`
   &:last-child {
     border-bottom: none;
   }
+
+  @media (max-width: 480px) {
+    grid-template-columns: auto 1fr;
+    grid-template-areas: 
+      "user content"
+      "user article";
+    gap: 1rem;
+    padding: 1.5rem 1rem;
+    align-items: end;
+  }
 `;
 
 export const CommentUserInfo = styled.div`
@@ -518,6 +532,10 @@ export const CommentUserInfo = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
+
+  @media (max-width: 480px) {
+    grid-area: user;
+  }
 `;
 
 export const CommentContent = styled.div`
@@ -527,6 +545,12 @@ export const CommentContent = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 0 1rem;
+
+  @media (max-width: 480px) {
+    grid-area: content;
+    padding: 0;
+    align-self: end;
+  }
 `;
 
 export const ArticleTitle = styled.div`
@@ -536,6 +560,13 @@ export const ArticleTitle = styled.div`
   color: var(--grey);
   font-weight: 500;
   padding: 0 1rem;
+
+  @media (max-width: 480px) {
+    grid-area: article;
+    padding: 0;
+    font-size: 0.9rem;
+    align-self: end;
+  }
 `;
 
 export const EmptyCommentsMessage = styled(EmptyFriendsMessage)`
