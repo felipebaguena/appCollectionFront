@@ -276,7 +276,7 @@ export const EditIcon = styled(FiEdit)`
   transform: translate(-50%, -50%);
   color: white;
   font-size: 1.5rem;
-  opacity: 0.8;
+  opacity: 0;
   transition: opacity 0.2s ease;
   z-index: 1;
 `;
