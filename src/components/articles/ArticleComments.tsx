@@ -209,7 +209,7 @@ interface ArticleCommentsProps {
 
 const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
     const { isAuthenticated, user } = useAuth();
-    const { comments, loading, fetchComments, createComment, updateComment, deleteComment, replyToComment } = useArticleComments();
+    const { comments, loading, fetchComments, createComment, updateComment, deleteComment, replyToComment, markCommentAsRead } = useArticleComments();
     const [newComment, setNewComment] = useState('');
     const [editingComment, setEditingComment] = useState<number | null>(null);
     const [editContent, setEditContent] = useState('');
@@ -242,6 +242,38 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
             }, 500);
         }
     }, [comments]);
+
+    useEffect(() => {
+        if (!isAuthenticated || !user || !comments) return;
+
+        const markRepliesAsRead = async () => {
+            const unreadReplies = comments.comments.reduce<string[]>((acc, comment) => {
+                if (comment.user.id === user.id) {
+                    const unreadReplyIds = comment.replies
+                        .filter(reply => reply.read === false)
+                        .map(reply => reply.id.toString());
+                    return [...acc, ...unreadReplyIds];
+                }
+
+                if (comment.parentId !== null) {
+                    const parentComment = comments.comments.find(c => c.id === comment.parentId);
+                    if (parentComment?.user.id === user.id && comment.read === false) {
+                        return [...acc, comment.id.toString()];
+                    }
+                }
+
+                return acc;
+            }, []);
+
+            if (unreadReplies.length > 0) {
+                await Promise.all(
+                    unreadReplies.map(commentId => markCommentAsRead(commentId))
+                );
+            }
+        };
+
+        markRepliesAsRead();
+    }, [comments, isAuthenticated, user, markCommentAsRead]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

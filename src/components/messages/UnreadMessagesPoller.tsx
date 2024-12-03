@@ -10,15 +10,16 @@ const POLLING_INTERVAL = 30000; // 30 segundos
 export default function UnreadMessagesPoller() {
     const { getUnreadMessages } = useUserActions();
     const { isAuthenticated } = useAuth();
-    const { setUnreadCount } = useUnreadMessages();
+    const { setUnreadCount, setHasUnreadComments } = useUnreadMessages();
 
     useEffect(() => {
         if (!isAuthenticated) return;
 
         const fetchMessages = async () => {
-            const count = await getUnreadMessages();
-            if (count !== null) {
-                setUnreadCount(count);
+            const response = await getUnreadMessages();
+            if (response !== null) {
+                setUnreadCount(response.unreadChats);
+                setHasUnreadComments(response.unreadComments);
             }
         };
 

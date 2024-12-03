@@ -175,6 +175,7 @@ interface FriendRequest {
 
 interface UnreadMessagesResponse {
   unreadChats: number;
+  unreadComments: boolean;
 }
 
 export const useUserActions = () => {
@@ -405,7 +406,7 @@ export const useUserActions = () => {
       );
 
       setIsLoading(false);
-      return response.unreadChats;
+      return response;
     } catch (error) {
       setError(error instanceof Error ? error.message : "Error desconocido");
       setIsLoading(false);

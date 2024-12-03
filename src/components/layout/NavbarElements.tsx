@@ -367,8 +367,20 @@ export const UserName = styled.span`
 `;
 
 export const UserContainer = styled.div`
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
+`;
+
+export const UnreadIndicator = styled.div`
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 12px;
+  height: 12px;
+  background-color: var(--app-yellow);
+  border-radius: 50%;
+  border: 2px solid var(--dark-grey);
 `;

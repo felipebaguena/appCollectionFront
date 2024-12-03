@@ -21,8 +21,10 @@ export interface Comment {
   updatedAt: string;
   isEdited: boolean;
   parentId: number | null;
+  read?: boolean;
   user: User;
   replies: Comment[];
+  isReplyToMe?: boolean;
 }
 
 interface CommentsResponse {
@@ -180,6 +182,25 @@ export const useArticleComments = () => {
     []
   );
 
+  const markCommentAsRead = useCallback(async (commentId: string) => {
+    setLoading(true);
+    try {
+      await api.put(
+        ENDPOINTS.MARK_COMMENT_AS_READ(commentId),
+        commentId,
+        {},
+        true // silentSuccess
+      );
+      setError(null);
+      return true;
+    } catch (error) {
+      setError("Error al marcar el comentario como leído");
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     comments,
     loading,
@@ -190,5 +211,6 @@ export const useArticleComments = () => {
     deleteComment,
     replyToComment,
     getCommentsReplies,
+    markCommentAsRead,
   };
 };

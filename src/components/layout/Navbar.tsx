@@ -35,10 +35,12 @@ import {
   UserAvatar,
   UserName,
   UserContainer,
+  UnreadIndicator,
 } from "@/components/layout/NavbarElements";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePathname, useRouter } from "next/navigation";
 import { getImageUrl } from "@/services/api";
+import { useUnreadMessages } from "@/contexts/UnreadMessagesContext";
 
 const Navbar = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -63,6 +65,7 @@ const Navbar = () => {
 
   const renderAuthButtons = () => {
     const isProfileRoute = pathname === "/profile";
+    const { hasUnreadComments } = useUnreadMessages();
 
     if (isAuthenticated && user) {
       return (
@@ -70,11 +73,14 @@ const Navbar = () => {
           <IconNavLink href="/profile" $isActive={isProfileRoute}>
             <UserContainer>
               {user.avatarPath ? (
-                <UserAvatar
-                  src={getImageUrl(user.avatarPath)}
-                  alt={user.name}
-                  $isActive={isProfileRoute}
-                />
+                <>
+                  <UserAvatar
+                    src={getImageUrl(user.avatarPath)}
+                    alt={user.name}
+                    $isActive={isProfileRoute}
+                  />
+                  {hasUnreadComments && <UnreadIndicator />}
+                </>
               ) : (
                 <UserName>{user.nik || user.name}</UserName>
               )}

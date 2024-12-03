@@ -100,4 +100,6 @@ export const ENDPOINTS = {
     `/articles/comments/${commentId}/reply`,
   GET_COMMENTS_REPLIES: (page: number = 1, limit: number = 10) =>
     `/users/me/comments/replies?page=${page}&limit=${limit}`,
+  MARK_COMMENT_AS_READ: (commentId: string) =>
+    `/articles/comments/${commentId}/read`,
 };
