@@ -501,7 +501,7 @@ export const HeaderColumn = styled.div<{ $align?: string }>`
   padding: ${props => props.$align === 'center' ? '0' : '0 1rem'};
 `;
 
-export const CommentItem = styled.div`
+export const CommentItem = styled.div<{ $unread?: boolean }>`
   display: grid;
   grid-template-columns: 140px 2fr 1fr;
   align-items: center;
@@ -509,6 +509,8 @@ export const CommentItem = styled.div`
   padding: 1rem 2rem;
   border-bottom: 1px solid var(--clear-grey);
   min-height: 5rem;
+  background-color: ${props => props.$unread ? 'var(--app-yellow)' : 'transparent'};
+  transition: background-color 0.2s ease;
 
   &:last-child {
     border-bottom: none;
@@ -525,13 +527,16 @@ export const CommentItem = styled.div`
   }
 `;
 
-export const StyledLink = styled(Link)`
+export const StyledLink = styled(Link) <{ $unread?: boolean }>`
   text-decoration: none;
   color: inherit;
   display: block;
   
   &:hover ${CommentItem} {
-    background-color: var(--clear-grey);
+    background-color: ${props => props.$unread
+    ? 'var(--app-mid-yellow)'
+    : 'var(--clear-grey)'
+  };
   }
 `;
 

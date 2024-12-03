@@ -76,7 +76,7 @@ const CommentItem = styled.div`
   transition: background-color 0.3s ease;
 
   &.highlight {
-    background-color: rgba(255, 198, 0, 0.1);
+    background-color: var(--app-yellow);
   }
 `;
 

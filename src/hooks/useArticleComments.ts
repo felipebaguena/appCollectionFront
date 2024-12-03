@@ -53,6 +53,7 @@ interface Reply {
   id: number;
   content: string;
   createdAt: string;
+  read?: boolean;
   user: ReplyUser;
 }
 

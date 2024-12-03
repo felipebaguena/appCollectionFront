@@ -353,8 +353,9 @@ const UserProfile = () => {
                                         <StyledLink
                                             key={reply.id}
                                             href={`/articles/${replies.article.id}#comment-${reply.id}`}
+                                            $unread={!reply.read}
                                         >
-                                            <CommentItem>
+                                            <CommentItem $unread={!reply.read}>
                                                 <CommentUserInfo>
                                                     <FriendAvatarContainer>
                                                         <FriendAvatar
