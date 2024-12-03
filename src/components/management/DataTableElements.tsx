@@ -164,7 +164,7 @@ export const TableContainer = styled.div`
 `;
 
 export const TableTitle = styled.h2`
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   margin: 0;
   color: var(--dark-grey);
 `;
@@ -172,7 +172,7 @@ export const TableTitle = styled.h2`
 export const TitleContainer = styled.div`
   background-color: var(--app-yellow);
   text-align: center;
-  padding: 0.3rem 1rem 0.3rem 1rem;
+  padding: 0.8rem 1rem 0.8rem 1rem;
   width: 100%;
 `;
 

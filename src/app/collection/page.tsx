@@ -195,7 +195,7 @@ export default function CollectionPage() {
   return (
     <PageContainer>
       <TitleBar>
-        <Title>Nuestra colección de Juegos</Title>
+        <Title>Nuestro catálogo de Juegos</Title>
       </TitleBar>
 
       <Controls>

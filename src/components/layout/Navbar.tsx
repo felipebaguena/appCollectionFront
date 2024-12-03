@@ -177,7 +177,7 @@ const Navbar = () => {
                   href="/my-collection"
                   $isActive={pathname === "/my-collection"}
                 >
-                  <span className="nav-text">Mi colección</span>
+                  <span className="nav-text">Colección</span>
                   <FiBookmark className="nav-icon" size={20} />
                 </NavLink>
               )}
