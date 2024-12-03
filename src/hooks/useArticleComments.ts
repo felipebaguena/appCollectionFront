@@ -53,13 +53,18 @@ interface Reply {
   id: number;
   content: string;
   createdAt: string;
-  read?: boolean;
+  read: boolean;
   user: ReplyUser;
 }
 
-interface RepliesResponse {
-  article: ArticleReply;
+interface ArticleWithReplies {
+  id: number;
+  title: string;
   replies: Reply[];
+}
+
+interface RepliesResponse {
+  articles: ArticleWithReplies[];
   totalItems: number;
   totalPages: number;
 }

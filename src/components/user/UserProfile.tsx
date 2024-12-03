@@ -99,6 +99,31 @@ interface FriendRequest {
     createdAt: string;
 }
 
+interface ArticleReply {
+    id: number;
+    content: string;
+    createdAt: string;
+    read: boolean;
+    user: {
+        id: number;
+        name: string;
+        nik: string;
+        avatarPath?: string;
+    };
+}
+
+interface Article {
+    id: number;
+    title: string;
+    replies: ArticleReply[];
+}
+
+interface RepliesData {
+    articles: Article[];
+    totalItems: number;
+    totalPages: number;
+}
+
 const EmptyCommentsMessage = styled(EmptyFriendsMessage)``;
 
 const UserProfile = () => {
@@ -112,7 +137,7 @@ const UserProfile = () => {
     const [showPendingRequestsModal, setShowPendingRequestsModal] = useState(false);
     const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
     const [showFriendsListModal, setShowFriendsListModal] = useState(false);
-    const [replies, setReplies] = useState<any>(null);
+    const [replies, setReplies] = useState<RepliesData | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const {
@@ -347,41 +372,43 @@ const UserProfile = () => {
                                 <HeaderColumn>Artículo</HeaderColumn>
                             </CommentsHeader>
 
-                            {replies && replies.replies.length > 0 ? (
+                            {replies && replies.articles.length > 0 ? (
                                 <>
-                                    {replies.replies.map((reply: any) => (
-                                        <StyledLink
-                                            key={reply.id}
-                                            href={`/articles/${replies.article.id}#comment-${reply.id}`}
-                                            $unread={!reply.read}
-                                        >
-                                            <CommentItem $unread={!reply.read}>
-                                                <CommentUserInfo>
-                                                    <FriendAvatarContainer>
-                                                        <FriendAvatar
-                                                            src={reply.user.avatarPath ? getImageUrl(reply.user.avatarPath) : USER_PROFILE_AVATAR}
-                                                            alt={reply.user.nik}
-                                                        />
-                                                    </FriendAvatarContainer>
-                                                    <UserInfoText>
-                                                        <CommentNik>{reply.user.nik}</CommentNik>
-                                                        <CommentDate>
-                                                            {new Date(reply.createdAt).toLocaleDateString('es-ES', {
-                                                                day: '2-digit',
-                                                                month: '2-digit',
-                                                                year: '2-digit'
-                                                            })}
-                                                        </CommentDate>
-                                                    </UserInfoText>
-                                                </CommentUserInfo>
-                                                <CommentContent>
-                                                    {reply.content}
-                                                </CommentContent>
-                                                <ArticleTitle>
-                                                    {replies.article.title}
-                                                </ArticleTitle>
-                                            </CommentItem>
-                                        </StyledLink>
+                                    {replies.articles.map((article: Article) => (
+                                        article.replies.map((reply: ArticleReply) => (
+                                            <StyledLink
+                                                key={reply.id}
+                                                href={`/articles/${article.id}#comment-${reply.id}`}
+                                                $unread={!reply.read}
+                                            >
+                                                <CommentItem $unread={!reply.read}>
+                                                    <CommentUserInfo>
+                                                        <FriendAvatarContainer>
+                                                            <FriendAvatar
+                                                                src={reply.user.avatarPath ? getImageUrl(reply.user.avatarPath) : USER_PROFILE_AVATAR}
+                                                                alt={reply.user.nik}
+                                                            />
+                                                        </FriendAvatarContainer>
+                                                        <UserInfoText>
+                                                            <CommentNik>{reply.user.nik}</CommentNik>
+                                                            <CommentDate>
+                                                                {new Date(reply.createdAt).toLocaleDateString('es-ES', {
+                                                                    day: '2-digit',
+                                                                    month: '2-digit',
+                                                                    year: '2-digit'
+                                                                })}
+                                                            </CommentDate>
+                                                        </UserInfoText>
+                                                    </CommentUserInfo>
+                                                    <CommentContent>
+                                                        {reply.content}
+                                                    </CommentContent>
+                                                    <ArticleTitle>
+                                                        {article.title}
+                                                    </ArticleTitle>
+                                                </CommentItem>
+                                            </StyledLink>
+                                        ))
                                     ))}
                                     <PaginationGrid
                                         currentPage={currentPage}

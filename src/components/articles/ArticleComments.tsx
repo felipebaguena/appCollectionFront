@@ -379,9 +379,13 @@ const ArticleComments: React.FC<ArticleCommentsProps> = ({ articleId }) => {
                         }}>
                             <FiEdit2 />
                         </ActionButton>
-                        <ActionButton onClick={() => handleDeleteClick(comment.id.toString())}>
-                            <FiTrash2 />
-                        </ActionButton>
+                        {!comment.replies || comment.replies.length === 0 ? (
+                            <ActionButton
+                                onClick={() => handleDeleteClick(comment.id.toString())}
+                            >
+                                <FiTrash2 />
+                            </ActionButton>
+                        ) : null}
                     </CommentActions>
                 )}
             </CommentHeader>
